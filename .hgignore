@@ -3,7 +3,7 @@ syntax: glob
 .project/
 .pydevproject/
 .settings/
-datos/
+data/
 *.o
 *.pyc
 *~

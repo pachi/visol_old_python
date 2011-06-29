@@ -225,7 +225,7 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description=u'Visor de archivos de resultados de LIDER')
-    parser.add_argument('file1',  action="store", default='datos/test')
+    parser.add_argument('file1',  action="store", default='data/test.res')
     try:
         params = parser.parse_args()
         file1 = codecs.open(params.file1, "rU", "latin-1" )
