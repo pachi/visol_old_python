@@ -10,7 +10,6 @@ from collections import OrderedDict, namedtuple
 
 TESTFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'datos/test.res'))
 
-class NS(object): pass
 Zonasdata = namedtuple('Zonasdata', 'm2 multiplicador calefaccion refrigeracion')
 TZonasdata = namedtuple('TZonasdata', 'm2 calefaccion refrigeracion')
 Detalle = namedtuple('Detalle', 'Cal_positivo, Cal_negativo, Cal_neto, Ref_positivo, Ref_negativo, Ref_neto')
@@ -22,13 +21,13 @@ class EdificioLIDER(object):
     """
     def __init__(self):
         self.numzonas = 0
-        self.totales = NS()
-        self.totales.calefaccion = None
-        self.totales.refrigeracion = None
-        self.totales.zonas = None
-        self.meses = NS()
-        self.meses.calefaccion = []
-        self.meses.refrigeracion = []
+        self.totales = {}
+        self.totales[u'calefaccion'] = None
+        self.totales[u'refrigeracion'] = None
+        self.totales[u'zonas'] = None
+        self.meses = {}
+        self.meses[u'calefaccion'] = []
+        self.meses[u'refrigeracion'] = []
         self.plantas = OrderedDict()
 
 def valores(linea):
@@ -98,12 +97,12 @@ def parseEdificio(block):
     for line in iblock:
         if line.startswith(u'Calefacción, Refrigeración anual'):
             cal, ref = next(iblock).split(',')
-            edificio.totales.calefaccion = float(cal)
-            edificio.totales.refrigeracion = float(ref)
+            edificio.totales[u'calefaccion'] = float(cal)
+            edificio.totales[u'refrigeracion'] = float(ref)
         if line.startswith(u'Calefacción mensual'):
-            edificio.meses.calefaccion = [float(mes) for mes in next(iblock).split(',')]
+            edificio.meses[u'calefaccion'] = [float(mes) for mes in next(iblock).split(',')]
         if line.startswith(u'Refrigeración mensual'):
-            edificio.meses.refrigeracion = [float(mes) for mes in next(iblock).split(',')]
+            edificio.meses[u'refrigeracion'] = [float(mes) for mes in next(iblock).split(',')]
         # XXX: Los datos de zonas son redundantes con el bloque de zonas,
         # XXX: ¿salvo el valor de mutiplicador?
         # XXX: se podrían eliminar o usarlos para comprobaciones
@@ -117,7 +116,7 @@ def parseEdificio(block):
                 if line.startswith(u'TOTAL'):
                     line = line.lstrip(u'TOTAL,')
                     vals = [float(d) for d in line.split(',')]
-                    edificio.totales.zonas = TZonasdata(*vals)
+                    edificio.totales[u'zonas'] = TZonasdata(*vals)
                     break
                 else:
                     t = line.split(',')
@@ -215,7 +214,7 @@ def parsefile(file):
             destzona[u'refrigeracion'] = origzona[u'refrigeracion']
     return edificio
 
-def chequea(edificio):
+def check(edificio):
     """Comprueba que los datos del edificio son coherentes"""
     # TODO: comprobar que el número de plantas del archivo es igual que el calculado
     # que las zonas están todas asignadas a plantas, que todas las zonas tienen todos
@@ -235,9 +234,9 @@ if __name__ == '__main__':
 
     edificio = parsefile(file1)
 
-    print edificio.totales.calefaccion, edificio.totales.refrigeracion
+    print edificio.totales[u'calefaccion'], edificio.totales[u'refrigeracion']
     print edificio.numzonas
-    print edificio.totales.zonas
+    print edificio.totales[u'zonas']
     print edificio.plantas[u'P02']
     print edificio.plantas[u'P02'][u'P02_E01'][u'datos']
     print edificio.plantas[u'P02'][u'P02_E01'][u'componentes']#zonas.datos
