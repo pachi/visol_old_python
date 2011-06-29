@@ -1,0 +1,18 @@
+# use glob syntax.
+syntax: glob
+.project/
+.pydevproject/
+.settings/
+*.o
+*.pyc
+*~
+*.swp
+*.orig
+*.bak
+*.DAT
+*.png
+*.txt
+
+# switch to regexp syntax.
+#syntax: regexp
+#^\.pc/
