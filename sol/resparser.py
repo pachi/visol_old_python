@@ -62,7 +62,7 @@ def findblocks(file):
             if currentblock is not None:
                 blocks[currentblock] = linebuffer[:]
                 linebuffer = []
-            blocks[line] = list()
+            blocks[line] = []
             currentblock = line
             # Fin creabloque
         elif line.startswith(u'RESULTADOS A NIVEL EDIFICIO'):
@@ -71,7 +71,7 @@ def findblocks(file):
             if currentblock is not None:
                 blocks[currentblock] = linebuffer[:]
                 linebuffer = []
-            blocks[line] = list()
+            blocks[line] = []
             currentblock = line
             # Fin creabloque
         else:
@@ -99,9 +99,9 @@ def parseEdificio(block):
             cal, ref = next(iblock).split(',')
             edificio.totales[u'calefaccion'] = float(cal)
             edificio.totales[u'refrigeracion'] = float(ref)
-        if line.startswith(u'Calefacción mensual'):
+            assert next(iblock).startswith(u'Calefacción mensual')
             edificio.meses[u'calefaccion'] = [float(mes) for mes in next(iblock).split(',')]
-        if line.startswith(u'Refrigeración mensual'):
+            assert next(iblock).startswith(u'Refrigeración mensual')
             edificio.meses[u'refrigeracion'] = [float(mes) for mes in next(iblock).split(',')]
         # XXX: Los datos de zonas son redundantes con el bloque de zonas,
         # XXX: ¿salvo el valor de mutiplicador?
@@ -125,11 +125,11 @@ def parseEdificio(block):
                     zonas[key][u'datos'] = Zonasdata(*values)
         if line.startswith(u'Calefacción mensual por zonas'):
             for i, (key, line) in enumerate(zip(zonas.keys(), iblock)):
-                if not line or i == edificio.numzonas - 1: break
+                if i == edificio.numzonas: break
                 zonas[key][u'calefaccion'] = [float(d) for d in line.split(',')]
         if line.startswith(u'Refrigeración mensual por zonas'):
             for i, (key, line) in enumerate(zip(zonas.keys(), iblock)):
-                if not line or i == edificio.numzonas - 1: break
+                if i == edificio.numzonas: break
                 zonas[key][u'refrigeracion'] = [float(d) for d in line.split(',')]
     return edificio, zonas
 
@@ -184,6 +184,7 @@ def parsePlanta(block):
                                 componentes[concepto] = Detalle(*vals)
                                 if j == numcomponentes - 1:
                                     break
+                            break
                     zonasencontradas += 1
 
                     planta[nombrezona] = {}
@@ -191,7 +192,8 @@ def parsePlanta(block):
                     planta[nombrezona][u'superficie'] = superficie
                     planta[nombrezona][u'flujos'] = flujos
                     planta[nombrezona][u'componentes'] = componentes
-
+                    planta[nombrezona][u'calefaccion'] = {}
+                    planta[nombrezona][u'refrigeracion'] = {}
     return planta
 
 def parsefile(file):
