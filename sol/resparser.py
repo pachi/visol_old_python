@@ -4,31 +4,9 @@
 Visor de archivos de resultados de LIDER
 ========================================
 """
-import os
 import codecs
-from collections import OrderedDict, namedtuple
-
-TESTFILE = os.path.abspath(os.path.join(os.path.dirname(__file__), 'datos/test.res'))
-
-Zonasdata = namedtuple('Zonasdata', 'm2 multiplicador calefaccion refrigeracion')
-TZonasdata = namedtuple('TZonasdata', 'm2 calefaccion refrigeracion')
-Detalle = namedtuple('Detalle', 'Cal_positivo, Cal_negativo, Cal_neto, Ref_positivo, Ref_negativo, Ref_neto')
-
-class EdificioLIDER(object):
-    """Edificio en LIDER
-
-    El edificio está organizado por plantas
-    """
-    def __init__(self):
-        self.numzonas = 0
-        self.totales = {}
-        self.totales[u'calefaccion'] = None
-        self.totales[u'refrigeracion'] = None
-        self.totales[u'zonas'] = None
-        self.meses = {}
-        self.meses[u'calefaccion'] = []
-        self.meses[u'refrigeracion'] = []
-        self.plantas = OrderedDict()
+from collections import OrderedDict
+from clases import EdificioLIDER, ZonaLIDER, DetalleLIDER
 
 def valores(linea):
     """Devuelve concepto y valores de líneas de detalle
@@ -40,12 +18,13 @@ def valores(linea):
     (u'Paredes Exteriores', [0.000000, -116.455211, 2.686940])
     """
     elems = linea.split(u',')
-    concepto = elems[0].strip()
+    concepto = elems[0].strip(u'"\'')
     valores = [float(elem) for elem in elems[1:]]
     return concepto, valores
 
 def findblocks(file):
     """Devuelve diccionario de bloques del archivo de resultados de LIDER"""
+    numplantas = 0
     blocks = OrderedDict()
     currentblock = None
     linebuffer = []
@@ -55,31 +34,20 @@ def findblocks(file):
         if not line:
             pass
         elif line.startswith(u'Numero de plantas'):
-            blocks[u'numplantas'] = int(next(file))
-        elif line.startswith(u'"P') and ',' not in line:
-            line = line.strip('"')
-            # Creabloque
+            numplantas = int(next(file))
+        elif ((line.startswith(u'"P') and ',' not in line) or
+              line.startswith(u'RESULTADOS A NIVEL EDIFICIO')):
+            blockname = line.strip('"') if line.startswith(u'"P') else u'Edificio'
             if currentblock is not None:
                 blocks[currentblock] = linebuffer[:]
                 linebuffer = []
-            blocks[line] = []
-            currentblock = line
-            # Fin creabloque
-        elif line.startswith(u'RESULTADOS A NIVEL EDIFICIO'):
-            line = u'Edificio'
-            # Creabloque
-            if currentblock is not None:
-                blocks[currentblock] = linebuffer[:]
-                linebuffer = []
-            blocks[line] = []
-            currentblock = line
-            # Fin creabloque
+            blocks[blockname] = []
+            currentblock = blockname
         else:
             linebuffer.append(line)
     if currentblock is not None:
         blocks[currentblock] = linebuffer[:]
-    #print currentblock
-    return blocks
+    return numplantas, blocks
 
 def parseEdificio(block):
     """Interpreta bloque de datos del edificio de LIDER
@@ -97,15 +65,12 @@ def parseEdificio(block):
     for line in iblock:
         if line.startswith(u'Calefacción, Refrigeración anual'):
             cal, ref = next(iblock).split(',')
-            edificio.totales[u'calefaccion'] = float(cal)
-            edificio.totales[u'refrigeracion'] = float(ref)
+            edificio.calefaccion = float(cal)
+            edificio.refrigeracion = float(ref)
             assert next(iblock).startswith(u'Calefacción mensual')
-            edificio.meses[u'calefaccion'] = [float(mes) for mes in next(iblock).split(',')]
+            edificio.calefaccion_meses = [float(mes) for mes in next(iblock).split(',')]
             assert next(iblock).startswith(u'Refrigeración mensual')
-            edificio.meses[u'refrigeracion'] = [float(mes) for mes in next(iblock).split(',')]
-        # XXX: Los datos de zonas son redundantes con el bloque de zonas,
-        # XXX: ¿salvo el valor de mutiplicador?
-        # XXX: se podrían eliminar o usarlos para comprobaciones
+            edificio.refrigeracion_meses = [float(mes) for mes in next(iblock).split(',')]
         if line.startswith(u'Numero de zonas'):
             edificio.numzonas = int(next(iblock))
             # Linea de encabezados antes de datos por zonas
@@ -114,26 +79,28 @@ def parseEdificio(block):
             for line in iblock:
                 # El bloque de zonas acaba con los totales
                 if line.startswith(u'TOTAL'):
-                    line = line.lstrip(u'TOTAL,')
-                    vals = [float(d) for d in line.split(',')]
-                    edificio.totales[u'zonas'] = TZonasdata(*vals)
+                    # TOTAL, m2, calefacción_total, refrigeracion
+                    vals = [float(d) for d in line.lstrip(u'TOTAL,').split(',')]
+                    edificio.superficie = vals[0]
+                    # Valores redundantes
+                    assert (vals[1] == edificio.calefaccion and
+                            vals[2] == edificio.refrigeracion)
                     break
                 else:
-                    t = line.split(',')
-                    key, values = t[0].strip('"'), [float(d) for d in t[1:]]
-                    zonas[key] = {}
-                    zonas[key][u'datos'] = Zonasdata(*values)
+                    # nombrezona, m2, multiplicador, calefaccion, refrigeracion
+                    key, (sup, multip, cal, ref) = valores(line)
+                    zonas[key] = ZonaLIDER(key, sup, multip, cal, ref)
         if line.startswith(u'Calefacción mensual por zonas'):
             for i, (key, line) in enumerate(zip(zonas.keys(), iblock)):
                 if i == edificio.numzonas: break
-                zonas[key][u'calefaccion'] = [float(d) for d in line.split(',')]
+                zonas[key].calefaccion_meses = [float(d) for d in line.split(',')]
         if line.startswith(u'Refrigeración mensual por zonas'):
             for i, (key, line) in enumerate(zip(zonas.keys(), iblock)):
                 if i == edificio.numzonas: break
-                zonas[key][u'refrigeracion'] = [float(d) for d in line.split(',')]
+                zonas[key].refrigeracion_meses = [float(d) for d in line.split(',')]
     return edificio, zonas
 
-def parsePlanta(block):
+def parsePlanta(block, nombreplanta, zonas):
     """Intepreta bloque de planta de LIDER
 
     Se devuelve un diccionario de zonas por planta.
@@ -170,7 +137,7 @@ def parsePlanta(block):
                         if zline.startswith(u'Concepto') or not zline:
                             continue
                         concepto, vals = valores(zline)
-                        flujos[concepto] = Detalle(*vals)
+                        flujos[concepto] = DetalleLIDER(concepto, *vals)
                         if zline.startswith(u'TOTAL'):
                             break
                     # Procesamos los componentes de zona, que están contados
@@ -181,39 +148,30 @@ def parsePlanta(block):
                             componentes = OrderedDict()
                             for j, zline in enumerate(iblock):
                                 concepto, vals = valores(zline)
-                                componentes[concepto] = Detalle(*vals)
+                                componentes[concepto] = DetalleLIDER(concepto, *vals)
                                 if j == numcomponentes - 1:
                                     break
                             break
                     zonasencontradas += 1
 
-                    planta[nombrezona] = {}
-                    planta[nombrezona][u'numero'] = numzona
-                    planta[nombrezona][u'superficie'] = superficie
-                    planta[nombrezona][u'flujos'] = flujos
-                    planta[nombrezona][u'componentes'] = componentes
-                    planta[nombrezona][u'calefaccion'] = {}
-                    planta[nombrezona][u'refrigeracion'] = {}
+                    zona = zonas[nombrezona]
+                    zona.numero = numzona
+                    zona.planta = nombreplanta
+                    zona.superficie = superficie
+                    zona.flujos = flujos
+                    zona.componentes = componentes
+                    planta[nombrezona] = zona
     return planta
 
 def parsefile(file):
     """Lee archivo y genera objeto de edificio con datos generales y por plantas"""
-    blocks = findblocks(file)
-    edificio, zonas = parseEdificio(blocks[u'Edificio'])
+    numplantas, plantablocks = findblocks(file)
+    edificio, zonas = parseEdificio(plantablocks.pop(u'Edificio'))
+    edificio.numplantas = numplantas
     # Acopla plantas en edificio
-    for block in blocks.keys():
-        if block in (u'numplantas', u'Edificio'):
-            continue
-        planta = parsePlanta(blocks[block])
-        edificio.plantas[block] = planta
-    # Acopla zonas en plantas de edificio
-    for planta in edificio.plantas:
-        for zona in edificio.plantas[planta]:
-            destzona = edificio.plantas[planta][zona]
-            origzona = zonas[zona]
-            destzona[u'datos'] = origzona[u'datos']
-            destzona[u'calefaccion'] = origzona[u'calefaccion']
-            destzona[u'refrigeracion'] = origzona[u'refrigeracion']
+    for nombreplanta in plantablocks:
+        planta = parsePlanta(plantablocks[nombreplanta], nombreplanta, zonas)
+        edificio.plantas[nombreplanta] = planta
     return edificio
 
 def check(edificio):
@@ -236,14 +194,19 @@ if __name__ == '__main__':
 
     edificio = parsefile(file1)
 
-    print edificio.totales[u'calefaccion'], edificio.totales[u'refrigeracion']
     print edificio.numzonas
-    print edificio.totales[u'zonas']
-    print edificio.plantas[u'P02']
-    print edificio.plantas[u'P02'][u'P02_E01'][u'datos']
-    print edificio.plantas[u'P02'][u'P02_E01'][u'componentes']#zonas.datos
-    print edificio.plantas[u'P02'][u'P02_E01'][u'flujos']
-    print edificio.plantas[u'P02'][u'P02_E01'][u'calefaccion']
-    print edificio.plantas[u'P02'][u'P02_E01'][u'refrigeracion']
-
-
+    print edificio.calefaccion, edificio.refrigeracion
+    print edificio.calefaccion_meses
+    print edificio.refrigeracion_meses
+    planta = edificio.plantas[u'P02']
+    print planta
+    zona = planta[u'P02_E01']
+    print zona.nombre
+    print zona.numero
+    print zona.planta
+    print zona.superficie
+    print zona.multiplicador
+    print zona.componentes
+    print zona.flujos
+    print zona.calefaccion
+    print zona.refrigeracion
