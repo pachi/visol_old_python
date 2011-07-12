@@ -72,12 +72,12 @@ class HistoBase(FigureCanvasGTKCairo):
         self.fig.savefig(filename)
 
 
-class HistoCanvas(HistoBase):
+class HistoMeses(HistoBase):
     """Histograma de demandas mensuales
 
     Dibuja un histograma de demandas de una zona por meses
     """
-    __gtype_name__ = 'HistoCanvas'
+    __gtype_name__ = 'HistoMeses'
 
     def __init__(self, edificio=None, zona=None):
         """Constructor

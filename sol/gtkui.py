@@ -30,7 +30,7 @@
 import gtk
 import codecs
 import util, resparser, clases
-from widgets import HistoCanvas
+from widgets import HistoMeses
 
 TESTFILE = util.get_resource('data/test.res')
 
@@ -49,7 +49,7 @@ class GtkSol(object):
         self.tb = self.ui.get_object('textbuffer')
         self.nb = self.ui.get_object('notebook')
 
-        self.histomeses = HistoCanvas()
+        self.histomeses = HistoMeses()
         vb = self.ui.get_object('vbmeses') #self.nb.get_nth_page(1)
         vb.pack_end(self.histomeses)
 
