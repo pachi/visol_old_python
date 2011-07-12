@@ -8,6 +8,7 @@ class EdificioLIDER(object):
 
     El edificio está organizado por plantas y contiene los siguientes datos:
 
+    nombre - Nombre del edificio
     numplantas - Número de plantas del edificio
     numzonas - Número de zonas en el edificio
     superficie - Superficie del edificio [m²]
@@ -17,7 +18,8 @@ class EdificioLIDER(object):
     refrigeracion_meses - Demandas mensuales de refrigeración del edificio [kWh/m²/mes]
     plantas - Diccionario de zonas por planta
     """
-    def __init__(self):
+    def __init__(self, nombre='Edificio1'):
+        self.nombre = nombre
         self.numplantas = 0
         self.numzonas = 0
         self.superficie = 0.0
@@ -31,6 +33,13 @@ class EdificioLIDER(object):
     def zonas(self):
         """Devuelve las zonas del edificio"""
         return [self.plantas[planta][zona] for planta in self.plantas for zona in self.plantas[planta]]
+
+    def zona(self, nombrezona):
+        """Devuelve zona a partir del nombre"""
+        for planta in self.plantas:
+            if nombrezona in self.plantas[planta]:
+                return self.plantas[planta][nombrezona]
+        return None
 
 class ZonaLIDER(object):
     """Zona de edificio de LIDER
