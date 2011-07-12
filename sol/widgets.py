@@ -33,7 +33,46 @@ from util import myround
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
          'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
-class HistoCanvas(FigureCanvasGTKCairo):
+class HistoBase(FigureCanvasGTKCairo):
+    """Histograma de Matplotlib"""
+    __gtype_name__ = 'HistoBase'
+
+    def __init__(self, edificio=None, zona=None):
+        """Constructor
+
+        zona - Zona analizada
+        """
+        self.fig = Figure()
+        FigureCanvasGTKCairo.__init__(self, self.fig)
+        self.fig.set_facecolor('w')
+        self.ax1 = self.fig.add_subplot(111)
+        self.ax1.set_axis_bgcolor('#f6f6f6')
+
+    def autolabel(self, ax, rects):
+        """Etiquetar valores fuera de las barras"""
+        #TODO: usar altura de texto en lugar de displacement
+        # ver http://matplotlib.sourceforge.net/faq/howto_faq.html
+        # Automatically make room for tick labels
+        texth = 2.0
+        for rect in rects:
+            height = rect.get_height()
+            if height:
+                # rect.get_y() es la base del rectángulo y es 0 si es positivo
+                _h = -(height + texth + 0.5) if rect.get_y() else (height + 0.5)
+                ax.text(rect.get_x() + rect.get_width() / 2.0,
+                        _h, '%.1f' % round(height, 1),
+                        ha='center', va='bottom', size='small')
+
+    def pixbuf(self, destwidth=600):
+        """Obtén un pixbuf a partir del canvas actual"""
+        return get_pixbuf_from_canvas(self, destwidth)
+
+    def save(self, filename='condensacionesplot.png'):
+        """Guardar y mostrar gráfica"""
+        self.fig.savefig(filename)
+
+
+class HistoCanvas(HistoBase):
     """Histograma de demandas mensuales
 
     Dibuja un histograma de demandas de una zona por meses
@@ -45,13 +84,14 @@ class HistoCanvas(FigureCanvasGTKCairo):
 
         zona - Zona analizada
         """
+        HistoBase.__init__(self)
         self.edificio = edificio
         self._zona = zona
         self._modo = 'edificio'
-        self.fig = Figure()
-        FigureCanvasGTKCairo.__init__(self, self.fig)
-        self.fig.set_facecolor('w')
-        self.ax1 = self.fig.add_subplot(111)
+
+        self.title = u"Demanda mensual"
+        self.xlabel = u"Periodo"
+        self.ylabel = u"Demanda [kWh/m²mes]"
 
     @property
     def modo(self):
@@ -81,41 +121,27 @@ class HistoCanvas(FigureCanvasGTKCairo):
         demanda existente [kWh/m²mes]
         """
 
-        def autolabel(ax, rects):
-            """Etiquetar valores fuera de las barras"""
-            #TODO: usar altura de texto en lugar de displacement
-            # ver http://matplotlib.sourceforge.net/faq/howto_faq.html
-            # Automatically make room for tick labels
-#            text = ax.text(0,0, "1", size='small')
-#            text.draw()
-#            bb = text.get_window_extent()
-#            print bb.width, bb.height
-            texth = 2.0
-            for rect in rects:
-                height = rect.get_height()
-                if height:
-                    # rect.get_y() es la base del rectángulo y es 0 si es positivo
-                    _h = -(height + texth + 0.5) if rect.get_y() else (height + 0.5)
-                    ax.text(rect.get_x() + rect.get_width() / 2.0,
-                            _h, '%.1f' % round(height, 1),
-                            ha='center', va='bottom', size='small')
-
         def barras(min, max, seriec, serier):
             w = 1.0
             rects1 = ax1.bar(ind, seriec, w, align='center', fc='r', ec='k')
             rects2 = ax1.bar(ind, serier, w, align='center', fc='b', ec='k')
-            ax1.legend((rects1[0], rects2[0]), ('Calefacción', 'Refrigeración'),
-                       loc='lower right', prop=FontProperties(size='small'))
+            leg = ax1.legend((rects1[0], rects2[0]), ('Calefacción', 'Refrigeración'),
+                             loc='lower right', prop={"size":'small'}, fancybox=True)
+            leg.draw_frame(False)
+            leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
             ax1.set_ylim(min - 10, max + 10)
-            autolabel(ax1, rects1)
-            autolabel(ax1, rects2)
+            self.autolabel(ax1, rects1)
+            self.autolabel(ax1, rects2)
 
         # Elementos generales
         ax1 = self.ax1
         ax1.clear() # Limpia imagen de datos anteriores
-        ax1.set_title(u"Demanda mensual", size='large')
-        ax1.set_xlabel(u"Periodo")
-        ax1.set_ylabel(u"Demanda [kWh/m²mes]", fontdict=dict(color='b'))
+        ax1.grid(True)
+        ax1.set_title(self.title, size='large')
+        ax1.set_xlabel(self.xlabel)
+        ax1.set_ylabel(self.ylabel, fontdict=dict(color='b'))
+
+        # Datos meses
         ind = numpy.arange(12)
         x_names = [mes[:3] for mes in MESES]
         ax1.set_xticks(ind)
@@ -127,8 +153,8 @@ class HistoCanvas(FigureCanvasGTKCairo):
             _min = myround(min(min(zona.calefaccion_meses) for zona in self.edificio.zonas), 5)
             _max = myround(max(max(zona.refrigeracion_meses) for zona in self.edificio.zonas), 5)
             barras(_min, _max,
-                   self.zona.calefaccion_meses,
-                   self.zona.refrigeracion_meses)
+                   self.edificio.zona(self.zona).calefaccion_meses,
+                   self.edificio.zona(self.zona).refrigeracion_meses)
         elif self.modo == 'edificio' and self.edificio:
             """Dibuja las barras correspondientes a la demanda global del edificio"""
             _min = myround(min(self.edificio.calefaccion_meses), 5)
@@ -143,14 +169,6 @@ class HistoCanvas(FigureCanvasGTKCairo):
         # Tamaño
         self.set_size_request(width, height)
         self.draw()
-
-    def pixbuf(self, destwidth=600):
-        """Obtén un pixbuf a partir del canvas actual"""
-        return get_pixbuf_from_canvas(self, destwidth)
-
-    def save(self, filename='condensacionesplot.png'):
-        """Guardar y mostrar gráfica"""
-        self.fig.savefig(filename)
 
 
 def get_pixbuf_from_canvas(canvas, destwidth=None):
