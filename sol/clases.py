@@ -30,7 +30,7 @@ class EdificioLIDER(object):
     @property
     def zonas(self):
         """Devuelve las zonas del edificio"""
-        return [zona for planta in self.plantas for zona in self.plantas[planta]]
+        return [self.plantas[planta][zona] for planta in self.plantas for zona in self.plantas[planta]]
 
 class ZonaLIDER(object):
     """Zona de edificio de LIDER
