@@ -30,6 +30,7 @@
 import gtk
 import codecs
 import util, resparser, clases
+from widgets import HistoCanvas
 
 TESTFILE = util.get_resource('data/test.res')
 
@@ -46,6 +47,14 @@ class GtkSol(object):
         self.edificiots = self.ui.get_object('treestore')
         self.edificiotv = self.ui.get_object('treeview')
         self.tb = self.ui.get_object('textbuffer')
+        self.nb = self.ui.get_object('notebook')
+
+        self.histomeses = HistoCanvas()
+        vb = self.ui.get_object('vbmeses') #self.nb.get_nth_page(1)
+        vb.pack_end(self.histomeses)
+
+
+
         # Filtro de archivos
         filter = self.ui.get_object('filefilter')
         filter.set_name('Archivos *.res')
@@ -54,7 +63,8 @@ class GtkSol(object):
         self.ui.connect_signals(self)
         # Carga datos de materiales, cerramientos y clima
         self.file = TESTFILE
-        self.edificio = self.loadfile(self.file)
+        self.loadfile(self.file)
+        self.edificiotv.set_cursor((0,0,0))
 
     def loadfile(self, file=TESTFILE):
         try:
@@ -70,7 +80,8 @@ class GtkSol(object):
             for zona in self.edificio.plantas[planta]:
                 iter= self.edificiots.append(parentiter, (zona, self.edificio.plantas[planta][zona]))
         self.edificiotv.expand_all()
-        # Modelo de
+        self.edificio = edificio
+        self.histomeses.edificio = edificio
         self.sb.push(0, u'Cargado modelo: %s' % file)
         return edificio
 
@@ -79,7 +90,7 @@ class GtkSol(object):
         def zona2txt(zona):
             txt = 'Zona del Edificio\n==============\n\n'
             txt += '%s (Zona %i)\n\n' % (zona.nombre, zona.numero)
-            txt += 'Superficie: %f m2\n' % zona.superficie
+            txt += 'Superficie: %f m²\n' % zona.superficie
             txt += 'Planta %s\n\n' % zona.planta
             txt += 'Flujos por elementos:\n------------\n\n'
             for elemento in zona.flujos:
@@ -96,9 +107,28 @@ class GtkSol(object):
         tm = tv.get_model()
         nombre, objeto = tm[path]
         if isinstance(objeto, clases.ZonaLIDER):
-            self.sb.push(0, u'Seleccionada zona: %s' % objeto.nombre)
             txt = zona2txt(objeto)
             self.tb.set_text(txt)
+            self.histomeses.zona = objeto
+            self.histomeses.modo = 'zona'
+            txt1 = u'Zona %s\n%d x %.2fm²\ncalefacción: %6.1f, refrigeración: %6.1f' % (
+                   nombre, objeto.multiplicador, objeto.superficie,
+                   objeto.calefaccion, objeto.refrigeracion)
+            self.sb.push(0, u'Seleccionada zona: %s' % nombre)
+        elif isinstance(objeto, clases.EdificioLIDER):
+            # TODO: poner en histograma los valores de los meses para cal. y ref.
+            self.histomeses.zona = None
+            self.histomeses.modo = 'edificio'
+            txt1 = u'Edificio: %s\n%.2fm²\ncalefacción: %6.1f, refrigeración: %6.1f' % (
+                   nombre, objeto.superficie,
+                   objeto.calefaccion, objeto.refrigeracion)
+            self.sb.push(0, u'Seleccionado edificio: %s' % nombre)
+        else: # Es una planta
+            self.histomeses.zona = None
+            self.histomeses.modo = 'planta'
+            txt1 = u''
+            self.sb.push(0, u'Seleccionada Planta: %s' % nombre)
+        self.ui.get_object('labelzona').props.label = txt1
 
     #{ Funciones generales de aplicación
     def openfile(self, toolbutton):
