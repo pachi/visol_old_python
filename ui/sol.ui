@@ -114,8 +114,8 @@
     <columns>
       <!-- column-name nombre -->
       <column type="gchararray"/>
-      <!-- column-name objeto -->
-      <column type="PyObject"/>
+      <!-- column-name tipo -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window">

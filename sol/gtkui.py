@@ -74,11 +74,11 @@ class GtkSol(object):
         self.edificio = edificio
         self.edificiots.clear()
         # Modelo de plantas y zonas
-        topiter = self.edificiots.append(None, ('Edificio1', self.edificio))
+        topiter = self.edificiots.append(None, (self.edificio.nombre, 'edificio'))
         for planta in self.edificio.plantas:
-            parentiter = self.edificiots.append(topiter, (planta, self.edificio.plantas[planta]))
+            parentiter = self.edificiots.append(topiter, (planta, 'planta'))
             for zona in self.edificio.plantas[planta]:
-                iter= self.edificiots.append(parentiter, (zona, self.edificio.plantas[planta][zona]))
+                iter= self.edificiots.append(parentiter, (zona, 'zona'))
         self.edificiotv.expand_all()
         self.histomeses.edificio = edificio
         self.sb.push(0, u'Cargado modelo: %s' % file)
@@ -104,17 +104,9 @@ class GtkSol(object):
 
         path, col = tv.get_cursor()
         tm = tv.get_model()
-        nombre, objeto = tm[path]
-        if isinstance(objeto, clases.ZonaLIDER):
-            self.tb.set_text(zona2txt(objeto))
-            self.histomeses.zona = objeto.nombre
-            self.histomeses.modo = 'zona'
-            txt1 = u'<big>Zona %s</big>\n' % nombre
-            txt1 += u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
-            txt1 += u'calefacción: %6.1f<i>kWh/m²</i>, ' % objeto.calefaccion
-            txt1 += u'refrigeración: %6.1f<i>kWh/m²</i>' % objeto.refrigeracion
-            self.sb.push(0, u'Seleccionada zona: %s' % nombre)
-        elif isinstance(objeto, clases.EdificioLIDER):
+        nombre, tipo = tm[path]
+        if tipo == 'edificio':
+            objeto = self.edificio
             # TODO: poner en histograma los valores de los meses para cal. y ref.
             self.histomeses.zona = None
             self.histomeses.modo = 'edificio'
@@ -123,11 +115,24 @@ class GtkSol(object):
                    objeto.superficie,
                    objeto.calefaccion, objeto.refrigeracion)
             self.sb.push(0, u'Seleccionado edificio: %s' % nombre)
-        else: # Es una planta
+        elif tipo == 'planta':
+            objeto = self.edificio.plantas[nombre]
             self.histomeses.zona = None
             self.histomeses.modo = 'planta'
-            txt1 = u''
+            txt1 = u'Planta: %s\n' % nombre
             self.sb.push(0, u'Seleccionada Planta: %s' % nombre)
+        elif tipo == 'zona':
+            objeto = self.edificio.zona(nombre)
+            self.tb.set_text(zona2txt(objeto))
+            self.histomeses.zona = objeto.nombre
+            self.histomeses.modo = 'zona'
+            txt1 = u'<big>Zona %s</big>\n' % nombre
+            txt1 += u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
+            txt1 += u'calefacción: %6.1f<i>kWh/m²</i>, ' % objeto.calefaccion
+            txt1 += u'refrigeración: %6.1f<i>kWh/m²</i>' % objeto.refrigeracion
+            self.sb.push(0, u'Seleccionada zona: %s' % nombre)
+        else:
+            raise "Tipo desconocido"
         self.ui.get_object('labelzona').props.label = txt1
 
     #{ Funciones generales de aplicación
