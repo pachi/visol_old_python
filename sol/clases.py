@@ -10,11 +10,11 @@ class EdificioLIDER(object):
 
     numplantas - Número de plantas del edificio
     numzonas - Número de zonas en el edificio
-    superficie - Superficie del edificio [m2]
-    calefaccion   - Demanda anual de calefacción del edificio [kW/m2/año]
-    refrigeracion - Demanda anual de refrigeración del edificio  [kW/m2/año]
-    calefaccion_meses   - Demandas mensuales de calefacción del edificio [kW/m2/mes]
-    refrigeracion_meses - Demandas mensuales de refrigeración del edificio [kW/m2/mes]
+    superficie - Superficie del edificio [m²]
+    calefaccion   - Demanda anual de calefacción del edificio [kWh/m²/año]
+    refrigeracion - Demanda anual de refrigeración del edificio  [kWh/m²/año]
+    calefaccion_meses   - Demandas mensuales de calefacción del edificio [kWh/m²/mes]
+    refrigeracion_meses - Demandas mensuales de refrigeración del edificio [kWh/m²/mes]
     plantas - Diccionario de zonas por planta
     """
     def __init__(self):
@@ -40,14 +40,14 @@ class ZonaLIDER(object):
     nombre - Nombre de la zona
     numero - Número identificativo de la zona
     planta - Nombre de la planta a la que pertenece la zona
-    superficie - Superficie de la zona [m2]
+    superficie - Superficie de la zona [m²]
     multiplicador - Número de zonas iguales
-    calefaccion - Demanda anual de calefacción de la zona [kW/m2/año]
-    refrigeracion - Demanda anual de refrigeración de la zona [kW/m2/año]
-    calefaccion_meses - Demanda mensual de calefacción de la zona [kW/m2/mes]
-    refrigeración_meses - Demanda mensual de refrigeración de la zona [kW/m2/mes]
-    flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kW/año]??
-    componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kW/año]???
+    calefaccion - Demanda anual de calefacción de la zona [kWh/m²/año]
+    refrigeracion - Demanda anual de refrigeración de la zona [kWh/m²/año]
+    calefaccion_meses - Demanda mensual de calefacción de la zona [kWh/m²/mes]
+    refrigeración_meses - Demanda mensual de refrigeración de la zona [kWh/m²/mes]
+    flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/año]??
+    componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kWh/año]???
 
     """
     def __init__(self, nombre=None, superficie=0.0, multiplicador=1.0,
