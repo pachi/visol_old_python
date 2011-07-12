@@ -81,17 +81,21 @@ class HistoCanvas(FigureCanvasGTKCairo):
         demanda existente [kWh/m²mes]
         """
 
-        def autolabel(ax, rects, pos=1.0):
+        def autolabel(ax, rects):
             """Etiquetar valores fuera de las barras"""
             #TODO: usar altura de texto en lugar de displacement
-            #TODO: detectar automáticamente si es positivo o negativo en lugar
-            #TODO: de usar pos
-            #TODO: usar tamaño de texto más pequeño para las etiquetas
+            # ver http://matplotlib.sourceforge.net/faq/howto_faq.html
+            # Automatically make room for tick labels
+#            text = ax.text(0,0, "1", size='small')
+#            text.draw()
+#            bb = text.get_window_extent()
+#            print bb.width, bb.height
             texth = 2.0
             for rect in rects:
                 height = rect.get_height()
                 if height:
-                    _h = -(height + texth + 0.5) if pos < 0 else (height + 0.5)
+                    # rect.get_y() es la base del rectángulo y es 0 si es positivo
+                    _h = -(height + texth + 0.5) if rect.get_y() else (height + 0.5)
                     ax.text(rect.get_x() + rect.get_width() / 2.0,
                             _h, '%.1f' % round(height, 1),
                             ha='center', va='bottom', size='small')
@@ -103,7 +107,7 @@ class HistoCanvas(FigureCanvasGTKCairo):
             ax1.legend((rects1[0], rects2[0]), ('Calefacción', 'Refrigeración'),
                        loc='lower right', prop=FontProperties(size='small'))
             ax1.set_ylim(min - 10, max + 10)
-            autolabel(ax1, rects1, -1.0)
+            autolabel(ax1, rects1)
             autolabel(ax1, rects2)
 
         # Elementos generales
