@@ -112,8 +112,7 @@ class GtkSol(object):
             self.histomeses.modo = 'edificio'
             txt1 = u'Edificio: %s\n' % nombre
             txt1 += u'%.2fm²\ncalefacción: %6.1f, refrigeración: %6.1f' % (
-                   objeto.superficie,
-                   objeto.calefaccion, objeto.refrigeracion)
+                    objeto.superficie, objeto.calefaccion, objeto.refrigeracion)
             self.sb.push(0, u'Seleccionado edificio: %s' % nombre)
         elif tipo == 'planta':
             objeto = self.edificio.plantas[nombre]

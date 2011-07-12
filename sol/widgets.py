@@ -86,7 +86,7 @@ class HistoCanvas(HistoBase):
         """
         HistoBase.__init__(self)
         self.edificio = edificio
-        self._zona = zona
+        self.zona = zona
         self._modo = 'edificio'
 
         self.title = u"Demanda mensual"
@@ -99,17 +99,7 @@ class HistoCanvas(HistoBase):
 
     @modo.setter
     def modo(self, val):
-        if self._modo != val:
-            self._modo = val
-            self.dibuja()
-
-    @property
-    def zona(self):
-        return self._zona
-
-    @zona.setter
-    def zona(self, val):
-        self._zona = val
+        self._modo = val
         self.dibuja()
 
     def dibuja(self, width=400, height=200):
