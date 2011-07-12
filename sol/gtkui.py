@@ -80,7 +80,6 @@ class GtkSol(object):
             for zona in self.edificio.plantas[planta]:
                 iter= self.edificiots.append(parentiter, (zona, self.edificio.plantas[planta][zona]))
         self.edificiotv.expand_all()
-        self.edificio = edificio
         self.histomeses.edificio = edificio
         self.sb.push(0, u'Cargado modelo: %s' % file)
         return edificio
@@ -107,20 +106,21 @@ class GtkSol(object):
         tm = tv.get_model()
         nombre, objeto = tm[path]
         if isinstance(objeto, clases.ZonaLIDER):
-            txt = zona2txt(objeto)
-            self.tb.set_text(txt)
-            self.histomeses.zona = objeto
+            self.tb.set_text(zona2txt(objeto))
+            self.histomeses.zona = objeto.nombre
             self.histomeses.modo = 'zona'
-            txt1 = u'Zona %s\n%d x %.2fm²\ncalefacción: %6.1f, refrigeración: %6.1f' % (
-                   nombre, objeto.multiplicador, objeto.superficie,
-                   objeto.calefaccion, objeto.refrigeracion)
+            txt1 = u'<big>Zona %s</big>\n' % nombre
+            txt1 += u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
+            txt1 += u'calefacción: %6.1f<i>kWh/m²</i>, ' % objeto.calefaccion
+            txt1 += u'refrigeración: %6.1f<i>kWh/m²</i>' % objeto.refrigeracion
             self.sb.push(0, u'Seleccionada zona: %s' % nombre)
         elif isinstance(objeto, clases.EdificioLIDER):
             # TODO: poner en histograma los valores de los meses para cal. y ref.
             self.histomeses.zona = None
             self.histomeses.modo = 'edificio'
-            txt1 = u'Edificio: %s\n%.2fm²\ncalefacción: %6.1f, refrigeración: %6.1f' % (
-                   nombre, objeto.superficie,
+            txt1 = u'Edificio: %s\n' % nombre
+            txt1 += u'%.2fm²\ncalefacción: %6.1f, refrigeración: %6.1f' % (
+                   objeto.superficie,
                    objeto.calefaccion, objeto.refrigeracion)
             self.sb.push(0, u'Seleccionado edificio: %s' % nombre)
         else: # Es una planta
