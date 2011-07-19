@@ -116,6 +116,12 @@
       <column type="gchararray"/>
       <!-- column-name tipo -->
       <column type="gchararray"/>
+      <!-- column-name edificio -->
+      <column type="gchararray"/>
+      <!-- column-name planta -->
+      <column type="gchararray"/>
+      <!-- column-name zona -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window">
@@ -141,6 +147,21 @@
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-open</property>
                 <signal name="clicked" handler="openfile" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToggleToolButton" id="showtext">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">Texto</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-file</property>
+                <signal name="toggled" handler="showtextfile" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -251,9 +272,9 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
-                  <object class="GtkScrolledWindow" id="scrolledwindow1">
-                    <property name="visible">True</property>
+                  <object class="GtkScrolledWindow" id="scrolledwindowtext">
                     <property name="can_focus">True</property>
+                    <property name="no_show_all">True</property>
                     <property name="hscrollbar_policy">automatic</property>
                     <property name="vscrollbar_policy">automatic</property>
                     <child>
