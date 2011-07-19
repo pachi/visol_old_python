@@ -6,7 +6,7 @@ Visor de archivos de resultados de LIDER
 """
 import codecs
 from collections import OrderedDict
-from clases import EdificioLIDER, ZonaLIDER, DetalleLIDER
+from clases import EdificioLIDER, PlantaLIDER, ZonaLIDER, DetalleLIDER
 
 def valores(linea):
     """Devuelve concepto y valores de líneas de detalle
@@ -116,7 +116,7 @@ def parsePlanta(block, nombreplanta, zonas):
     Detalle -> 'Cal_positivo, Cal_negativo, Cal_neto, Ref_positivo, Ref_negativo, Ref_neto'
     """
     iblock = iter(block)
-    planta = OrderedDict()
+    planta = PlantaLIDER()
 
     for line in iblock:
         if line.startswith(u'Numero de zonas'):
