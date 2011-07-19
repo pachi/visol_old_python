@@ -29,8 +29,8 @@
 #import gobject
 import gtk
 import codecs
-import util, resparser, clases
-from widgets import HistoMeses
+import util, resparser
+from widgets import HistoMeses, HistoElementos
 
 TESTFILE = util.get_resource('data/test.res')
 
@@ -53,6 +53,9 @@ class GtkSol(object):
         vb = self.ui.get_object('vbmeses') #self.nb.get_nth_page(1)
         vb.pack_end(self.histomeses)
 
+        self.histoelementos = HistoElementos()
+        vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
+        vb.pack_end(self.histoelementos)
 
 
         # Filtro de archivos
