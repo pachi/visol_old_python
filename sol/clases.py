@@ -140,3 +140,5 @@ class DetalleLIDER(object):
         return t % (self.nombre, self.calpos, self.calneg, self.calnet,
                     self.refpos, self.refneg, self.refnet)
 
+    def values(self):
+        return (self.calpos, self.calneg, self.calnet, self.refpos, self.refnet, self.refnet)
