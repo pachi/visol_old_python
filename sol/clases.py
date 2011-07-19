@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import numpy
 from collections import OrderedDict
 
 class EdificioLIDER(object):
@@ -40,6 +41,45 @@ class EdificioLIDER(object):
             if nombrezona in self.plantas[planta]:
                 return self.plantas[planta][nombrezona]
         return None
+
+class PlantaLIDER(OrderedDict):
+    """Planta de LIDER"""
+    def __init__(self):
+        OrderedDict.__init__(self)
+
+    @property
+    def superficie(self):
+        """Superficie de la planta"""
+        return sum(self[zona].superficie * self[zona].multiplicador for zona in self.keys())
+
+    @property
+    def calefaccion(self):
+        """Demanda anual de calefacción por m2"""
+        return sum(self.calefaccion_meses)
+
+    @property
+    def calefaccion_meses(self):
+        """Array de demandas de calefacción mensuales por m2"""
+        cal_planta = numpy.array([0.0] * 12)
+        for nzona in self:
+            zona = self[nzona]
+            cal_planta += numpy.array(zona.calefaccion_meses) * zona.superficie
+            #ref_planta += numpy.array(zona.refrigeracion_meses) * zona.superficie
+        return cal_planta / self.superficie
+
+    @property
+    def refrigeracion(self):
+        """Demanda anual de refrigeración por m2"""
+        return sum(self.refrigeracion_meses)
+
+    @property
+    def refrigeracion_meses(self):
+        """Array de demandas de refrigeración mensuales por m2"""
+        ref_planta = numpy.array([0.0] * 12)
+        for nzona in self:
+            zona = self[nzona]
+            ref_planta += numpy.array(zona.refrigeracion_meses) * zona.superficie
+        return ref_planta / self.superficie
 
 class ZonaLIDER(object):
     """Zona de edificio de LIDER
