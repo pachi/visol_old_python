@@ -68,9 +68,13 @@ class GtkSol(object):
 
     def loadfile(self, file=TESTFILE):
         try:
-            edificio = resparser.parsefile(codecs.open(file, "rU", "latin-1" ))
+            fd = codecs.open(file, "rU", "latin-1" )
+            edificio = resparser.parsefile(fd)
+            fd.seek(0)
+            txtfile = fd.read()
         except:
             raise
+        self.tb.set_text(txtfile)
         self.edificio = edificio
         self.edificiots.clear()
         # Modelo de plantas y zonas
@@ -85,6 +89,13 @@ class GtkSol(object):
         self.histoelementos.edificio = edificio
         self.sb.push(0, u'Cargado modelo: %s' % file)
         return edificio
+
+    def showtextfile(self, button):
+        """Cambia la visibilidad de la pestaña de texto"""
+        if not button.props.active:
+            self.ui.get_object('scrolledwindowtext').hide()
+        else:
+            self.ui.get_object('scrolledwindowtext').show()
 
     def cursorchanged(self, tv):
         """Seleccionada una nueva fila de la vista de árbol"""
