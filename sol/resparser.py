@@ -116,7 +116,7 @@ def parsePlanta(block, nombreplanta, zonas):
     Detalle -> 'Cal_positivo, Cal_negativo, Cal_neto, Ref_positivo, Ref_negativo, Ref_neto'
     """
     iblock = iter(block)
-    planta = PlantaLIDER()
+    planta = PlantaLIDER(nombreplanta)
 
     for line in iblock:
         if line.startswith(u'Numero de zonas'):

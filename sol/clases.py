@@ -43,9 +43,13 @@ class EdificioLIDER(object):
         return None
 
 class PlantaLIDER(OrderedDict):
-    """Planta de LIDER"""
-    def __init__(self):
+    """Planta de LIDER
+
+    nombre - Nombre de la planta
+    """
+    def __init__(self, nombre=''):
         OrderedDict.__init__(self)
+        self.nombre = nombre
 
     @property
     def superficie(self):
