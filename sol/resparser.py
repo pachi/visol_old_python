@@ -6,7 +6,7 @@ Visor de archivos de resultados de LIDER
 """
 import codecs
 from collections import OrderedDict
-from clases import EdificioLIDER, PlantaLIDER, ZonaLIDER, DetalleLIDER
+from clases import EdificioLIDER, PlantaLIDER, ZonaLIDER
 
 def valores(linea):
     """Devuelve concepto y valores de líneas de detalle
@@ -137,7 +137,7 @@ def parsePlanta(block, nombreplanta, zonas):
                         if zline.startswith(u'Concepto') or not zline:
                             continue
                         concepto, vals = valores(zline)
-                        flujos[concepto] = DetalleLIDER(concepto, *vals)
+                        flujos[concepto] = vals
                         if zline.startswith(u'TOTAL'):
                             break
                     # Procesamos los componentes de zona, que están contados
@@ -148,7 +148,7 @@ def parsePlanta(block, nombreplanta, zonas):
                             componentes = OrderedDict()
                             for j, zline in enumerate(iblock):
                                 concepto, vals = valores(zline)
-                                componentes[concepto] = DetalleLIDER(concepto, *vals)
+                                componentes[concepto] = vals
                                 if j == numcomponentes - 1:
                                     break
                             break

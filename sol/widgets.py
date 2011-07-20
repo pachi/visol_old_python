@@ -211,8 +211,8 @@ class HistoElementos(HistoBase):
         for nzona in zonas:
             zona = zonas[nzona]
             x_names = zona.flujos.keys()
-            pmin.append(myround(min(min(zona.flujos[name].values()) for zona in self.edificio.zonas for name in x_names), 10))
-            pmax.append(myround(max(max(zona.flujos[name].values()) for zona in self.edificio.zonas for name in x_names), 10))
+            pmin.append(myround(min(min(zona.flujos[name]) for zona in self.edificio.zonas for name in x_names), 10))
+            pmax.append(myround(max(max(zona.flujos[name]) for zona in self.edificio.zonas for name in x_names), 10))
         return min(pmin), max(pmax)
 
     def dibujaseries(self, ax1):
@@ -256,7 +256,7 @@ class HistoElementos(HistoBase):
             #plt.xticks(ind + 0.5, ind)
             ax1.set_xticklabels(x_labels, size='small', rotation=45, ha='right')
             _min, _max = self.minmaxplanta()
-            values = [zona.flujos[name].values() for name in x_names]
+            values = [zona.flujos[name] for name in x_names]
             calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
             barras(_min, _max, calpos, calneg, calnet, refpos, refneg, refnet)
             self.fig.subplots_adjust(bottom=0.17, left=.15)

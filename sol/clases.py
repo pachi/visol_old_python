@@ -115,33 +115,3 @@ class ZonaLIDER(object):
         self.refrigeracion_meses = []
         self.flujos = None
         self.componentes = None
-
-class DetalleLIDER(object):
-    def __init__(self, nombre='',
-                 calpos=0.0, calneg=0.0, calnet=0.0,
-                 refpos=0.0, refneg=0.0, refnet=0.0):
-        """Detalle de flujo de LIDER
-
-        nombre - Nombre del elemento
-        calpos - Flujo positivo en calefacción
-        calneg - Flujo negativo en calefacción
-        calnet - Flujo neto en calefacción
-        refpos - Flujo positivo en refrigeración
-        refneg - Flujo negativo en refrigeración
-        refnet - Flujo neto en refrigeración
-        """
-        self.nombre = nombre
-        self.calpos = calpos
-        self.calneg = calneg
-        self.calnet = calnet
-        self.refpos = refpos
-        self.refneg = refneg
-        self.refnet = refnet
-
-    def __repr__(self):
-        t = "DetalleLIDER(%s, %f, %f, %f, %f, %f, %f)"
-        return t % (self.nombre, self.calpos, self.calneg, self.calnet,
-                    self.refpos, self.refneg, self.refnet)
-
-    def values(self):
-        return (self.calpos, self.calneg, self.calnet, self.refpos, self.refnet, self.refnet)
