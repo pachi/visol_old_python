@@ -105,9 +105,10 @@ class GtkSol(object):
         path, col = tv.get_cursor()
         tm = tv.get_model()
         nombre, tipo, ed, pl, zn = tm[path]
+        self.histomeses.data = (ed, pl, zn)
+        self.histoelementos.data = (ed, pl, zn)
         if tipo == 'edificio':
             objeto = self.edificio
-            self.histomeses.zona = None
             self.histomeses.modo = 'edificio'
             txt1 = u'Edificio: <big>%s</big>\n' % nombre
             txt1 += u'<i>%.2fm²</i>\n' % objeto.superficie
@@ -116,8 +117,8 @@ class GtkSol(object):
             self.sb.push(0, u'Seleccionado edificio: %s' % nombre)
         elif tipo == 'planta':
             objeto = self.edificio.plantas[nombre]
-            self.histomeses.zona = None
             self.histomeses.modo = 'planta'
+            self.histoelementos.modo = 'zona'
             txt1 = u'Planta: <big>%s</big>\n' % nombre
             txt1 += u'<i>%.2fm²</i>\n' % objeto.superficie
             txt1 += u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
@@ -125,11 +126,7 @@ class GtkSol(object):
             self.sb.push(0, u'Seleccionada Planta: %s' % nombre)
         elif tipo == 'zona':
             objeto = self.edificio.plantas[pl][zn]
-            self.histomeses.zona = zn
-            self.histomeses.planta = pl
             self.histomeses.modo = 'zona'
-            self.histoelementos.zona = zn
-            self.histoelementos.planta = pl
             self.histoelementos.modo = 'zona'
             txt1 = u'Zona: <big>%s</big>\n' % nombre
             txt1 += u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
