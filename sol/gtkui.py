@@ -110,6 +110,7 @@ class GtkSol(object):
         if tipo == 'edificio':
             objeto = self.edificio
             self.histomeses.modo = 'edificio'
+            self.histoelementos.modo = 'edificio'
             txt1 = u'Edificio: <big>%s</big>\n' % nombre
             txt1 += u'<i>%.2fm²</i>\n' % objeto.superficie
             txt1 += u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
