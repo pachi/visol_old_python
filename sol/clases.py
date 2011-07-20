@@ -59,12 +59,11 @@ class PlantaLIDER(OrderedDict):
 
     @property
     def calefaccion_meses(self):
-        """Array de demandas de calefacción mensuales por m2"""
+        """Demandas de calefacción mensuales por m2"""
         cal_planta = numpy.array([0.0] * 12)
         for nzona in self:
             zona = self[nzona]
             cal_planta += numpy.array(zona.calefaccion_meses) * zona.superficie
-            #ref_planta += numpy.array(zona.refrigeracion_meses) * zona.superficie
         return cal_planta / self.superficie
 
     @property
@@ -74,7 +73,7 @@ class PlantaLIDER(OrderedDict):
 
     @property
     def refrigeracion_meses(self):
-        """Array de demandas de refrigeración mensuales por m2"""
+        """Demandas de refrigeración mensuales por m2"""
         ref_planta = numpy.array([0.0] * 12)
         for nzona in self:
             zona = self[nzona]
