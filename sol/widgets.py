@@ -53,6 +53,26 @@ class HistoBase(FigureCanvasGTKCairo):
         self.ax1 = self.fig.add_subplot(111)
         self.ax1.set_axis_bgcolor('#f6f6f6')
 
+    @property
+    def modo(self):
+        return self._modo
+
+    @modo.setter
+    def modo(self, val):
+        self._modo = val
+        self.dibuja()
+
+    @property
+    def data(self):
+        return self.edificio, self.planta, self.zona
+
+    @data.setter
+    def data(self, value):
+        edificio, planta, zona = value
+        #self.edificio = edificio # Es el nombre, no el objeto edificio
+        self.planta = planta
+        self.zona = zona
+
     def autolabel(self, ax, rects):
         """Etiquetar valores fuera de las barras"""
         #TODO: usar altura de texto en lugar de displacement
@@ -113,15 +133,6 @@ class HistoMeses(HistoBase):
         self.title = u"Demanda mensual"
         self.xlabel = u"Periodo"
         self.ylabel = u"Demanda [kWh/m²mes]"
-
-    @property
-    def modo(self):
-        return self._modo
-
-    @modo.setter
-    def modo(self, val):
-        self._modo = val
-        self.dibuja()
 
     def minmax(self):
         """Mínimo y máximo en demanda por m2 del edificio.
@@ -203,15 +214,6 @@ class HistoElementos(HistoBase):
         self.title = u"Demandas por elemento"
         self.xlabel = u"Elemento"
         self.ylabel = u"Demanda [kWh/m²mes]"
-
-    @property
-    def modo(self):
-        return self._modo
-
-    @modo.setter
-    def modo(self, val):
-        self._modo = val
-        self.dibuja()
 
     def minmaxplanta(self):
         """Mínimo y máximo de la escala vertical para todas las zonas de una planta"""
