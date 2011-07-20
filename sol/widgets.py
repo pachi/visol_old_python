@@ -41,11 +41,13 @@ class HistoBase(FigureCanvasGTKCairo):
     def __init__(self, edificio=None, planta=None, zona=None):
         """Constructor
 
-        zona - Zona analizada
+        edificio - Edificio analizado (EdificioLIDER)
+        planta - Nombre de la planta analizada en el edificio (str)
+        zona - Nombre de la Zona analizada en la planta (str)
         """
-        self.edificio = edificio
-        self.zona = zona
-        self.planta = planta
+        self.edificio = edificio # Objeto EdificioLIDER
+        self.planta = planta # Nombre de planta
+        self.zona = zona # Nombre de zona
 
         self.fig = Figure()
         FigureCanvasGTKCairo.__init__(self, self.fig)
