@@ -176,27 +176,14 @@ class HistoMeses(HistoBase):
 
         # Demandas
         if self.modo == 'zona' and self.zona:
-            barras(_min, _max,
-                   self.edificio.plantas[self.planta][self.zona].calefaccion_meses,
-                   self.edificio.plantas[self.planta][self.zona].refrigeracion_meses)
+            zona = self.edificio.plantas[self.planta][self.zona]
+            barras(_min, _max,zona.calefaccion_meses, zona.refrigeracion_meses)
         elif self.modo == 'edificio' and self.edificio:
-            barras(_min, _max,
-                   self.edificio.calefaccion_meses,
-                   self.edificio.refrigeracion_meses)
+            e = self.edificio
+            barras(_min, _max, e.calefaccion_meses, e.refrigeracion_meses)
         elif self.modo == 'planta':
-            #TODO: mover lógica de plantas a clases base (EdificioLIDER)
-            #cal_planta = numpy.array([0.0] * 12)
-            ref_planta = numpy.array([0.0] * 12)
-            planta = self.edificio.plantas[self.planta]
-            cal_planta = planta.calefaccion_meses
-            supplanta = planta.superficie
-            for nzona in planta:
-                zona = planta[nzona]
-                #cal_planta += numpy.array(zona.calefaccion_meses) * zona.superficie
-                ref_planta += numpy.array(zona.refrigeracion_meses) * zona.superficie
-            #cal_planta /= supplanta
-            ref_planta /= supplanta
-            barras(_min, _max, cal_planta, ref_planta)
+            pl = self.edificio.plantas[self.planta]
+            barras(_min, _max, pl.calefaccion_meses, pl.refrigeracion_meses)
 
 class HistoElementos(HistoBase):
     """Histograma de demandas por elementos
