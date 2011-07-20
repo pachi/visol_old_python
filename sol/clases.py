@@ -45,7 +45,14 @@ class EdificioLIDER(object):
 class PlantaLIDER(OrderedDict):
     """Planta de LIDER
 
+    Es un diccionario ordenado de zonas.
+
     nombre - Nombre de la planta
+    superficie - Superficie de la planta [m²]
+    calefaccion - Demanda anual de calefacción de la planta [kWh/m²año]
+    refrigeracion - Demanda anual de refrigeración de la planta [kWh/m²año]
+    calefaccion_meses   - Demandas mensuales de calefacción de la planta [kWh/m²/mes]
+    refrigeracion_meses - Demandas mensuales de refrigeración de la planta [kWh/m²/mes]
     """
     def __init__(self, nombre=''):
         OrderedDict.__init__(self)
@@ -53,17 +60,17 @@ class PlantaLIDER(OrderedDict):
 
     @property
     def superficie(self):
-        """Superficie de la planta"""
+        """Superficie de la planta en m²"""
         return sum(self[zona].superficie * self[zona].multiplicador for zona in self.keys())
 
     @property
     def calefaccion(self):
-        """Demanda anual de calefacción por m2"""
+        """Demanda anual de calefacción por m²"""
         return sum(self.calefaccion_meses)
 
     @property
     def calefaccion_meses(self):
-        """Demandas de calefacción mensuales por m2"""
+        """Demandas de calefacción mensuales por m²"""
         cal_planta = numpy.array([0.0] * 12)
         for nzona in self:
             zona = self[nzona]
@@ -72,12 +79,12 @@ class PlantaLIDER(OrderedDict):
 
     @property
     def refrigeracion(self):
-        """Demanda anual de refrigeración por m2"""
+        """Demanda anual de refrigeración por m²"""
         return sum(self.refrigeracion_meses)
 
     @property
     def refrigeracion_meses(self):
-        """Demandas de refrigeración mensuales por m2"""
+        """Demandas de refrigeración mensuales por m²"""
         ref_planta = numpy.array([0.0] * 12)
         for nzona in self:
             zona = self[nzona]
@@ -113,5 +120,8 @@ class ZonaLIDER(object):
         self.refrigeracion = refrigeracion
         self.calefaccion_meses = []
         self.refrigeracion_meses = []
+        # Elementos: incluyen información desglosada de flujos:
+        # Calef. positivo, Calef. negativo, Calef. neto
+        # Ref. poisitivo, Ref. negativo, Ref. neto
         self.flujos = None
         self.componentes = None
