@@ -118,7 +118,7 @@ class GtkSol(object):
         elif tipo == 'planta':
             objeto = self.edificio.plantas[nombre]
             self.histomeses.modo = 'planta'
-            self.histoelementos.modo = 'zona'
+            self.histoelementos.modo = 'planta'
             txt1 = u'Planta: <big>%s</big>\n' % nombre
             txt1 += u'<i>%.2fm²</i>\n' % objeto.superficie
             txt1 += u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
