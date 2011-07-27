@@ -175,15 +175,15 @@ class HistoMeses(HistoBase):
         _min, _max = self.minmax()
 
         # Demandas
-        if self.modo == 'zona' and self.zona:
-            zona = self.edificio.plantas[self.planta][self.zona]
-            barras(_min, _max,zona.calefaccion_meses, zona.refrigeracion_meses)
-        elif self.modo == 'edificio' and self.edificio:
+        if self.modo == 'edificio' and self.edificio:
             e = self.edificio
             barras(_min, _max, e.calefaccion_meses, e.refrigeracion_meses)
         elif self.modo == 'planta':
             pl = self.edificio.plantas[self.planta]
             barras(_min, _max, pl.calefaccion_meses, pl.refrigeracion_meses)
+        elif self.modo == 'zona' and self.zona:
+            zona = self.edificio.plantas[self.planta][self.zona]
+            barras(_min, _max,zona.calefaccion_meses, zona.refrigeracion_meses)
 
 class HistoElementos(HistoBase):
     """Histograma de demandas por elementos
@@ -246,7 +246,24 @@ class HistoElementos(HistoBase):
             self.autolabel(ax1, rectsr3)
 
         # Demandas
-        if self.modo == 'zona' and self.zona:
+        if self.modo == 'edificio' and self.edificio:
+            #TODO: demandas por elementos para edificio
+            pass
+        elif self.modo == 'planta':
+            #TODO: demandas por elementos para planta
+            planta = self.edificio.plantas[self.planta]
+            x_names = planta.flujos.keys()
+            x_labels = ["\n".join(name.split()) for name in x_names]
+            ind = numpy.arange(len(x_names))
+            ax1.set_xticks(ind)
+            #plt.xticks(ind + 0.5, ind)
+            ax1.set_xticklabels(x_labels, size='small', rotation=45, ha='right')
+            _min, _max = self.minmaxplanta()
+            values = [planta.flujos[name] for name in x_names]
+            calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
+            barras(_min, _max, calpos, calneg, calnet, refpos, refneg, refnet)
+            self.fig.subplots_adjust(bottom=0.17, left=.15)
+        elif self.modo == 'zona' and self.zona:
             # Datos meses
             zona = self.edificio.plantas[self.planta][self.zona]
             x_names = zona.flujos.keys()
@@ -260,12 +277,6 @@ class HistoElementos(HistoBase):
             calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
             barras(_min, _max, calpos, calneg, calnet, refpos, refneg, refnet)
             self.fig.subplots_adjust(bottom=0.17, left=.15)
-        elif self.modo == 'edificio' and self.edificio:
-            #TODO: demandas por elementos para edificio
-            pass
-        elif self.modo == 'planta':
-            #TODO: demandas por elementos para planta
-            pass
 
 
 def get_pixbuf_from_canvas(canvas, destwidth=None):

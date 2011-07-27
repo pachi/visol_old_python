@@ -36,6 +36,7 @@ class EdificioLIDER(object):
         return [self.plantas[planta][zona] for planta in self.plantas for zona in self.plantas[planta]]
 
     def zona(self, nombrezona):
+        #BUG: esto falla si hay varias zonas con el mismo nombre
         """Devuelve zona a partir del nombre"""
         for planta in self.plantas:
             if nombrezona in self.plantas[planta]:
@@ -53,6 +54,9 @@ class PlantaLIDER(OrderedDict):
     refrigeracion - Demanda anual de refrigeración de la planta [kWh/m²año]
     calefaccion_meses   - Demandas mensuales de calefacción de la planta [kWh/m²/mes]
     refrigeracion_meses - Demandas mensuales de refrigeración de la planta [kWh/m²/mes]
+
+    flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/m²año]
+    componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kWh/m²año]
     """
     def __init__(self, nombre=''):
         OrderedDict.__init__(self)
@@ -91,6 +95,19 @@ class PlantaLIDER(OrderedDict):
             ref_planta += numpy.array(zona.refrigeracion_meses) * zona.superficie
         return ref_planta / self.superficie
 
+    @property
+    def flujos(self):
+        """Flujos de calor de los grupos, para la planta"""
+        dic = OrderedDict()
+        flujoskeys = self[self.keys()[0]].flujos.keys()
+        for grupo in flujoskeys:
+            params = [self[object].superficie *
+                      self[object].multiplicador *
+                      numpy.array(self[object].flujos[grupo]) for object in self]
+            plist = [sum(lst) for lst in zip(*params)]
+            dic[grupo] = tuple(numpy.array(plist) / self.superficie)
+        return dic
+
 class ZonaLIDER(object):
     """Zona de edificio de LIDER
 
@@ -105,9 +122,8 @@ class ZonaLIDER(object):
     refrigeracion - Demanda anual de refrigeración de la zona [kWh/m²/año]
     calefaccion_meses - Demanda mensual de calefacción de la zona [kWh/m²/mes]
     refrigeración_meses - Demanda mensual de refrigeración de la zona [kWh/m²/mes]
-    flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/año]??
-    componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kWh/año]???
-
+    flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/año]
+    componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kWh/año]
     """
     def __init__(self, nombre=None, superficie=0.0, multiplicador=1.0,
                  calefaccion=0.0, refrigeracion=0.0):
