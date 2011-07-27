@@ -55,7 +55,7 @@ class GtkSol(object):
         self.nb = self.ui.get_object('notebook')
 
         self.histomeses = HistoMeses()
-        vb = self.ui.get_object('vbmeses') #self.nb.get_nth_page(1)
+        vb = self.ui.get_object('vbmeses')
         vb.pack_end(self.histomeses)
 
         self.histoelementos = HistoElementos()
