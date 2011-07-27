@@ -34,6 +34,11 @@ from widgets import HistoMeses, HistoElementos
 
 TESTFILE = util.get_resource('data/test.res')
 
+class VISOLModel(object):
+    """Modelo para la aplicación ViSOL"""
+    def __init__(self, edificio=None):
+        self.edificio = edificio
+
 
 class GtkSol(object):
     """Aplicación Visor de archivos de LIDER"""
