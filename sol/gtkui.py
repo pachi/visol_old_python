@@ -137,6 +137,13 @@ class GtkSol(object):
         self.sb.push(0, u'Seleccionado %s: %s' % (tipo, nombre))
         self.ui.get_object('labelzona').props.label = txt1
 
+    def cbelementos(self, action):
+        cbcalpos = self.ui.get_object('cbcalpos')
+        cbcalneg = self.ui.get_object('cbcalneg')
+        cbrefpos = self.ui.get_object('cbrefpos')
+        cbrefneg = self.ui.get_object('cbrefneg')
+        print cbcalpos.props.active, cbcalneg.props.active, cbrefpos.props.active, cbrefneg.props.active
+
     #{ Funciones generales de aplicación
     def openfile(self, toolbutton):
         chooser = self.ui.get_object('filechooserdialog')
