@@ -165,7 +165,7 @@ def parsePlanta(block, nombreplanta, zonas):
 
 def parsefile(file):
     """Lee archivo y genera objeto de edificio con datos generales y por plantas"""
-    numplantas, plantablocks = findblocks(file)
+    numplantas, plantablocks = findblocks(iter(file))
     edificio, zonas = parseEdificio(plantablocks.pop(u'Edificio'))
     edificio.numplantas = numplantas
     # Acopla plantas en edificio
