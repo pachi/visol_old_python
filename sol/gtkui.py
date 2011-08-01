@@ -87,16 +87,7 @@ class GtkSol(object):
             self.loadfile(self._file)
 
     def loadfile(self, file=TESTFILE):
-        def parsefile(file=TESTFILE):
-            try:
-                data = codecs.open(file, "rU", "latin-1" ).readlines()
-                edificio = resparser.parsefile(data)
-                txtfile = ''.join(data)
-            except:
-                raise
-            return edificio, txtfile
-
-        self.edificio, self.txtfile = parsefile(file)
+        self.edificio, self.txtfile = resparser.loadfile(file)
         self.tb.set_text(self.txtfile)
         self.edificiots.clear()
         # Modelo de plantas y zonas

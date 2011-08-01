@@ -174,6 +174,16 @@ def parsefile(file):
         edificio.plantas[nombreplanta] = planta
     return edificio
 
+def loadfile(file):
+    """Devuelve edificio y texto original del archivo en forma de lista"""
+    try:
+        data = codecs.open(file, "rU", "latin-1" ).readlines()
+        edificio = parsefile(data)
+        txtfile = ''.join(data)
+    except:
+        raise
+    return edificio, txtfile
+
 def check(edificio):
     """Comprueba que los datos del edificio son coherentes"""
     # TODO: comprobar que el número de plantas del archivo es igual que el calculado
