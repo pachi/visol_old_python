@@ -28,7 +28,6 @@
 
 #import gobject
 import gtk
-import codecs
 import util, resparser
 from widgets import HistoMeses, HistoElementos
 
