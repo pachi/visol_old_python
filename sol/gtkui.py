@@ -44,6 +44,8 @@ class GtkSol(object):
     """Aplicación Visor de archivos de LIDER"""
     def __init__(self):
         """Inicialización de datos e interfaz"""
+        self._file = None
+
         self.ui = gtk.Builder()
         self.ui.add_from_file(util.get_resource('ui', 'sol.ui'))
 
@@ -71,19 +73,31 @@ class GtkSol(object):
         self.ui.connect_signals(self)
         # Carga datos de materiales, cerramientos y clima
         self.file = TESTFILE
-        self.loadfile(self.file)
+
         self.edificiotv.set_cursor((0,0,0))
 
+    @property
+    def file(self):
+        return self._file
+
+    @file.setter
+    def file(self, value):
+        if value != self.file:
+            self._file = value
+            self.loadfile(self._file)
+
     def loadfile(self, file=TESTFILE):
-        try:
-            fd = codecs.open(file, "rU", "latin-1" )
-            edificio = resparser.parsefile(fd)
-            fd.seek(0)
-            txtfile = fd.read()
-        except:
-            raise
-        self.tb.set_text(txtfile)
-        self.edificio = edificio
+        def parsefile(file=TESTFILE):
+            try:
+                data = codecs.open(file, "rU", "latin-1" ).readlines()
+                edificio = resparser.parsefile(data)
+                txtfile = ''.join(data)
+            except:
+                raise
+            return edificio, txtfile
+
+        self.edificio, self.txtfile = parsefile(file)
+        self.tb.set_text(self.txtfile)
         self.edificiots.clear()
         # Modelo de plantas y zonas
         ed = self.edificio.nombre
@@ -93,10 +107,9 @@ class GtkSol(object):
             for zona in self.edificio.plantas[planta]:
                 iter= self.edificiots.append(parentiter, (zona, 'zona', ed, planta, zona))
         self.edificiotv.expand_all()
-        self.histomeses.edificio = edificio
-        self.histoelementos.edificio = edificio
+        self.histomeses.edificio = self.edificio
+        self.histoelementos.edificio = self.edificio
         self.sb.push(0, u'Cargado modelo: %s' % file)
-        return edificio
 
     def showtextfile(self, button):
         """Cambia la visibilidad de la pestaña de texto"""
@@ -153,7 +166,6 @@ class GtkSol(object):
         if response == gtk.RESPONSE_ACCEPT:
             self.file = chooser.get_filename()
             self.sb.push(0, u'Seleccionado archivo: %s' % self.file)
-            self.edificio = self.loadfile(self.file)
         elif response == gtk.RESPONSE_CANCEL:
             self.sb.push(0, u'Carga de archivo cancelada')
         chooser.hide()
