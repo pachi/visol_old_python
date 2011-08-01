@@ -18,6 +18,7 @@ class EdificioLIDER(object):
     calefaccion_meses   - Demandas mensuales de calefacción del edificio [kWh/m²/mes]
     refrigeracion_meses - Demandas mensuales de refrigeración del edificio [kWh/m²/mes]
     plantas - Diccionario de zonas por planta
+    resdata - Contenido del archivo .RES del edificio
     """
     def __init__(self, nombre='Edificio1'):
         self.nombre = nombre
@@ -29,6 +30,7 @@ class EdificioLIDER(object):
         self.calefaccion_meses = []
         self.refrigeracion_meses = []
         self.plantas = OrderedDict()
+        self.resdata = ''
 
     @property
     def zonas(self):
