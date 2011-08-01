@@ -37,13 +37,24 @@ class VISOLModel(object):
     """Modelo para la aplicación ViSOL"""
     def __init__(self, edificio=None):
         self.edificio = edificio
+        self._file = None
+
+    @property
+    def file(self):
+        return self._file
+
+    @file.setter
+    def file(self, value):
+        if value != self.file:
+            self._file = value
+            self.edificio = resparser.loadfile(value)
 
 
 class GtkSol(object):
     """Aplicación Visor de archivos de LIDER"""
     def __init__(self):
         """Inicialización de datos e interfaz"""
-        self._file = None
+        self.model = VISOLModel()
 
         self.ui = gtk.Builder()
         self.ui.add_from_file(util.get_resource('ui', 'sol.ui'))
@@ -71,34 +82,25 @@ class GtkSol(object):
 
         self.ui.connect_signals(self)
         # Carga datos de materiales, cerramientos y clima
-        self.file = TESTFILE
+        self.loadfile(TESTFILE)
 
         self.edificiotv.set_cursor((0,0,0))
 
-    @property
-    def file(self):
-        return self._file
-
-    @file.setter
-    def file(self, value):
-        if value != self.file:
-            self._file = value
-            self.loadfile(self._file)
-
     def loadfile(self, file=TESTFILE):
-        self.edificio = resparser.loadfile(file)
-        self.tb.set_text(self.edificio.resdata)
+        self.model.file = file
+        e = self.model.edificio
+        self.tb.set_text(e.resdata)
         self.edificiots.clear()
         # Modelo de plantas y zonas
-        ed = self.edificio.nombre
+        ed = e.nombre
         topiter = self.edificiots.append(None, (ed, 'edificio', ed, '', ''))
-        for planta in self.edificio.plantas:
+        for planta in e.plantas:
             parentiter = self.edificiots.append(topiter, (planta, 'planta', ed, planta, ''))
-            for zona in self.edificio.plantas[planta]:
+            for zona in e.plantas[planta]:
                 iter= self.edificiots.append(parentiter, (zona, 'zona', ed, planta, zona))
         self.edificiotv.expand_all()
-        self.histomeses.edificio = self.edificio
-        self.histoelementos.edificio = self.edificio
+        self.histomeses.edificio = e
+        self.histoelementos.edificio = e
         self.sb.push(0, u'Cargado modelo: %s' % file)
 
     def showtextfile(self, button):
@@ -116,17 +118,17 @@ class GtkSol(object):
         self.histomeses.data = (ed, pl, zn)
         self.histoelementos.data = (ed, pl, zn)
         if tipo == 'edificio':
-            objeto = self.edificio
+            objeto = self.model.edificio
             self.histomeses.modo = 'edificio'
             self.histoelementos.modo = 'edificio'
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
         elif tipo == 'planta':
-            objeto = self.edificio.plantas[nombre]
+            objeto = self.model.edificio.plantas[nombre]
             self.histomeses.modo = 'planta'
             self.histoelementos.modo = 'planta'
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
         elif tipo == 'zona':
-            objeto = self.edificio.plantas[pl][zn]
+            objeto = self.model.edificio.plantas[pl][zn]
             self.histomeses.modo = 'zona'
             self.histoelementos.modo = 'zona'
             sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
@@ -151,12 +153,12 @@ class GtkSol(object):
     #{ Funciones generales de aplicación
     def openfile(self, toolbutton):
         chooser = self.ui.get_object('filechooserdialog')
-        chooser.set_filename(self.file)
+        chooser.set_filename(self.model.file)
         response = chooser.run()
 
         if response == gtk.RESPONSE_ACCEPT:
-            self.file = chooser.get_filename()
-            self.sb.push(0, u'Seleccionado archivo: %s' % self.file)
+            self.loadfile(chooser.get_filename())
+            self.sb.push(0, u'Seleccionado archivo: %s' % self.model.file)
         elif response == gtk.RESPONSE_CANCEL:
             self.sb.push(0, u'Carga de archivo cancelada')
         chooser.hide()
