@@ -87,8 +87,8 @@ class GtkSol(object):
             self.loadfile(self._file)
 
     def loadfile(self, file=TESTFILE):
-        self.edificio, self.txtfile = resparser.loadfile(file)
-        self.tb.set_text(self.txtfile)
+        self.edificio = resparser.loadfile(file)
+        self.tb.set_text(self.edificio.resdata)
         self.edificiots.clear()
         # Modelo de plantas y zonas
         ed = self.edificio.nombre
@@ -142,6 +142,7 @@ class GtkSol(object):
         self.ui.get_object('labelzona').props.label = txt1
 
     def cbelementos(self, action):
+        """Modifica el número de flujos activos en la vista de elementos"""
         cbcalpos = self.ui.get_object('cbcalpos')
         cbcalneg = self.ui.get_object('cbcalneg')
         cbrefpos = self.ui.get_object('cbrefpos')

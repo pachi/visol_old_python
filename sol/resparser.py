@@ -179,10 +179,10 @@ def loadfile(file):
     try:
         data = codecs.open(file, "rU", "latin-1" ).readlines()
         edificio = parsefile(data)
-        txtfile = ''.join(data)
+        edificio.resdata = ''.join(data)
     except:
         raise
-    return edificio, txtfile
+    return edificio
 
 def check(edificio):
     """Comprueba que los datos del edificio son coherentes"""
