@@ -223,7 +223,8 @@ class HistoElementos(HistoBase):
         """
         #TODO: Comprobar si la demanda es anual
 
-        def barras(min, max, calpos, calneg, calnet, refpos, refneg, refnet):
+        def barras(calpos, calneg, calnet, refpos, refneg, refnet):
+            min, max = self.minmaxplanta()
             w = 1.0 / 6
             # Calefacción
             rectsc1 = ax1.bar(ind + 0.5*w, calpos, w, align='center', fc='#FFBBFF', ec='0.5')
@@ -252,32 +253,25 @@ class HistoElementos(HistoBase):
             #TODO: demandas por elementos para edificio
             pass
         elif self.modo == 'planta':
-            #TODO: demandas por elementos para planta
+            # Demandas por elementos para planta
             planta = self.edificio.plantas[self.planta]
-            x_names = planta.flujos.keys()
-            x_labels = ["\n".join(name.split()) for name in x_names]
-            ind = numpy.arange(len(x_names))
-            ax1.set_xticks(ind)
-            #plt.xticks(ind + 0.5, ind)
-            ax1.set_xticklabels(x_labels, size='small', rotation=45, ha='right')
-            _min, _max = self.minmaxplanta()
+            x_labels = ["\n".join(name.split()) for name in planta.flujos.keys()]
             calpos, calneg, calnet, refpos, refneg, refnet = planta.demandaelementos
-            barras(_min, _max, calpos, calneg, calnet, refpos, refneg, refnet)
-            self.fig.subplots_adjust(bottom=0.17, left=.15)
+
         elif self.modo == 'zona' and self.zona:
-            # Datos meses
+            # Datos por elementos para una zona
             zona = self.edificio.plantas[self.planta][self.zona]
-            zonaflujos = zona.flujos
-            x_names = zonaflujos.keys()
-            x_labels = ["\n".join(name.split()) for name in x_names]
-            ind = numpy.arange(len(x_names))
-            ax1.set_xticks(ind)
-            #plt.xticks(ind + 0.5, ind)
-            ax1.set_xticklabels(x_labels, size='small', rotation=45, ha='right')
-            _min, _max = self.minmaxplanta()
+            x_labels = ["\n".join(name.split()) for name in zona.flujos.keys()]
             calpos, calneg, calnet, refpos, refneg, refnet = zona.demandaelementos
-            barras(_min, _max, calpos, calneg, calnet, refpos, refneg, refnet)
-            self.fig.subplots_adjust(bottom=0.17, left=.15)
+        
+        ind = numpy.arange(len(x_labels))
+        barras(calpos, calneg, calnet, refpos, refneg, refnet)
+        ax1.set_xticks(ind + 0.5)
+        ax1.set_xticklabels(x_labels, size='small', rotation=90, ha='center')
+        ymin, ymax = ax1.get_ylim()
+        ax1.vlines(ind, ymin, ymax, color='gray')
+        ax1.grid(False)
+        self.fig.subplots_adjust(bottom=0.17, left=.15)
 
 
 def get_pixbuf_from_canvas(canvas, destwidth=None):
