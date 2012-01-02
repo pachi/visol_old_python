@@ -256,16 +256,16 @@ class HistoElementos(HistoBase):
             # Demandas por elementos para planta
             planta = self.edificio.plantas[self.planta]
             x_labels = ["\n".join(name.split()) for name in planta.flujos.keys()]
-            calpos, calneg, calnet, refpos, refneg, refnet = planta.demandaelementos
+            demandas = planta.demandaelementos
 
         elif self.modo == 'zona' and self.zona:
             # Datos por elementos para una zona
             zona = self.edificio.plantas[self.planta][self.zona]
             x_labels = ["\n".join(name.split()) for name in zona.flujos.keys()]
-            calpos, calneg, calnet, refpos, refneg, refnet = zona.demandaelementos
+            demandas = zona.demandaelementos
         
         ind = numpy.arange(len(x_labels))
-        barras(calpos, calneg, calnet, refpos, refneg, refnet)
+        barras(*demandas)
         ax1.set_xticks(ind + 0.5)
         ax1.set_xticklabels(x_labels, size='small', rotation=90, ha='center')
         ymin, ymax = ax1.get_ylim()
