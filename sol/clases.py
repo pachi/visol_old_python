@@ -98,11 +98,25 @@ class PlantaLIDER(OrderedDict):
         return ref_planta / self.superficie
 
     @property
-    def flujos(self):
-        """Flujos de calor de los grupos, para la planta"""
+    def flujos(self, grupos=None):
+        """Flujos de calor de los grupos, para la planta [kW/m²año]
+        
+        Si se indica una lista de grupos devuelve los flujos para esos grupos.
+        Si no se indica grupos se consideran todos los grupos posibles.
+        
+        Devuelve un diccionario indexado por grupo (p.e. u'Paredes exteriores')
+        que contiene una tupla con las demandas de cada grupo:
+            (calefacción +, calefacción -, calefacción neta,
+             refrigeración +, refrigeración -, refrigeración neta)
+        """
+        if not grupos:
+            # Todas las zonas incluyen por defecto todos los grupos
+            grupos = self[self.keys()[0]].flujos.keys()
+        if not isinstance(grupos, (list, tuple)):
+            grupos = list(grupos)
+        
         dic = OrderedDict()
-        flujoskeys = self[self.keys()[0]].flujos.keys()
-        for grupo in flujoskeys:
+        for grupo in grupos:
             params = [self[object].superficie *
                       self[object].multiplicador *
                       numpy.array(self[object].flujos[grupo]) for object in self]
@@ -112,12 +126,15 @@ class PlantaLIDER(OrderedDict):
     
     @property
     def demandaelementos(self):
-        """Demanda de la planta por elementos"""
-        flujos = self.flujos
-        x_names = flujos.keys()
-        values = [flujos[name] for name in x_names]
-        calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
-        return calpos, calneg, calnet, refpos, refneg, refnet
+        """Demandas de la planta por elementos [kW/m²año]
+        
+        Devuelve una tupla con las demandas de:
+            (calefacción +, calefacción -, calefacción neta,
+             refrigeración +, refrigeración -, refrigeración neta)
+        total para la planta (suma de todos los grupos).
+        """
+        # calpos, calneg, calnet, refpos, refneg, refnet
+        return zip(*self.flujos.values())
         
 
 class ZonaLIDER(object):
