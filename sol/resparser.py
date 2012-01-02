@@ -22,19 +22,19 @@ def valores(linea):
     valores = [float(elem) for elem in elems[1:]]
     return concepto, valores
 
-def findblocks(file):
+def findblocks(resfile):
     """Devuelve diccionario de bloques del archivo de resultados de LIDER"""
     numplantas = 0
     blocks = OrderedDict()
     currentblock = None
     linebuffer = []
 
-    for line in file:
+    for line in resfile:
         line = line.strip()
         if not line:
             pass
         elif line.startswith(u'Numero de plantas'):
-            numplantas = int(next(file))
+            numplantas = int(next(resfile))
         elif ((line.startswith(u'"P') and ',' not in line) or
               line.startswith(u'RESULTADOS A NIVEL EDIFICIO')):
             blockname = line.strip('"') if line.startswith(u'"P') else u'Edificio'
@@ -163,9 +163,9 @@ def parsePlanta(block, nombreplanta, zonas):
                     planta[nombrezona] = zona
     return planta
 
-def parsefile(file):
-    """Lee archivo y genera objeto de edificio con datos generales y por plantas"""
-    numplantas, plantablocks = findblocks(iter(file))
+def parsefile(resfile):
+    """Lee archivo y genera objeto edificio con datos generales y por plantas"""
+    numplantas, plantablocks = findblocks(iter(resfile))
     edificio, zonas = parseEdificio(plantablocks.pop(u'Edificio'))
     edificio.numplantas = numplantas
     # Acopla plantas en edificio
@@ -174,10 +174,10 @@ def parsefile(file):
         edificio.plantas[nombreplanta] = planta
     return edificio
 
-def loadfile(file):
+def loadfile(resfile):
     """Devuelve edificio y texto original del archivo en forma de lista"""
     try:
-        data = codecs.open(file, "rU", "latin-1" ).readlines()
+        data = codecs.open(resfile, "rU", "latin-1" ).readlines()
         edificio = parsefile(data)
         edificio.resdata = ''.join(data)
     except:
@@ -186,9 +186,9 @@ def loadfile(file):
 
 def check(edificio):
     """Comprueba que los datos del edificio son coherentes"""
-    # TODO: comprobar que el número de plantas del archivo es igual que el calculado
-    # que las zonas están todas asignadas a plantas, que todas las zonas tienen todos
-    # los datos, que las sumas dan lo de los totales....
+    # TODO: comprobar que el número de plantas del archivo es igual que el
+    # calculado, que las zonas están todas asignadas a plantas, que todas las
+    # zonas tienen todos los datos, que las sumas dan lo de los totales....
     pass
 
 if __name__ == '__main__':
