@@ -87,6 +87,7 @@ class GtkSol(object):
         self.edificiotv.set_cursor((0,0,0))
 
     def loadfile(self, file=TESTFILE):
+        """Carga archivo en el modelo y actualiza la interfaz"""
         self.model.file = file
         e = self.model.edificio
         self.tb.set_text(e.resdata)

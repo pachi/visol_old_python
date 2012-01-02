@@ -42,12 +42,12 @@ class HistoBase(FigureCanvasGTKCairo):
         """Constructor
 
         edificio - Edificio analizado (EdificioLIDER)
-        planta - Nombre de la planta analizada en el edificio (str)
-        zona - Nombre de la Zona analizada en la planta (str)
+        planta - Nombre de la planta "actual" analizada en el edificio (str)
+        zona - Nombre de la Zona "actual" analizada en la planta (str)
         """
-        self.edificio = edificio # Objeto EdificioLIDER
-        self.planta = planta # Nombre de planta
-        self.zona = zona # Nombre de zona
+        self.edificio = edificio
+        self.planta = planta
+        self.zona = zona
 
         self.fig = Figure()
         FigureCanvasGTKCairo.__init__(self, self.fig)
@@ -225,9 +225,11 @@ class HistoElementos(HistoBase):
 
         def barras(min, max, calpos, calneg, calnet, refpos, refneg, refnet):
             w = 1.0 / 6
+            # Calefacción
             rectsc1 = ax1.bar(ind + 0.5*w, calpos, w, align='center', fc='#FFBBFF', ec='0.5')
             rectsc2 = ax1.bar(ind + 1.5*w, calneg, w, align='center', fc='#FF6666', ec='0.5')
             rectsc3 = ax1.bar(ind + 2.5*w, calnet, w, align='center', fc='#FF0000', ec='k')
+            # Refrigeración
             rectsr1 = ax1.bar(ind + 3.5*w, refpos, w, align='center', fc='#6666FF', ec='0.5')
             rectsr2 = ax1.bar(ind + 4.5*w, refneg, w, align='center', fc='#B3FFB3', ec='0.5')
             rectsr3 = ax1.bar(ind + 5.5*w, refnet, w, align='center', fc='#0000FF', ec='k')
