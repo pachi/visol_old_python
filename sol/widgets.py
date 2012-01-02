@@ -259,22 +259,21 @@ class HistoElementos(HistoBase):
             #plt.xticks(ind + 0.5, ind)
             ax1.set_xticklabels(x_labels, size='small', rotation=45, ha='right')
             _min, _max = self.minmaxplanta()
-            values = [planta.flujos[name] for name in x_names]
-            calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
+            calpos, calneg, calnet, refpos, refneg, refnet = planta.demandaelementos
             barras(_min, _max, calpos, calneg, calnet, refpos, refneg, refnet)
             self.fig.subplots_adjust(bottom=0.17, left=.15)
         elif self.modo == 'zona' and self.zona:
             # Datos meses
             zona = self.edificio.plantas[self.planta][self.zona]
-            x_names = zona.flujos.keys()
+            zonaflujos = zona.flujos
+            x_names = zonaflujos.keys()
             x_labels = ["\n".join(name.split()) for name in x_names]
             ind = numpy.arange(len(x_names))
             ax1.set_xticks(ind)
             #plt.xticks(ind + 0.5, ind)
             ax1.set_xticklabels(x_labels, size='small', rotation=45, ha='right')
             _min, _max = self.minmaxplanta()
-            values = [zona.flujos[name] for name in x_names]
-            calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
+            calpos, calneg, calnet, refpos, refneg, refnet = zona.demandaelementos
             barras(_min, _max, calpos, calneg, calnet, refpos, refneg, refnet)
             self.fig.subplots_adjust(bottom=0.17, left=.15)
 

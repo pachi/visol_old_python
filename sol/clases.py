@@ -109,6 +109,16 @@ class PlantaLIDER(OrderedDict):
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / self.superficie)
         return dic
+    
+    @property
+    def demandaelementos(self):
+        """Demanda de la planta por elementos"""
+        flujos = self.flujos
+        x_names = flujos.keys()
+        values = [flujos[name] for name in x_names]
+        calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
+        return calpos, calneg, calnet, refpos, refneg, refnet
+        
 
 class ZonaLIDER(object):
     """Zona de edificio de LIDER
@@ -143,3 +153,11 @@ class ZonaLIDER(object):
         # Ref. poisitivo, Ref. negativo, Ref. neto
         self.flujos = None
         self.componentes = None
+
+    @property
+    def demandaelementos(self):
+        """Demanda de la zona por elementos"""
+        x_names = self.flujos.keys()
+        values = [self.flujos[name] for name in x_names]
+        calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
+        return calpos, calneg, calnet, refpos, refneg, refnet
