@@ -131,7 +131,8 @@ class PlantaLIDER(OrderedDict):
         Devuelve una tupla con las demandas de:
             (calefacción +, calefacción -, calefacción neta,
              refrigeración +, refrigeración -, refrigeración neta)
-        total para la planta (suma de todos los grupos).
+        para cada grupo de la planta
+        El orden de los grupos es el del diccionario self.flujos.keys().
         """
         # calpos, calneg, calnet, refpos, refneg, refnet
         return zip(*self.flujos.values())
