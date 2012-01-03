@@ -126,18 +126,23 @@ class PlantaLIDER(OrderedDict):
         return dic
     
     @property
-    def demandaelementos(self):
+    def demandas(self):
         """Demandas de la planta por grupos [kW/m²año]
         
-        Devuelve seis tuplas de calefacción +, calefacción -, calefacción neta,
-        refrigeración +, refrigeración -, refrigeración neta que contienen el
-        valor correspondiente para cada grupo de la planta.
+        Devuelve un diccionario con seis tuplas de calefacción +, calefacción -,
+        calefacción neta, refrigeración +, refrigeración -, refrigeración neta
+        que contienen el valor correspondiente para cada grupo de la planta.
         
         El orden de los valores corresponde al de los grupos en el diccionario
         self.flujos.keys().
         """
-        calpos, calneg, calnet, refpos, refneg, refnet = zip(*self.flujos.values())
-        return calpos, calneg, calnet, refpos, refneg, refnet
+        # XXX: Esto es dependiente del orden de values() y keys()...
+        d = OrderedDict()
+        (d['cal+'], d['cal-'], d['cal'],
+         d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
+        d['grupos'] = self.flujos.keys()
+        return d
+    #calpos, calneg, calnet, refpos, refneg, refnet
         
 
 class ZonaLIDER(object):
@@ -175,9 +180,11 @@ class ZonaLIDER(object):
         self.componentes = None
 
     @property
-    def demandaelementos(self):
+    def demandas(self):
         """Demanda de la zona por elementos"""
-        x_names = self.flujos.keys()
-        values = [self.flujos[name] for name in x_names]
-        calpos, calneg, calnet, refpos, refneg, refnet = zip(*values)
-        return calpos, calneg, calnet, refpos, refneg, refnet
+        # XXX: Esto es dependiente del orden de values() y keys()...
+        d = OrderedDict()
+        (d['cal+'], d['cal-'], d['cal'],
+         d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
+        d['grupos'] = self.flujos.keys()
+        return d

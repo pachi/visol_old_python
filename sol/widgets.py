@@ -236,7 +236,13 @@ class HistoElementos(HistoBase):
         """
         #TODO: Comprobar si la demanda es anual
 
-        def barras(calpos, calneg, calnet, refpos, refneg, refnet):
+        def barras(demandas):
+            calpos = demandas.get('cal+', [])
+            calneg = demandas.get('cal-', [])
+            calnet = demandas.get('cal', [])
+            refpos = demandas.get('ref+', [])
+            refneg = demandas.get('ref-', [])
+            refnet = demandas.get('ref', [])
             min, max = self.minmaxplanta()
             w = 1.0 / 6
             # Calefacción
@@ -265,16 +271,16 @@ class HistoElementos(HistoBase):
             # Demandas por elementos para planta
             planta = self.edificio.plantas[self.planta]
             x_labels = ["\n".join(name.split()) for name in planta.flujos.keys()]
-            demandas = planta.demandaelementos
+            demandas = planta.demandas
 
         elif self.modo == 'zona' and self.zona:
             # Datos por elementos para una zona
             zona = self.edificio.plantas[self.planta][self.zona]
             x_labels = ["\n".join(name.split()) for name in zona.flujos.keys()]
-            demandas = zona.demandaelementos
+            demandas = zona.demandas
         
         ind = numpy.arange(len(x_labels))
-        barras(*demandas)
+        barras(demandas)
         ax1.set_xticks(ind + 0.5)
         ax1.set_xticklabels(x_labels, size='small', rotation=90, ha='center')
         ymin, ymax = ax1.get_ylim()
