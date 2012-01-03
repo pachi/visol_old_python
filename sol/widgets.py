@@ -29,6 +29,7 @@ matplotlib.use('GTKCairo')
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtkcairo import FigureCanvasGTKCairo
 from matplotlib.font_manager import FontProperties
+from matplotlib.transforms import offset_copy
 from util import myround
 
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
@@ -54,7 +55,18 @@ class HistoBase(FigureCanvasGTKCairo):
         self.fig.set_facecolor('w')
         self.ax1 = self.fig.add_subplot(111)
         self.ax1.set_axis_bgcolor('#f6f6f6')
-
+        
+        # Tamaños de letra y transformaciones para etiquetas de barras
+        fontsize = matplotlib.rcParams['font.size']
+        labelscale = 0.7
+        self.labelfs = fontsize * labelscale
+        labeloffset = fontsize * (1.0 - labelscale)
+        
+        self.trneg = offset_copy(self.ax1.transData, fig=self.fig,
+                                 x=0, y=-fontsize, units='points')
+        self.trpos = offset_copy(self.ax1.transData, fig=self.fig,
+                                 x=0, y=labeloffset, units='points')
+    
     @property
     def modo(self):
         return self._modo
@@ -77,18 +89,19 @@ class HistoBase(FigureCanvasGTKCairo):
 
     def autolabel(self, ax, rects):
         """Etiquetar valores fuera de las barras"""
-        #TODO: usar altura de texto en lugar de displacement
-        # ver http://matplotlib.sourceforge.net/faq/howto_faq.html
-        # Automatically make room for tick labels
-        texth = 2.0
         for rect in rects:
             height = rect.get_height()
             if height:
                 # rect.get_y() es la base del rectángulo y es 0 si es positivo
-                _h = -(height + texth + 0.5) if rect.get_y() else (height + 0.5)
-                ax.text(rect.get_x() + rect.get_width() / 2.0,
-                        _h, '%.1f' % round(height, 1),
-                        ha='center', va='bottom', size='small')
+                rectbasey = rect.get_y()
+                if rectbasey == 0:  # rectángulo en la parte positiva
+                    tr = self.trpos
+                    rectbasey = height
+                else:               # rectángulo en la parte negativa
+                    tr = self.trneg
+                ax.text(rect.get_x() + rect.get_width() / 2.0, rectbasey,
+                        '%.1f' % round(height, 1), ha='center', va='bottom',
+                        size=self.labelfs, transform=tr)
 
     def dibujaseries(self, ax):
         pass
@@ -241,11 +254,7 @@ class HistoElementos(HistoBase):
             leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
             ax1.set_ylim(min - 10, max + 10)
             ax1.set_xlim(0, ind[-1] + 6 * w) # mismo ancho aunque los extremos valgan cero
-#            self.autolabel(ax1, rectsc1)
-#            self.autolabel(ax1, rectsc2)
             self.autolabel(ax1, rectsc3)
-#            self.autolabel(ax1, rectsr1)
-#            self.autolabel(ax1, rectsr2)
             self.autolabel(ax1, rectsr3)
 
         # Demandas
