@@ -58,6 +58,7 @@ class PlantaLIDER(OrderedDict):
     refrigeracion_meses - Demandas mensuales de refrigeración de la planta [kWh/m²/mes]
 
     flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/m²año]
+    demanda - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/m²año]
     componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kWh/m²año]
     """
     def __init__(self, nombre=''):
@@ -126,16 +127,17 @@ class PlantaLIDER(OrderedDict):
     
     @property
     def demandaelementos(self):
-        """Demandas de la planta por elementos [kW/m²año]
+        """Demandas de la planta por grupos [kW/m²año]
         
-        Devuelve una tupla con las demandas de:
-            (calefacción +, calefacción -, calefacción neta,
-             refrigeración +, refrigeración -, refrigeración neta)
-        para cada grupo de la planta
-        El orden de los grupos es el del diccionario self.flujos.keys().
+        Devuelve seis tuplas de calefacción +, calefacción -, calefacción neta,
+        refrigeración +, refrigeración -, refrigeración neta que contienen el
+        valor correspondiente para cada grupo de la planta.
+        
+        El orden de los valores corresponde al de los grupos en el diccionario
+        self.flujos.keys().
         """
-        # calpos, calneg, calnet, refpos, refneg, refnet
-        return zip(*self.flujos.values())
+        calpos, calneg, calnet, refpos, refneg, refnet = zip(*self.flujos.values())
+        return calpos, calneg, calnet, refpos, refneg, refnet
         
 
 class ZonaLIDER(object):
