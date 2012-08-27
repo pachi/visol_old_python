@@ -216,6 +216,11 @@ class HistoElementos(HistoBase):
         self.title = u"Demandas por elemento"
         self.xlabel = u"Elemento"
         self.ylabel = u"Demanda [kWh/m²mes]"
+        # Muestra o no los distintos desgloses de calefacción y refrigeración
+        self.showcalpos = True
+        self.showcalneg = True
+        self.showrefpos = True
+        self.showrefneg = True
 
     def minmaxplanta(self):
         """Mínimo y máximo de la escala vertical para todas las zonas de una planta"""
@@ -234,49 +239,68 @@ class HistoElementos(HistoBase):
         El eje horizontal representa los elementos y el eje vertical la
         demanda existente [kWh/m²año]
         """
-        #TODO: Comprobar si la demanda es anual
-
         def barras(demandas):
+            """Dibuja las barras de demanda para las series activas"""
             calpos = demandas.get('cal+', [])
             calneg = demandas.get('cal-', [])
             calnet = demandas.get('cal', [])
             refpos = demandas.get('ref+', [])
             refneg = demandas.get('ref-', [])
             refnet = demandas.get('ref', [])
-            min, max = self.minmaxplanta()
-            w = 1.0 / 6
-            # Calefacción
-            rectsc1 = ax1.bar(ind + 0.5*w, calpos, w, align='center', fc='#FFBBFF', ec='0.5')
-            rectsc2 = ax1.bar(ind + 1.5*w, calneg, w, align='center', fc='#FF6666', ec='0.5')
-            rectsc3 = ax1.bar(ind + 2.5*w, calnet, w, align='center', fc='#FF0000', ec='k')
-            # Refrigeración
-            rectsr1 = ax1.bar(ind + 3.5*w, refpos, w, align='center', fc='#6666FF', ec='0.5')
-            rectsr2 = ax1.bar(ind + 4.5*w, refneg, w, align='center', fc='#B3FFB3', ec='0.5')
-            rectsr3 = ax1.bar(ind + 5.5*w, refnet, w, align='center', fc='#0000FF', ec='k')
-            leg = ax1.legend((rectsc1[0], rectsc2[0], rectsc3[0], rectsr1[0], rectsr2[0], rectsr3[0]),
-                             ('Calefacción +', 'Calefacción -', 'Calefacción', 'Refrigeración +', 'Refrigeración -', 'Refrigeración'),
-                             loc='lower left', prop={"size":'small'}, fancybox=True)
+            if self.modo == 'edificio':
+                mind = min(calneg + refneg)
+                maxd = max(calpos + refpos + calnet + refnet)
+            else:
+                mind, maxd = self.minmaxplanta()
+            
+            seriesall = []
+            
+            if self.showcalpos:
+                seriesall.append((calpos, '#FFBBFF', '0.5', 'Calefacción +'))
+            if self.showcalneg:
+                seriesall.append((calneg, '#FF6666', '0.5', 'Calefacción -'))
+            seriesall.append((calnet, '#FF0000', 'k', 'Calefacción'))
+            if self.showrefpos:
+                seriesall.append((refpos, '#6666FF', '0.5', 'Refrigeración +'))
+            if self.showrefneg:
+                seriesall.append((refneg, '#B3FFB3', '0.5', 'Refrigeración -'))
+            seriesall.append((refnet, '#0000FF', 'k', 'Refrigeración'))
+            
+            active = len(seriesall) # total active series
+            w = 1.0 / active # width of each active serie
+            
+            seriesd = []
+            labelsd = []
+            
+            for ii, (serie, fc, ec, label) in enumerate(seriesall):
+                rects = ax1.bar(ind+(ii+0.5)*w, serie, w, align='center', fc=fc, ec=ec)
+                seriesd.append(rects[0])
+                labelsd.append(label)
+                if label == 'Calefacción' or label == 'Refrigeración':
+                    self.autolabel(ax1, rects)
+            
+            leg = ax1.legend(seriesd, labelsd, loc='lower left',
+                             prop={"size":'small'}, fancybox=True)
             leg.draw_frame(False)
             leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
-            ax1.set_ylim(min - 10, max + 10)
-            ax1.set_xlim(0, ind[-1] + 6 * w) # mismo ancho aunque los extremos valgan cero
-            self.autolabel(ax1, rectsc3)
-            self.autolabel(ax1, rectsr3)
+            ax1.set_ylim(mind - 10, maxd + 10)
+            ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
 
         # Demandas
         if self.modo == 'edificio' and self.edificio:
             #TODO: demandas por elementos para edificio
-            pass
+            edificio = self.edificio
+            x_labels = ["\n".join(name.split()) for name in edificio.flujos]
+            demandas = edificio.demandas
         elif self.modo == 'planta':
             # Demandas por elementos para planta
             planta = self.edificio.plantas[self.planta]
-            x_labels = ["\n".join(name.split()) for name in planta.flujos.keys()]
+            x_labels = ["\n".join(name.split()) for name in planta.flujos]
             demandas = planta.demandas
-
         elif self.modo == 'zona' and self.zona:
             # Datos por elementos para una zona
             zona = self.edificio.plantas[self.planta][self.zona]
-            x_labels = ["\n".join(name.split()) for name in zona.flujos.keys()]
+            x_labels = ["\n".join(name.split()) for name in zona.flujos]
             demandas = zona.demandas
         
         ind = numpy.arange(len(x_labels))
