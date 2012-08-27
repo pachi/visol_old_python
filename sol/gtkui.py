@@ -76,9 +76,9 @@ class GtkSol(object):
 
 
         # Filtro de archivos
-        filter = self.ui.get_object('filefilter')
-        filter.set_name('Archivos *.res')
-        filter.add_pattern('*.res')
+        ffilter = self.ui.get_object('filefilter')
+        ffilter.set_name('Archivos *.res')
+        ffilter.add_pattern('*.res')
 
         self.ui.connect_signals(self)
         # Carga datos de materiales, cerramientos y clima
@@ -98,7 +98,7 @@ class GtkSol(object):
         for planta in e.plantas:
             parentiter = self.edificiots.append(topiter, (planta, 'planta', ed, planta, ''))
             for zona in e.plantas[planta]:
-                iter= self.edificiots.append(parentiter, (zona, 'zona', ed, planta, zona))
+                self.edificiots.append(parentiter, (zona, 'zona', ed, planta, zona))
         self.edificiotv.expand_all()
         self.histomeses.edificio = e
         self.histoelementos.edificio = e
