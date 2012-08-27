@@ -44,6 +44,54 @@ class EdificioLIDER(object):
             if nombrezona in self.plantas[planta]:
                 return self.plantas[planta][nombrezona]
         return None
+    
+    @property
+    def flujos(self, grupos=None):
+        """Flujos de calor de los grupos, para el edificio [kW/m²·año]
+        
+        Si se indica una lista de grupos devuelve los flujos para esos grupos.
+        Si no se indica grupos se consideran todos los grupos posibles.
+        
+        Devuelve un diccionario indexado por grupo (p.e. u'Paredes exteriores')
+        que contiene una tupla con las demandas de cada grupo:
+            (calefacción +, calefacción -, calefacción neta,
+             refrigeración +, refrigeración -, refrigeración neta)
+        """
+        if not grupos:
+            # Todas las zonas incluyen por defecto todos los grupos
+            plname = self.plantas.keys()[0]
+            zonaname = self.plantas[plname].keys()[0]
+            grupos = self.plantas[plname][zonaname].flujos.keys()
+            # TODO: se podría comprobar que grupos no es []
+        if not isinstance(grupos, (list, tuple)):
+            grupos = list(grupos)
+        dic = OrderedDict()
+        #TODO: hacer Edificio iterable, devolviendo las plantas, para acceder directamente
+        for grupo in grupos:
+            params = [self.plantas[planta].superficie *
+                      numpy.array(self.plantas[planta].flujos[grupo]) for planta in self.plantas]
+            plist = [sum(lst) for lst in zip(*params)]
+            dic[grupo] = tuple(numpy.array(plist) / self.superficie)
+        return dic
+        
+    @property
+    def demandas(self):
+        """Demandas del edificio por grupos [kW/m²·año]
+        
+        Devuelve un diccionario con seis tuplas de calefacción +, calefacción -,
+        calefacción neta, refrigeración +, refrigeración -, refrigeración neta
+        que contienen el valor correspondiente para cada grupo del edificio.
+        
+        El orden de los valores corresponde al de los grupos en el diccionario
+        self.flujos.keys().
+        """
+        # XXX: Esto es dependiente del orden de values() y keys()...
+        d = OrderedDict()
+        (d['cal+'], d['cal-'], d['cal'],
+         d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
+        d['grupos'] = self.flujos.keys()
+        return d
+        #calpos, calneg, calnet, refpos, refneg, refnet
 
 class PlantaLIDER(OrderedDict):
     """Planta de LIDER
@@ -67,17 +115,17 @@ class PlantaLIDER(OrderedDict):
 
     @property
     def superficie(self):
-        """Superficie de la planta en m²"""
-        return sum(self[zona].superficie * self[zona].multiplicador for zona in self.keys())
+        """Superficie de la planta en m² [m²]"""
+        return sum(self[zona].superficie * self[zona].multiplicador for zona in self)
 
     @property
     def calefaccion(self):
-        """Demanda anual de calefacción por m²"""
+        """Demanda anual de calefacción por m² [kWh/m²·año]"""
         return sum(self.calefaccion_meses)
 
     @property
     def calefaccion_meses(self):
-        """Demandas de calefacción mensuales por m²"""
+        """Demandas de calefacción mensuales por m² [kWh/m²·mes]"""
         cal_planta = numpy.array([0.0] * 12)
         for nzona in self:
             zona = self[nzona]
@@ -86,12 +134,12 @@ class PlantaLIDER(OrderedDict):
 
     @property
     def refrigeracion(self):
-        """Demanda anual de refrigeración por m²"""
+        """Demanda anual de refrigeración por m² [kWh/m²·año]"""
         return sum(self.refrigeracion_meses)
 
     @property
     def refrigeracion_meses(self):
-        """Demandas de refrigeración mensuales por m²"""
+        """Demandas de refrigeración mensuales por m² [kWh/m²·mes]"""
         ref_planta = numpy.array([0.0] * 12)
         for nzona in self:
             zona = self[nzona]
@@ -100,7 +148,7 @@ class PlantaLIDER(OrderedDict):
 
     @property
     def flujos(self, grupos=None):
-        """Flujos de calor de los grupos, para la planta [kW/m²año]
+        """Flujos de calor de los grupos, para la planta [kW/m²·año]
         
         Si se indica una lista de grupos devuelve los flujos para esos grupos.
         Si no se indica grupos se consideran todos los grupos posibles.
@@ -112,7 +160,9 @@ class PlantaLIDER(OrderedDict):
         """
         if not grupos:
             # Todas las zonas incluyen por defecto todos los grupos
-            grupos = self[self.keys()[0]].flujos.keys()
+            zonaname = self.keys()[0]
+            grupos = self[zonaname].flujos.keys()
+            # TODO: se podría comprobar que grupos no es []
         if not isinstance(grupos, (list, tuple)):
             grupos = list(grupos)
         
@@ -127,7 +177,7 @@ class PlantaLIDER(OrderedDict):
     
     @property
     def demandas(self):
-        """Demandas de la planta por grupos [kW/m²año]
+        """Demandas de la planta por grupos [kW/m²·año]
         
         Devuelve un diccionario con seis tuplas de calefacción +, calefacción -,
         calefacción neta, refrigeración +, refrigeración -, refrigeración neta
@@ -142,7 +192,7 @@ class PlantaLIDER(OrderedDict):
          d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
         d['grupos'] = self.flujos.keys()
         return d
-    #calpos, calneg, calnet, refpos, refneg, refnet
+        #calpos, calneg, calnet, refpos, refneg, refnet
         
 
 class ZonaLIDER(object):
