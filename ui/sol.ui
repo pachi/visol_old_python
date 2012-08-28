@@ -125,6 +125,8 @@
       <column type="gchararray"/>
       <!-- column-name zona -->
       <column type="gchararray"/>
+      <!-- column-name componente -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window">
@@ -232,6 +234,7 @@
                 <property name="vscrollbar_policy">automatic</property>
                 <child>
                   <object class="GtkTreeView" id="treeview">
+                    <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="model">treestore</property>

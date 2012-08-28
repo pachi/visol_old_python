@@ -171,7 +171,7 @@ def parsefile(resfile):
     # Acopla plantas en edificio
     for nombreplanta in plantablocks:
         planta = parsePlanta(plantablocks[nombreplanta], nombreplanta, zonas)
-        edificio.plantas[nombreplanta] = planta
+        edificio[nombreplanta] = planta
     return edificio
 
 def loadfile(resfile):

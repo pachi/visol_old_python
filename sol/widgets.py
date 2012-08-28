@@ -39,7 +39,7 @@ class HistoBase(FigureCanvasGTKCairo):
     """Histograma de Matplotlib"""
     __gtype_name__ = 'HistoBase'
 
-    def __init__(self, edificio=None, planta=None, zona=None):
+    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
         """Constructor
 
         edificio - Edificio analizado (EdificioLIDER)
@@ -49,6 +49,7 @@ class HistoBase(FigureCanvasGTKCairo):
         self.edificio = edificio
         self.planta = planta
         self.zona = zona
+        self.componente = componente
 
         self.fig = Figure()
         FigureCanvasGTKCairo.__init__(self, self.fig)
@@ -78,14 +79,15 @@ class HistoBase(FigureCanvasGTKCairo):
 
     @property
     def data(self):
-        return self.edificio, self.planta, self.zona
+        return self.edificio, self.planta, self.zona, self.componente
 
     @data.setter
     def data(self, value):
-        edificio, planta, zona = value
+        edificio, planta, zona, componente = value
         #self.edificio = edificio # Es el nombre, no el objeto edificio
         self.planta = planta
         self.zona = zona
+        self.componente = componente
 
     def autolabel(self, ax, rects):
         """Etiquetar valores fuera de las barras"""
@@ -137,12 +139,12 @@ class HistoMeses(HistoBase):
     """
     __gtype_name__ = 'HistoMeses'
 
-    def __init__(self, edificio=None, planta=None, zona=None):
+    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
         """Constructor
 
         zona - Zona analizada
         """
-        HistoBase.__init__(self, edificio, planta, zona)
+        HistoBase.__init__(self, edificio, planta, zona, componente)
         self._modo = 'edificio'
 
         self.title = u"Demanda mensual"
@@ -188,14 +190,14 @@ class HistoMeses(HistoBase):
         _min, _max = self.minmax()
 
         # Demandas
-        if self.modo == 'edificio' and self.edificio:
+        if self.modo == 'edificio' and self.edificio is not None:
             e = self.edificio
             barras(_min, _max, e.calefaccion_meses, e.refrigeracion_meses)
         elif self.modo == 'planta':
-            pl = self.edificio.plantas[self.planta]
+            pl = self.edificio[self.planta]
             barras(_min, _max, pl.calefaccion_meses, pl.refrigeracion_meses)
         elif self.modo == 'zona' and self.zona:
-            zona = self.edificio.plantas[self.planta][self.zona]
+            zona = self.edificio[self.planta][self.zona]
             barras(_min, _max,zona.calefaccion_meses, zona.refrigeracion_meses)
 
 class HistoElementos(HistoBase):
@@ -205,12 +207,12 @@ class HistoElementos(HistoBase):
     """
     __gtype_name__ = 'HistoElementos'
 
-    def __init__(self, edificio=None, planta=None, zona=None):
+    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
         """Constructor
 
         zona - Zona analizada
         """
-        HistoBase.__init__(self, edificio, planta, zona)
+        HistoBase.__init__(self, edificio, planta, zona, componente)
         self._modo = 'edificio'
 
         self.title = u"Demandas por elemento"
@@ -225,7 +227,7 @@ class HistoElementos(HistoBase):
     def minmaxplanta(self):
         """Mínimo y máximo de la escala vertical para todas las zonas de una planta"""
         pmin, pmax = [], []
-        zonas = self.edificio.plantas[self.planta]
+        zonas = self.edificio[self.planta]
         for nzona in zonas:
             zona = zonas[nzona]
             x_names = zona.flujos.keys()
@@ -287,21 +289,27 @@ class HistoElementos(HistoBase):
             ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
 
         # Demandas
-        if self.modo == 'edificio' and self.edificio:
+        if self.modo == 'edificio' and self.edificio is not None:
             #TODO: demandas por elementos para edificio
             edificio = self.edificio
             x_labels = ["\n".join(name.split()) for name in edificio.flujos]
             demandas = edificio.demandas
         elif self.modo == 'planta':
             # Demandas por elementos para planta
-            planta = self.edificio.plantas[self.planta]
+            planta = self.edificio[self.planta]
             x_labels = ["\n".join(name.split()) for name in planta.flujos]
             demandas = planta.demandas
         elif self.modo == 'zona' and self.zona:
             # Datos por elementos para una zona
-            zona = self.edificio.plantas[self.planta][self.zona]
+            zona = self.edificio[self.planta][self.zona]
             x_labels = ["\n".join(name.split()) for name in zona.flujos]
             demandas = zona.demandas
+        elif self.modo == 'componente' and self.componente:
+            #TODO: preparar vista de componente
+            print self.componente, "visto"
+        else:
+            raise NameError("Modo de operación inesperado: %s (%s, %s, %s, %s)" % 
+                        (self.modo, self.edificio, self.planta, self.zona, self.componente))
         
         ind = numpy.arange(len(x_labels))
         barras(demandas)

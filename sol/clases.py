@@ -4,10 +4,10 @@
 import numpy
 from collections import OrderedDict
 
-class EdificioLIDER(object):
+class EdificioLIDER(OrderedDict):
     """Edificio en LIDER
 
-    El edificio está organizado por plantas y contiene los siguientes datos:
+    El edificio es un diccionario de plantas y tiene las siguientes propiedades
 
     nombre - Nombre del edificio
     numplantas - Número de plantas del edificio
@@ -17,10 +17,10 @@ class EdificioLIDER(object):
     refrigeracion - Demanda anual de refrigeración del edificio  [kWh/m²/año]
     calefaccion_meses   - Demandas mensuales de calefacción del edificio [kWh/m²/mes]
     refrigeracion_meses - Demandas mensuales de refrigeración del edificio [kWh/m²/mes]
-    plantas - Diccionario de zonas por planta
     resdata - Contenido del archivo .RES del edificio
     """
     def __init__(self, nombre='Edificio1'):
+        OrderedDict.__init__(self)
         self.nombre = nombre
         self.numplantas = 0
         self.numzonas = 0
@@ -29,20 +29,19 @@ class EdificioLIDER(object):
         self.refrigeracion = 0.0
         self.calefaccion_meses = []
         self.refrigeracion_meses = []
-        self.plantas = OrderedDict()
         self.resdata = ''
 
     @property
     def zonas(self):
         """Devuelve las zonas del edificio"""
-        return [self.plantas[planta][zona] for planta in self.plantas for zona in self.plantas[planta]]
+        return [self[planta][zona] for planta in self for zona in self[planta]]
 
     def zona(self, nombrezona):
         #BUG: esto falla si hay varias zonas con el mismo nombre
         """Devuelve zona a partir del nombre"""
-        for planta in self.plantas:
-            if nombrezona in self.plantas[planta]:
-                return self.plantas[planta][nombrezona]
+        for planta in self:
+            if nombrezona in self[planta]:
+                return self[planta][nombrezona]
         return None
     
     @property
@@ -59,18 +58,18 @@ class EdificioLIDER(object):
         """
         if not grupos:
             # Todas las zonas incluyen por defecto todos los grupos
-            plname = self.plantas.keys()[0]
-            zonaname = self.plantas[plname].keys()[0]
-            grupos = self.plantas[plname][zonaname].flujos.keys()
+            plname = self.keys()[0]
+            zonaname = self[plname].keys()[0]
+            grupos = self[plname][zonaname].flujos.keys()
             # TODO: se podría comprobar que grupos no es []
         if not isinstance(grupos, (list, tuple)):
             grupos = list(grupos)
         dic = OrderedDict()
         #TODO: hacer Edificio iterable, devolviendo las plantas, para acceder directamente
         for grupo in grupos:
-            params = [self.plantas[planta].superficie *
-                      numpy.array(self.plantas[planta].flujos[grupo])
-                      for planta in self.plantas]
+            params = [self[planta].superficie *
+                      numpy.array(self[planta].flujos[grupo])
+                      for planta in self]
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / self.superficie)
         return dic

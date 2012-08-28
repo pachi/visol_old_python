@@ -94,11 +94,15 @@ class GtkSol(object):
         self.edificiots.clear()
         # Modelo de plantas y zonas
         ed = e.nombre
-        topiter = self.edificiots.append(None, (ed, 'edificio', ed, '', ''))
-        for planta in e.plantas:
-            parentiter = self.edificiots.append(topiter, (planta, 'planta', ed, planta, ''))
-            for zona in e.plantas[planta]:
-                self.edificiots.append(parentiter, (zona, 'zona', ed, planta, zona))
+        edificioiter = self.edificiots.append(None, (ed, 'edificio', ed, '', '', ''))
+        for planta in e:
+            plantaiter = self.edificiots.append(edificioiter, (planta, 'planta', ed, planta, '', ''))
+            zonas = e[planta]
+            for zona in zonas:
+                zonaiter = self.edificiots.append(plantaiter, (zona, 'zona', ed, planta, zona, ''))
+                componentes = zonas[zona].componentes 
+                for componente in componentes:
+                    self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente))
         self.edificiotv.expand_all()
         self.histomeses.edificio = e
         self.histoelementos.edificio = e
@@ -115,24 +119,29 @@ class GtkSol(object):
         """Seleccionada una nueva fila de la vista de árbol"""
         path, col = tv.get_cursor()
         tm = tv.get_model()
-        nombre, tipo, ed, pl, zn = tm[path]
-        self.histomeses.data = (ed, pl, zn)
-        self.histoelementos.data = (ed, pl, zn)
+        nombre, tipo, ed, pl, zn, comp = tm[path]
+        self.histomeses.data = (ed, pl, zn, comp)
+        self.histoelementos.data = (ed, pl, zn, comp)
         if tipo == 'edificio':
             objeto = self.model.edificio
             self.histomeses.modo = 'edificio'
             self.histoelementos.modo = 'edificio'
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
         elif tipo == 'planta':
-            objeto = self.model.edificio.plantas[nombre]
+            objeto = self.model.edificio[nombre]
             self.histomeses.modo = 'planta'
             self.histoelementos.modo = 'planta'
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
         elif tipo == 'zona':
-            objeto = self.model.edificio.plantas[pl][zn]
+            objeto = self.model.edificio[pl][zn]
             self.histomeses.modo = 'zona'
             self.histoelementos.modo = 'zona'
             sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
+        elif tipo == 'componente':
+            #TODO: hacer zona un diccionario de componentes
+            objeto = self.model.edificio[pl][zn].componentes[comp]
+            self.histomeses.modo = 'componente'
+            self.histoelementos.modo = 'componente'
         else:
             raise "Tipo desconocido"
 
