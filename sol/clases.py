@@ -69,7 +69,8 @@ class EdificioLIDER(object):
         #TODO: hacer Edificio iterable, devolviendo las plantas, para acceder directamente
         for grupo in grupos:
             params = [self.plantas[planta].superficie *
-                      numpy.array(self.plantas[planta].flujos[grupo]) for planta in self.plantas]
+                      numpy.array(self.plantas[planta].flujos[grupo])
+                      for planta in self.plantas]
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / self.superficie)
         return dic
@@ -168,9 +169,9 @@ class PlantaLIDER(OrderedDict):
         
         dic = OrderedDict()
         for grupo in grupos:
-            params = [self[object].superficie *
-                      self[object].multiplicador *
-                      numpy.array(self[object].flujos[grupo]) for object in self]
+            params = [self[zona].superficie *
+                      self[zona].multiplicador *
+                      numpy.array(self[zona].flujos[grupo]) for zona in self]
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / self.superficie)
         return dic
