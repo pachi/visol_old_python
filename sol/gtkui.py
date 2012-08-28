@@ -100,8 +100,7 @@ class GtkSol(object):
             zonas = e[planta]
             for zona in zonas:
                 zonaiter = self.edificiots.append(plantaiter, (zona, 'zona', ed, planta, zona, ''))
-                componentes = zonas[zona].componentes 
-                for componente in componentes:
+                for componente in zonas[zona]:
                     self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente))
         self.edificiotv.expand_all()
         self.histomeses.edificio = e
@@ -138,8 +137,7 @@ class GtkSol(object):
             self.histoelementos.modo = 'zona'
             sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
         elif tipo == 'componente':
-            #TODO: hacer zona un diccionario de componentes
-            objeto = self.model.edificio[pl][zn].componentes[comp]
+            objeto = self.model.edificio[pl][zn][comp]
             self.histomeses.modo = 'componente'
             self.histoelementos.modo = 'componente'
         else:

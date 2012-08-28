@@ -307,6 +307,8 @@ class HistoElementos(HistoBase):
         elif self.modo == 'componente' and self.componente:
             #TODO: preparar vista de componente
             print self.componente, "visto"
+            print "Implementar vista de componentes"
+            raise NotImplementedError()
         else:
             raise NameError("Modo de operación inesperado: %s (%s, %s, %s, %s)" % 
                         (self.modo, self.edificio, self.planta, self.zona, self.componente))

@@ -195,10 +195,12 @@ class PlantaLIDER(OrderedDict):
         #calpos, calneg, calnet, refpos, refneg, refnet
         
 
-class ZonaLIDER(object):
+class ZonaLIDER(OrderedDict):
     """Zona de edificio de LIDER
 
-    Las zonas incluyen los siguientes datos:
+    Diccionario de componentes, con los siguientes atributos:
+    Los componentes incluyen flujos de calor por componente
+        (Hueco H1, muro M1...) [kWh/año]
 
     nombre - Nombre de la zona
     numero - Número identificativo de la zona
@@ -210,10 +212,10 @@ class ZonaLIDER(object):
     calefaccion_meses - Demanda mensual de calefacción de la zona [kWh/m²/mes]
     refrigeración_meses - Demanda mensual de refrigeración de la zona [kWh/m²/mes]
     flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/año]
-    componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kWh/año]
     """
     def __init__(self, nombre=None, superficie=0.0, multiplicador=1.0,
                  calefaccion=0.0, refrigeracion=0.0):
+        OrderedDict.__init__(self)
         self.nombre = nombre
         self.numero = None
         self.planta = None
@@ -227,7 +229,6 @@ class ZonaLIDER(object):
         # Calef. positivo, Calef. negativo, Calef. neto
         # Ref. poisitivo, Ref. negativo, Ref. neto
         self.flujos = None
-        self.componentes = None
 
     @property
     def demandas(self):

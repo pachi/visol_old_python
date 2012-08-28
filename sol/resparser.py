@@ -127,12 +127,14 @@ def parsePlanta(block, nombreplanta, zonas):
                     break
                 elif line.startswith(u'Zona '):
                     numzona, nombrezona = line[4:].split(',')
-                    # XXX: ¿Se usa en algún lado o vale con nombrezona?
-                    numzona = int(numzona)
                     nombrezona = nombrezona.strip(u' "')
-                    superficie = float(next(iblock))
-                    flujos = OrderedDict()
+                    zona = zonas[nombrezona]
+                    zona.numero = int(numzona)
+                    zona.planta = nombreplanta
+                    zona.superficie = float(next(iblock))
+                    
                     # Procesamos los flujos de zona, que finalizan con el TOTAL
+                    flujos = OrderedDict()
                     for zline in iblock:
                         if zline.startswith(u'Concepto') or not zline:
                             continue
@@ -140,26 +142,21 @@ def parsePlanta(block, nombreplanta, zonas):
                         flujos[concepto] = vals
                         if zline.startswith(u'TOTAL'):
                             break
+                    zona.flujos = flujos
+                    
                     # Procesamos los componentes de zona, que están contados
                     for zline in iblock:
                         if zline.startswith(u'Numero de Componentes'):
                             numcomponentes = int(next(iblock))
                             next(iblock) # títulos
-                            componentes = OrderedDict()
                             for j, zline in enumerate(iblock):
-                                concepto, vals = valores(zline)
-                                componentes[concepto] = vals
+                                componente, vals = valores(zline)
+                                zona[componente] = vals
                                 if j == numcomponentes - 1:
                                     break
                             break
+                    
                     zonasencontradas += 1
-
-                    zona = zonas[nombrezona]
-                    zona.numero = numzona
-                    zona.planta = nombreplanta
-                    zona.superficie = superficie
-                    zona.flujos = flujos
-                    zona.componentes = componentes
                     planta[nombrezona] = zona
     return planta
 
@@ -216,7 +213,7 @@ if __name__ == '__main__':
     print zona.planta
     print zona.superficie
     print zona.multiplicador
-    print zona.componentes
+    print zona.keys()
     print zona.flujos
     print zona.calefaccion
     print zona.refrigeracion
