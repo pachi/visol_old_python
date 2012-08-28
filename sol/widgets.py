@@ -215,7 +215,7 @@ class HistoElementos(HistoBase):
 
         self.title = u"Demandas por elemento"
         self.xlabel = u"Elemento"
-        self.ylabel = u"Demanda [kWh/m²mes]"
+        self.ylabel = u"Demanda [kWh/m²·año]"
         # Muestra o no los distintos desgloses de calefacción y refrigeración
         self.showcalpos = True
         self.showcalneg = True
