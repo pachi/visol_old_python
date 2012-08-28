@@ -149,7 +149,11 @@ class GtkSol(object):
         cbcalneg = self.ui.get_object('cbcalneg')
         cbrefpos = self.ui.get_object('cbrefpos')
         cbrefneg = self.ui.get_object('cbrefneg')
-        print cbcalpos.props.active, cbcalneg.props.active, cbrefpos.props.active, cbrefneg.props.active
+        self.histoelementos.showcalpos = cbcalpos.props.active
+        self.histoelementos.showcalneg = cbcalneg.props.active
+        self.histoelementos.showrefpos = cbrefpos.props.active
+        self.histoelementos.showrefneg = cbrefneg.props.active
+        self.histoelementos.dibuja()
 
     #{ Funciones generales de aplicación
     def openfile(self, toolbutton):
