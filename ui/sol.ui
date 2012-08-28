@@ -222,19 +222,19 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox1">
+          <object class="GtkHPaned" id="hpaned1">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can_focus">True</property>
             <child>
               <object class="GtkScrolledWindow" id="scrolledwindow2">
-                <property name="width_request">130</property>
+                <property name="width_request">200</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="hscrollbar_policy">automatic</property>
                 <property name="vscrollbar_policy">automatic</property>
                 <child>
                   <object class="GtkTreeView" id="treeview">
-                    <property name="width_request">100</property>
+                    <property name="width_request">200</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="model">treestore</property>
@@ -257,24 +257,13 @@
                 </child>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkVSeparator" id="vseparator1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
               </packing>
             </child>
             <child>
               <object class="GtkVBox" id="vbox2">
+                <property name="width_request">600</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -321,29 +310,6 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbmeses">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child type="tab">
-                      <object class="GtkLabel" id="label2">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Meses</property>
-                      </object>
-                      <packing>
-                        <property name="position">1</property>
-                        <property name="tab_fill">False</property>
-                      </packing>
-                    </child>
-                    <child>
                       <object class="GtkVBox" id="vbelementos">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -361,6 +327,7 @@
                                 <property name="receives_default">False</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
+                                <property name="use_underline">True</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </object>
@@ -373,6 +340,7 @@
                                 <property name="receives_default">False</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
+                                <property name="use_underline">True</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </object>
@@ -389,6 +357,7 @@
                                 <property name="receives_default">False</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
+                                <property name="use_underline">True</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </object>
@@ -405,6 +374,7 @@
                                 <property name="receives_default">False</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
+                                <property name="use_underline">True</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                               </object>
@@ -438,7 +408,7 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="position">2</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child type="tab">
@@ -448,12 +418,12 @@
                         <property name="label" translatable="yes">Elementos</property>
                       </object>
                       <packing>
-                        <property name="position">2</property>
+                        <property name="position">1</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbcomponentes">
+                      <object class="GtkVBox" id="vbmeses">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
@@ -461,18 +431,17 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="position">3</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child type="tab">
-                      <object class="GtkLabel" id="label6">
+                      <object class="GtkLabel" id="label2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Componentes</property>
-                        <property name="justify">center</property>
+                        <property name="label" translatable="yes">Meses</property>
                       </object>
                       <packing>
-                        <property name="position">3</property>
+                        <property name="position">2</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
@@ -485,9 +454,8 @@
                 </child>
               </object>
               <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
               </packing>
             </child>
           </object>

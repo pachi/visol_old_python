@@ -222,10 +222,10 @@ class HistoElementos(HistoBase):
         self.xlabel = u"Elemento"
         self.ylabel = u"Demanda [kWh/m²·año]"
         # Muestra o no los distintos desgloses de calefacción y refrigeración
-        self.showcalpos = True
-        self.showcalneg = True
-        self.showrefpos = True
-        self.showrefneg = True
+        self.showcalpos = False
+        self.showcalneg = False
+        self.showrefpos = False
+        self.showrefneg = False
 
     def minmaxplanta(self):
         """Mínimo y máximo de la escala vertical para todas las zonas de una planta"""

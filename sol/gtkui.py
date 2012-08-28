@@ -84,7 +84,7 @@ class GtkSol(object):
         # Carga datos de materiales, cerramientos y clima
         self.loadfile(TESTFILE)
 
-        self.edificiotv.set_cursor((0,0,0))
+        self.edificiotv.set_cursor((0,))
 
     def loadfile(self, file=TESTFILE):
         """Carga archivo en el modelo y actualiza la interfaz"""
@@ -92,6 +92,7 @@ class GtkSol(object):
         e = self.model.edificio
         self.tb.set_text(e.resdata)
         self.edificiots.clear()
+        self.edificiotv.collapse_all()
         # Modelo de plantas y zonas
         ed = e.nombre
         edificioiter = self.edificiots.append(None, (ed, 'edificio', ed, '', '', ''))
@@ -100,9 +101,9 @@ class GtkSol(object):
             zonas = e[planta]
             for zona in zonas:
                 zonaiter = self.edificiots.append(plantaiter, (zona, 'zona', ed, planta, zona, ''))
+                self.edificiotv.expand_to_path(self.edificiots.get_path(zonaiter))
                 for componente in zonas[zona]:
                     self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente))
-        self.edificiotv.expand_all()
         self.histomeses.edificio = e
         self.histoelementos.edificio = e
         self.sb.push(0, u'Cargado modelo: %s' % file)
@@ -143,16 +144,20 @@ class GtkSol(object):
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
             ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
         elif tipo == 'componente':
-            self.histomeses.modo = 'componente'
+            #self.histomeses.modo = 'componente'
+            self.ui.get_object('vbmeses').hide()
             self.histoelementos.modo = 'componente'
             objeto = self.model.edificio[pl][zn][comp]
-            sup = ''
+            sup = '\n'
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto[2]
             ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto[5]
         else:
             raise "Tipo desconocido"
+        
+        if tipo != 'componente':
+            self.ui.get_object('vbmeses').show()
 
-        txt1 = u'%s: <big>%s</big>\n' % (tipo.capitalize(), nombre)
+        txt1 = u'<big>%s</big> (%s)\n' % (nombre, tipo.capitalize())
         txt1 += sup
         txt1 += cal
         txt1 += ref
@@ -161,15 +166,12 @@ class GtkSol(object):
 
     def cbelementos(self, action):
         """Modifica el número de flujos activos en la vista de elementos"""
-        cbcalpos = self.ui.get_object('cbcalpos')
-        cbcalneg = self.ui.get_object('cbcalneg')
-        cbrefpos = self.ui.get_object('cbrefpos')
-        cbrefneg = self.ui.get_object('cbrefneg')
-        self.histoelementos.showcalpos = cbcalpos.props.active
-        self.histoelementos.showcalneg = cbcalneg.props.active
-        self.histoelementos.showrefpos = cbrefpos.props.active
-        self.histoelementos.showrefneg = cbrefneg.props.active
-        self.histoelementos.dibuja()
+        he = self.histoelementos
+        he.showcalpos = self.ui.get_object('cbcalpos').props.active
+        he.showcalneg = self.ui.get_object('cbcalneg').props.active
+        he.showrefpos = self.ui.get_object('cbrefpos').props.active
+        he.showrefneg = self.ui.get_object('cbrefneg').props.active
+        he.dibuja()
 
     #{ Funciones generales de aplicación
     def openfile(self, toolbutton):
