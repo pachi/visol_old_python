@@ -31,6 +31,7 @@ from matplotlib.backends.backend_gtkcairo import FigureCanvasGTKCairo
 from matplotlib.font_manager import FontProperties
 from matplotlib.transforms import offset_copy
 from util import myround
+from collections import OrderedDict
 
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
          'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
@@ -99,10 +100,12 @@ class HistoBase(FigureCanvasGTKCairo):
                 if rectbasey == 0:  # rectángulo en la parte positiva
                     tr = self.trpos
                     rectbasey = height
+                    k = 1.0
                 else:               # rectángulo en la parte negativa
                     tr = self.trneg
+                    k = -1.0
                 ax.text(rect.get_x() + rect.get_width() / 2.0, rectbasey,
-                        '%.1f' % round(height, 1), ha='center', va='bottom',
+                        '%.1f' % (k*round(height, 1)), ha='center', va='bottom',
                         size=self.labelfs, transform=tr)
 
     def dibujaseries(self, ax):
@@ -289,26 +292,29 @@ class HistoElementos(HistoBase):
             ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
 
         # Demandas
-        if self.modo == 'edificio' and self.edificio is not None:
+        edificio = self.edificio
+        labelrotation = 90
+        if self.modo == 'edificio' and edificio is not None:
             #TODO: demandas por elementos para edificio
-            edificio = self.edificio
             x_labels = ["\n".join(name.split()) for name in edificio.flujos]
             demandas = edificio.demandas
         elif self.modo == 'planta':
             # Demandas por elementos para planta
-            planta = self.edificio[self.planta]
+            planta = edificio[self.planta]
             x_labels = ["\n".join(name.split()) for name in planta.flujos]
             demandas = planta.demandas
-        elif self.modo == 'zona' and self.zona:
+        elif self.modo == 'zona' and self.zona is not None:
             # Datos por elementos para una zona
-            zona = self.edificio[self.planta][self.zona]
+            zona = edificio[self.planta][self.zona]
             x_labels = ["\n".join(name.split()) for name in zona.flujos]
             demandas = zona.demandas
-        elif self.modo == 'componente' and self.componente:
-            #TODO: preparar vista de componente
-            print self.componente, "visto"
-            print "Implementar vista de componentes"
-            raise NotImplementedError()
+        elif self.modo == 'componente':
+            labelrotation = 0
+            flujos = edificio[self.planta][self.zona][self.componente]
+            demandas = OrderedDict()
+            x_labels = [self.componente,]
+            (demandas['cal+'], demandas['cal-'], demandas['cal'],
+             demandas['ref+'], demandas['ref-'], demandas['ref']) = flujos
         else:
             raise NameError("Modo de operación inesperado: %s (%s, %s, %s, %s)" % 
                         (self.modo, self.edificio, self.planta, self.zona, self.componente))
@@ -316,7 +322,8 @@ class HistoElementos(HistoBase):
         ind = numpy.arange(len(x_labels))
         barras(demandas)
         ax1.set_xticks(ind + 0.5)
-        ax1.set_xticklabels(x_labels, size='small', rotation=90, ha='center')
+        ax1.set_xticklabels(x_labels, size='small',
+                            rotation=labelrotation, ha='center')
         ymin, ymax = ax1.get_ylim()
         ax1.vlines(ind, ymin, ymax, color='gray')
         ax1.grid(False)

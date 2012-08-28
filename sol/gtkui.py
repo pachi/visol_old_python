@@ -122,31 +122,40 @@ class GtkSol(object):
         self.histomeses.data = (ed, pl, zn, comp)
         self.histoelementos.data = (ed, pl, zn, comp)
         if tipo == 'edificio':
-            objeto = self.model.edificio
             self.histomeses.modo = 'edificio'
             self.histoelementos.modo = 'edificio'
+            objeto = self.model.edificio
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
+            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
+            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
         elif tipo == 'planta':
-            objeto = self.model.edificio[nombre]
             self.histomeses.modo = 'planta'
             self.histoelementos.modo = 'planta'
+            objeto = self.model.edificio[nombre]
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
+            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
+            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
         elif tipo == 'zona':
-            objeto = self.model.edificio[pl][zn]
             self.histomeses.modo = 'zona'
             self.histoelementos.modo = 'zona'
+            objeto = self.model.edificio[pl][zn]
             sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
+            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
+            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
         elif tipo == 'componente':
-            objeto = self.model.edificio[pl][zn][comp]
             self.histomeses.modo = 'componente'
             self.histoelementos.modo = 'componente'
+            objeto = self.model.edificio[pl][zn][comp]
+            sup = ''
+            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto[2]
+            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto[5]
         else:
             raise "Tipo desconocido"
 
         txt1 = u'%s: <big>%s</big>\n' % (tipo.capitalize(), nombre)
         txt1 += sup
-        txt1 += u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
-        txt1 += u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
+        txt1 += cal
+        txt1 += ref
         self.sb.push(0, u'Seleccionado %s: %s' % (tipo, nombre))
         self.ui.get_object('labelzona').props.label = txt1
 

@@ -206,7 +206,7 @@ class ZonaLIDER(OrderedDict):
     numero - Número identificativo de la zona
     planta - Nombre de la planta a la que pertenece la zona
     superficie - Superficie de la zona [m²]
-    multiplicador - Número de zonas iguales
+    multiplicador - Número de zonas iguales en la planta
     calefaccion - Demanda anual de calefacción de la zona [kWh/m²/año]
     refrigeracion - Demanda anual de refrigeración de la zona [kWh/m²/año]
     calefaccion_meses - Demanda mensual de calefacción de la zona [kWh/m²/mes]
