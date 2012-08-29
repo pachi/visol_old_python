@@ -160,7 +160,7 @@ class GtkSol(object):
         if tipo != 'componente':
             self.ui.get_object('vbmeses').show()
 
-        txt1 = u'<big>%s</big> (%s)\n' % (nombre, tipo.capitalize())
+        txt1 = u'<big><b>%s</b></big> (%s)\n' % (nombre, tipo.capitalize())
         txt1 += sup
         txt1 += cal
         txt1 += ref
