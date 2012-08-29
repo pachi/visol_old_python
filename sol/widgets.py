@@ -57,6 +57,9 @@ class HistoBase(FigureCanvasGTKCairo):
         self.fig.set_facecolor('w')
         self.ax1 = self.fig.add_subplot(111)
         self.ax1.set_axis_bgcolor('#f6f6f6')
+        self.title = ''
+        self.xlabel = ''
+        self.ylabel = ''
         
         # Tamaños de letra y transformaciones para etiquetas de barras
         fontsize = matplotlib.rcParams['font.size']
@@ -109,20 +112,20 @@ class HistoBase(FigureCanvasGTKCairo):
                         size=self.labelfs, transform=tr)
 
     def dibujaseries(self, ax):
+        """Dibuja series de datos"""
         pass
 
     def dibuja(self, width=400, height=200):
-        # Elementos generales
+        """Dibuja elementos generales de la gráfica"""
         ax1 = self.ax1
         ax1.clear() # Limpia imagen de datos anteriores
         ax1.grid(True)
         ax1.set_title(self.title, size='large')
-        ax1.set_xlabel(self.xlabel,  fontdict=dict(color='0.5'))
+        ax1.set_xlabel(self.xlabel, fontdict=dict(color='0.5'))
         ax1.set_ylabel(self.ylabel, fontdict=dict(color='0.5'))
 
         self.dibujaseries(ax1)
 
-        # Tamaño
         self.set_size_request(width, height)
         self.draw()
 
@@ -154,7 +157,7 @@ class HistoMeses(HistoBase):
         self.xlabel = u"Periodo"
         self.ylabel = u"Demanda [kWh/m²mes]"
 
-    def minmax(self):
+    def minmaxdemandas(self):
         """Mínimo y máximo en demanda por m2 del edificio.
 
         Corresponde al mínimo y máximo de las zonas, ya que las plantas y edificio
@@ -172,36 +175,36 @@ class HistoMeses(HistoBase):
         El eje horizontal representa los periodos [meses] y el eje vertical la
         demanda existente [kWh/m²mes]
         """
-
-        def barras(min, max, seriec, serier):
-            w = 1.0
-            rects1 = ax1.bar(ind, seriec, w, align='center', fc='r', ec='k')
-            rects2 = ax1.bar(ind, serier, w, align='center', fc='b', ec='k')
-            leg = ax1.legend((rects1[0], rects2[0]), ('Calefacción', 'Refrigeración'),
-                             loc='lower left', prop={"size":'small'}, fancybox=True)
-            leg.draw_frame(False)
-            leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
-            ax1.set_ylim(min - 10, max + 10)
-            self.autolabel(ax1, rects1)
-            self.autolabel(ax1, rects2)
-
-        # Datos meses
+        # Meses como etiquetas y localizamos los valores límite
         ind = numpy.arange(12)
         x_names = [mes[:3] for mes in MESES]
         ax1.set_xticks(ind)
         ax1.set_xticklabels(x_names, size='small', rotation=90)
-        _min, _max = self.minmax()
-
-        # Demandas
+        # Seleccionamos las demandas
         if self.modo == 'edificio' and self.edificio is not None:
             e = self.edificio
-            barras(_min, _max, e.calefaccion_meses, e.refrigeracion_meses)
+            seriecal, serieref = e.calefaccion_meses, e.refrigeracion_meses
         elif self.modo == 'planta':
             pl = self.edificio[self.planta]
-            barras(_min, _max, pl.calefaccion_meses, pl.refrigeracion_meses)
+            seriecal, serieref = pl.calefaccion_meses, pl.refrigeracion_meses
         elif self.modo == 'zona' and self.zona:
             zona = self.edificio[self.planta][self.zona]
-            barras(_min, _max,zona.calefaccion_meses, zona.refrigeracion_meses)
+            seriecal, serieref = zona.calefaccion_meses, zona.refrigeracion_meses
+        else:
+            seriecal, serieref = [], []
+        # Dibujamos los rectángulos
+        rects1 = ax1.bar(ind, seriecal, 1.0, align='center', fc='r', ec='k')
+        rects2 = ax1.bar(ind, serieref, 1.0, align='center', fc='b', ec='k')
+        leg = ax1.legend((rects1[0], rects2[0]),
+                         ('Calefacción', 'Refrigeración'),
+                         loc='lower left', prop={"size":'small'}, fancybox=True)
+        leg.draw_frame(False)
+        leg.get_frame().set_alpha(0.5)
+        _min, _max = self.minmaxdemandas()
+        ax1.set_ylim(_min - 10, _max + 10)
+        self.autolabel(ax1, rects1)
+        self.autolabel(ax1, rects2)
+        
 
 class HistoElementos(HistoBase):
     """Histograma de demandas por elementos
@@ -227,16 +230,13 @@ class HistoElementos(HistoBase):
         self.showrefpos = False
         self.showrefneg = False
 
-    def minmaxplanta(self):
-        """Mínimo y máximo de la escala vertical para todas las zonas de una planta"""
-        pmin, pmax = [], []
-        zonas = self.edificio[self.planta]
-        for nzona in zonas:
-            zona = zonas[nzona]
-            x_names = zona.flujos.keys()
-            pmin.append(myround(min(min(zona.flujos[name]) for zona in self.edificio.zonas for name in x_names), 10))
-            pmax.append(myround(max(max(zona.flujos[name]) for zona in self.edificio.zonas for name in x_names), 10))
-        return min(pmin), max(pmax)
+    def minmaxflujoszonas(self):
+        """Mínimo y máximo de la escala vertical para todas las zonas del edificio"""
+        x_names = self.edificio.zonas[0].flujos.keys()
+        zonas = self.edificio.zonas
+        pmin = min(min(zona.flujos[name]) for zona in zonas for name in x_names)
+        pmax = max(max(zona.flujos[name]) for zona in zonas for name in x_names)
+        return myround(pmin, 10), myround(pmax, 10)
 
     def dibujaseries(self, ax1):
         """Representa histograma de demanda por elemento
@@ -246,30 +246,17 @@ class HistoElementos(HistoBase):
         """
         def barras(demandas):
             """Dibuja las barras de demanda para las series activas"""
-            calpos = demandas.get('cal+', [])
-            calneg = demandas.get('cal-', [])
-            calnet = demandas.get('cal', [])
-            refpos = demandas.get('ref+', [])
-            refneg = demandas.get('ref-', [])
-            refnet = demandas.get('ref', [])
-            if self.modo == 'edificio':
-                mind = min(calneg + refneg)
-                maxd = max(calpos + refpos + calnet + refnet)
-            else:
-                mind, maxd = self.minmaxplanta()
-            
             seriesall = []
-            
             if self.showcalpos:
-                seriesall.append((calpos, '#FFBBFF', '0.5', 'Calefacción +'))
+                seriesall.append((demandas.get('cal+', []), '#FFBBFF', '0.5', 'Calefacción +'))
             if self.showcalneg:
-                seriesall.append((calneg, '#FF6666', '0.5', 'Calefacción -'))
-            seriesall.append((calnet, '#FF0000', 'k', 'Calefacción'))
+                seriesall.append((demandas.get('cal-', []), '#FF6666', '0.5', 'Calefacción -'))
+            seriesall.append((demandas.get('cal', []), '#FF0000', 'k', 'Calefacción'))
             if self.showrefpos:
-                seriesall.append((refpos, '#6666FF', '0.5', 'Refrigeración +'))
+                seriesall.append((demandas.get('ref+', []), '#6666FF', '0.5', 'Refrigeración +'))
             if self.showrefneg:
-                seriesall.append((refneg, '#B3FFB3', '0.5', 'Refrigeración -'))
-            seriesall.append((refnet, '#0000FF', 'k', 'Refrigeración'))
+                seriesall.append((demandas.get('ref-', []), '#B3FFB3', '0.5', 'Refrigeración -'))
+            seriesall.append((demandas.get('ref', []), '#0000FF', 'k', 'Refrigeración'))
             
             active = len(seriesall) # total active series
             w = 1.0 / active # width of each active serie
@@ -288,36 +275,31 @@ class HistoElementos(HistoBase):
                              prop={"size":'small'}, fancybox=True)
             leg.draw_frame(False)
             leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
+            mind, maxd = self.minmaxflujoszonas()
             ax1.set_ylim(mind - 10, maxd + 10)
             ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
 
-        # Demandas
+        # Flujos por elementos
         edificio = self.edificio
         labelrotation = 90
         if self.modo == 'edificio' and edificio is not None:
-            #TODO: demandas por elementos para edificio
             x_labels = ["\n".join(name.split()) for name in edificio.flujos]
             demandas = edificio.demandas
         elif self.modo == 'planta':
-            # Demandas por elementos para planta
             planta = edificio[self.planta]
             x_labels = ["\n".join(name.split()) for name in planta.flujos]
             demandas = planta.demandas
         elif self.modo == 'zona' and self.zona is not None:
-            # Datos por elementos para una zona
             zona = edificio[self.planta][self.zona]
             x_labels = ["\n".join(name.split()) for name in zona.flujos]
             demandas = zona.demandas
         elif self.modo == 'componente':
             labelrotation = 0
             flujos = edificio[self.planta][self.zona][self.componente]
-            demandas = OrderedDict()
             x_labels = [self.componente,]
-            (demandas['cal+'], demandas['cal-'], demandas['cal'],
-             demandas['ref+'], demandas['ref-'], demandas['ref']) = flujos
+            demandas = dict(zip(('cal+', 'cal-', 'cal', 'ref+', 'ref-', 'ref'), flujos))
         else:
-            raise NameError("Modo de operación inesperado: %s (%s, %s, %s, %s)" % 
-                        (self.modo, self.edificio, self.planta, self.zona, self.componente))
+            raise NameError("Modo de operación inesperado: %s" % self.modo)
         
         ind = numpy.arange(len(x_labels))
         barras(demandas)
