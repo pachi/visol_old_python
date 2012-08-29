@@ -32,6 +32,10 @@ import util, resparser
 from widgets import HistoMeses, HistoElementos
 
 TESTFILE = util.get_resource('data/test.res')
+EDIFICIOICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/edificioicono.png'))
+PLANTAICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/plantaicono.png'))
+ZONAICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/zonaicono.png'))
+COMPONENTEICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/componenteicono.png'))
 
 class VISOLModel(object):
     """Modelo para la aplicación ViSOL"""
@@ -68,12 +72,11 @@ class GtkSol(object):
 
         self.histomeses = HistoMeses()
         vb = self.ui.get_object('vbmeses')
-        vb.pack_end(self.histomeses)
+        vb.pack_start(self.histomeses)
 
         self.histoelementos = HistoElementos()
         vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
-        vb.pack_end(self.histoelementos)
-
+        vb.pack_start(self.histoelementos)
 
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')
@@ -86,27 +89,27 @@ class GtkSol(object):
 
         self.edificiotv.set_cursor((0,))
 
-    def loadfile(self, file=TESTFILE):
+    def loadfile(self, path=TESTFILE):
         """Carga archivo en el modelo y actualiza la interfaz"""
-        self.model.file = file
+        self.model.file = path
         e = self.model.edificio
         self.tb.set_text(e.resdata)
         self.edificiots.clear()
         self.edificiotv.collapse_all()
         # Modelo de plantas y zonas
         ed = e.nombre
-        edificioiter = self.edificiots.append(None, (ed, 'edificio', ed, '', '', ''))
+        edificioiter = self.edificiots.append(None, (ed, 'edificio', ed, '', '', '', EDIFICIOICON))
         for planta in e:
-            plantaiter = self.edificiots.append(edificioiter, (planta, 'planta', ed, planta, '', ''))
+            plantaiter = self.edificiots.append(edificioiter, (planta, 'planta', ed, planta, '', '', PLANTAICON))
             zonas = e[planta]
             for zona in zonas:
-                zonaiter = self.edificiots.append(plantaiter, (zona, 'zona', ed, planta, zona, ''))
+                zonaiter = self.edificiots.append(plantaiter, (zona, 'zona', ed, planta, zona, '', ZONAICON))
                 self.edificiotv.expand_to_path(self.edificiots.get_path(zonaiter))
                 for componente in zonas[zona]:
-                    self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente))
+                    self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
         self.histomeses.edificio = e
         self.histoelementos.edificio = e
-        self.sb.push(0, u'Cargado modelo: %s' % file)
+        self.sb.push(0, u'Cargado modelo: %s' % path)
 
     def showtextfile(self, button):
         """Cambia la visibilidad de la pestaña de texto"""
@@ -119,7 +122,7 @@ class GtkSol(object):
         """Seleccionada una nueva fila de la vista de árbol"""
         path, col = tv.get_cursor()
         tm = tv.get_model()
-        nombre, tipo, ed, pl, zn, comp = tm[path]
+        nombre, tipo, ed, pl, zn, comp, icon = tm[path]
         self.histomeses.data = (ed, pl, zn, comp)
         self.histoelementos.data = (ed, pl, zn, comp)
         if tipo == 'edificio':
@@ -152,7 +155,7 @@ class GtkSol(object):
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto[2]
             ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto[5]
         else:
-            raise "Tipo desconocido"
+            raise ValueError("Tipo desconocido")
         
         if tipo != 'componente':
             self.ui.get_object('vbmeses').show()
@@ -175,6 +178,7 @@ class GtkSol(object):
 
     #{ Funciones generales de aplicación
     def openfile(self, toolbutton):
+        """Abre archivo de resultados"""
         chooser = self.ui.get_object('filechooserdialog')
         chooser.set_filename(self.model.file)
         response = chooser.run()
@@ -187,9 +191,10 @@ class GtkSol(object):
         chooser.hide()
 
     def about(self, toolbutton):
+        """Diálogo de créditos"""
         about = self.ui.get_object('aboutdialog')
         about.run()
-        about.destroy()
+        about.hide()
 
     def quit(self, w, *args):
         """Salir de la aplicación"""

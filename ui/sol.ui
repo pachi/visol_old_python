@@ -5,12 +5,6 @@
   <object class="GtkAction" id="actioncbelementos">
     <signal name="activate" handler="cbelementos" swapped="no"/>
   </object>
-  <object class="GtkAction" id="salir">
-    <property name="label" translatable="yes">Salir</property>
-    <property name="tooltip" translatable="yes">Salir de la aplicación</property>
-    <property name="stock_id">gtk-quit</property>
-    <signal name="activate" handler="quit" swapped="no"/>
-  </object>
   <object class="GtkAboutDialog" id="aboutdialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -45,6 +39,12 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAction" id="salir">
+    <property name="label" translatable="yes">Salir</property>
+    <property name="tooltip" translatable="yes">Salir de la aplicación</property>
+    <property name="stock_id">gtk-quit</property>
+    <signal name="activate" handler="quit" swapped="no"/>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog">
     <property name="can_focus">False</property>
@@ -127,6 +127,8 @@
       <column type="gchararray"/>
       <!-- column-name componente -->
       <column type="gchararray"/>
+      <!-- column-name pixbuf -->
+      <column type="GdkPixbuf"/>
     </columns>
   </object>
   <object class="GtkWindow" id="window">
@@ -243,8 +245,22 @@
                     <property name="enable_tree_lines">True</property>
                     <signal name="cursor-changed" handler="cursorchanged" swapped="no"/>
                     <child>
-                      <object class="GtkTreeViewColumn" id="treeviewcolumn1">
-                        <property name="title" translatable="yes">column</property>
+                      <object class="GtkTreeViewColumn" id="treeviewcol">
+                        <property name="title" translatable="yes">Tipo</property>
+                        <child>
+                          <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1">
+                            <property name="width">16</property>
+                            <property name="height">16</property>
+                          </object>
+                          <attributes>
+                            <attribute name="pixbuf">6</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn" id="treeviewcol1">
+                        <property name="title" translatable="yes">Nombre</property>
                         <child>
                           <object class="GtkCellRendererText" id="cellrenderertext1"/>
                           <attributes>
@@ -314,6 +330,9 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
+                          <placeholder/>
+                        </child>
+                        <child>
                           <object class="GtkTable" id="table1">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
@@ -328,7 +347,7 @@
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
-                                <property name="active">True</property>
+                                <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                             </child>
@@ -341,7 +360,7 @@
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
-                                <property name="active">True</property>
+                                <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -358,7 +377,7 @@
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
-                                <property name="active">True</property>
+                                <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -375,7 +394,7 @@
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
-                                <property name="active">True</property>
+                                <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -389,7 +408,8 @@
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">0</property>
+                            <property name="pack_type">end</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                         <child>
@@ -400,11 +420,9 @@
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">1</property>
+                            <property name="pack_type">end</property>
+                            <property name="position">2</property>
                           </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                       </object>
                       <packing>
