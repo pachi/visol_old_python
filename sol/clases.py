@@ -65,7 +65,6 @@ class EdificioLIDER(OrderedDict):
         if not isinstance(grupos, (list, tuple)):
             grupos = list(grupos)
         dic = OrderedDict()
-        #TODO: hacer Edificio iterable, devolviendo las plantas, para acceder directamente
         for grupo in grupos:
             params = [self[planta].superficie *
                       numpy.array(self[planta].flujos[grupo])
