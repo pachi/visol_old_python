@@ -134,7 +134,7 @@ def parsePlanta(block, nombreplanta, zonas):
                     zona.numero = int(numzona)
                     zona.planta = nombreplanta
                     zona.superficie = float(next(iblock))
-                    
+
                     # Procesamos los flujos de zona, que finalizan con el TOTAL
                     flujos = OrderedDict()
                     for zline in iblock:
@@ -145,7 +145,7 @@ def parsePlanta(block, nombreplanta, zonas):
                         if zline.startswith(u'TOTAL'):
                             break
                     zona.flujos = flujos
-                    
+
                     # Procesamos los componentes de zona, que están contados
                     for zline in iblock:
                         if zline.startswith(u'Numero de Componentes'):
@@ -157,7 +157,7 @@ def parsePlanta(block, nombreplanta, zonas):
                                 if j == numcomponentes - 1:
                                     break
                             break
-                    
+
                     zonasencontradas += 1
                     planta[nombrezona] = zona
     return planta
