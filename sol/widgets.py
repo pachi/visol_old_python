@@ -60,18 +60,18 @@ class HistoBase(FigureCanvasGTKCairo):
         self.title = ''
         self.xlabel = ''
         self.ylabel = ''
-        
+
         # Tamaños de letra y transformaciones para etiquetas de barras
         fontsize = matplotlib.rcParams['font.size']
         labelscale = 0.7
         self.labelfs = fontsize * labelscale
         labeloffset = fontsize * (1.0 - labelscale)
-        
+
         self.trneg = offset_copy(self.ax1.transData, fig=self.fig,
                                  x=0, y=-fontsize, units='points')
         self.trpos = offset_copy(self.ax1.transData, fig=self.fig,
                                  x=0, y=labeloffset, units='points')
-    
+
     @property
     def modo(self):
         return self._modo
@@ -204,7 +204,7 @@ class HistoMeses(HistoBase):
         ax1.set_ylim(_min - 10, _max + 10)
         self.autolabel(ax1, rects1)
         self.autolabel(ax1, rects2)
-        
+
 
 class HistoElementos(HistoBase):
     """Histograma de demandas por elementos
@@ -257,20 +257,20 @@ class HistoElementos(HistoBase):
             if self.showrefneg:
                 seriesall.append((demandas.get('ref-', []), '#B3FFB3', '0.5', 'Refrigeración -'))
             seriesall.append((demandas.get('ref', []), '#0000FF', 'k', 'Refrigeración'))
-            
+
             active = len(seriesall) # total active series
             w = 1.0 / active # width of each active serie
-            
+
             seriesd = []
             labelsd = []
-            
+
             for ii, (serie, fc, ec, label) in enumerate(seriesall):
                 rects = ax1.bar(ind+(ii+0.5)*w, serie, w, align='center', fc=fc, ec=ec)
                 seriesd.append(rects[0])
                 labelsd.append(label)
                 if label == 'Calefacción' or label == 'Refrigeración':
                     self.autolabel(ax1, rects)
-            
+
             leg = ax1.legend(seriesd, labelsd, loc='lower left',
                              prop={"size":'small'}, fancybox=True)
             leg.draw_frame(False)
@@ -300,7 +300,7 @@ class HistoElementos(HistoBase):
             demandas = dict(zip(('cal+', 'cal-', 'cal', 'ref+', 'ref-', 'ref'), flujos))
         else:
             raise NameError("Modo de operación inesperado: %s" % self.modo)
-        
+
         ind = numpy.arange(len(x_labels))
         barras(demandas)
         ax1.set_xticks(ind + 0.5)
