@@ -158,6 +158,7 @@ class GtkSol(object):
             #self.histomeses.modo = 'componente'
             self.ui.get_object('vbmeses').hide()
             self.histoelementos.modo = 'componente'
+            self.globalchart.modo = 'componente'
             objeto = self.model.edificio[pl][zn][comp]
             sup = '\n'
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto[2]
