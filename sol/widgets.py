@@ -30,6 +30,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtkcairo import FigureCanvasGTKCairo
 from matplotlib.font_manager import FontProperties
 from matplotlib.transforms import offset_copy
+import matplotlib.gridspec as gridspec
 from util import myround
 from collections import OrderedDict
 
@@ -51,25 +52,20 @@ class PieGlobal(FigureCanvasGTKCairo):
         self.planta = planta
         self.zona = zona
         self.componente = componente
+        self._modo = 'edificio'
 
+        #TODO: Dejar una sola tarta, con el reparto por componentes para calefacción y refrigeración
+        #TODO: (otra opción es dos tartas, una para cal y otra de ref de componentes...)
+        #TODO: y poner abajo un texto con % de cal y % de ref.
+        self.title = 'Distribución de la demanda'
         self.fig = Figure()
         FigureCanvasGTKCairo.__init__(self, self.fig)
         self.fig.set_facecolor('w')
-        self.ax1 = self.fig.add_subplot(111)
-        self.ax1.set_axis_bgcolor('#f6f6f6')
-        self.title = 'Tarta de datos'
-
-        # Tamaños de letra y transformaciones para etiquetas de barras
-        fontsize = matplotlib.rcParams['font.size']
-        labelscale = 0.7
-        self.labelfs = fontsize * labelscale
-        labeloffset = fontsize * (1.0 - labelscale)
-
-        # self.trneg = offset_copy(self.ax1.transData, fig=self.fig,
-        #                          x=0, y=-fontsize, units='points')
-        # self.trpos = offset_copy(self.ax1.transData, fig=self.fig,
-        #                          x=0, y=labeloffset, units='points')
-        self.dibuja() #XXX: mientras probamos...
+        self.ax1 = self.fig.add_subplot(111, aspect='equal')
+        #gs = gridspec.GridSpec(1,2, width_ratios=[2,1])
+        #self.ax1 = self.fig.add_subplot(gs[0,0], aspect='equal')
+        #self.ax2 = self.fig.add_subplot(gs[0,1], aspect='equal')
+        #self.fig.subplots_adjust(left=0.14, right=0.87)#, wspace=0.3, hspace=0.3)
 
     @property
     def modo(self):
@@ -94,19 +90,45 @@ class PieGlobal(FigureCanvasGTKCairo):
 
     def dibujaseries(self, ax):
         """Dibuja series de datos"""
-        labels = 'Twice Daily', 'Daily', '3-4 times per week', 'Once per week','Occasionally'
-        fracs = [20,50,10,10,10]
+        edificio = self.edificio
+        if self.modo == 'edificio' and edificio is not None:
+            labels1 = ["calef.\n%.1f\n[kW/h·m2·año]" % edificio.calefaccion,
+                      "refr.\n%.1f\n[kW/h·m2·año]" % edificio.refrigeracion]
+            demandas1 = [abs(edificio.calefaccion), abs(edificio.refrigeracion)]
+        elif self.modo == 'planta':
+            planta = edificio[self.planta]
+            labels1 = ["calefacción\n(%.1f kW/h·m2·año)" % planta.calefaccion,
+                      "refrigeración\n (%.1f kW/h·m2·año)" % planta.refrigeracion]
+            demandas1 = [abs(planta.calefaccion), abs(planta.refrigeracion)]
+        elif self.modo == 'zona' and self.zona is not None:
+            zona = edificio[self.planta][self.zona]
+            labels1 = ["calefacción\n(%.1f kW/h·m2·año)" % zona.calefaccion,
+                      "refrigeración\n (%.1f kW/h·m2·año)" % zona.refrigeracion]
+            demandas1 = [abs(zona.calefaccion), abs(zona.refrigeracion)]
+        elif self.modo == 'componente':
+            componente = edificio[self.planta][self.zona][self.componente]
+            labels1 = ["calefacción\n(%.1f kW/h·m2·año)" % componente.calnet,
+                      "refrigeración\n (%.1f kW/h·m2·año)" % componente.refnet]
+            demandas1 = [abs(componente.calnet), abs(componente.refnet)]
+        else:
+            raise NameError("Modo de operación inesperado: %s" % self.modo)
 
-        #explode=(0, 0, 0, 0,0.1)
-        patches, texts, autotexts = ax.pie(fracs, labels=labels, #explode = explode,
-                                           autopct='%1.1f%%', shadow =False)
+        colors = ['r', 'b']
+        patches, texts, autotexts = ax.pie(demandas1, labels=labels1, colors=colors,
+                                           autopct="%1.1f%%", shadow =False)
+        for text in texts:
+            size = text.get_size()
+            text.set_fontsize(size*0.8)
+        for text in autotexts:
+            size = text.get_size()
+            text.set_fontsize(size*0.8)
 
     def dibuja(self, width=400, height=200):
         """Dibuja elementos generales de la gráfica"""
         ax1 = self.ax1
+        self.fig.suptitle(self.title, size='large')
         ax1.clear() # Limpia imagen de datos anteriores
-        #ax1.grid(True)
-        ax1.set_title(self.title, size='large')
+        ax1.set_title("Reparto por componentes", size='medium')
 
         self.dibujaseries(ax1)
 
@@ -396,7 +418,6 @@ class HistoElementos(HistoBase):
         ax1.vlines(ind, ymin, ymax, color='gray')
         ax1.grid(False)
         self.fig.subplots_adjust(bottom=0.17, left=.15)
-
 
 def get_pixbuf_from_canvas(canvas, destwidth=None):
     """Devuelve un pixbuf a partir de un canvas de Matplotlib
