@@ -5,8 +5,10 @@ Visor de archivos de resultados de LIDER
 ========================================
 """
 import codecs
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from clases import EdificioLIDER, PlantaLIDER, ZonaLIDER
+
+Componentevals = namedtuple('Componentevals', ['calpos', 'calneg', 'calnet', 'refpos', 'refneg', 'refnet'])
 
 def valores(linea):
     """Devuelve concepto y valores de líneas de detalle
@@ -139,7 +141,7 @@ def parsePlanta(block, nombreplanta, zonas):
                         if zline.startswith(u'Concepto') or not zline:
                             continue
                         concepto, vals = valores(zline)
-                        flujos[concepto] = vals
+                        flujos[concepto] = Componentevals._make(vals)
                         if zline.startswith(u'TOTAL'):
                             break
                     zona.flujos = flujos
@@ -151,7 +153,7 @@ def parsePlanta(block, nombreplanta, zonas):
                             next(iblock) # títulos
                             for j, zline in enumerate(iblock):
                                 componente, vals = valores(zline)
-                                zona[componente] = vals
+                                zona[componente] = Componentevals._make(vals)
                                 if j == numcomponentes - 1:
                                     break
                             break
