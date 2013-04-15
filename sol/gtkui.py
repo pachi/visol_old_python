@@ -87,8 +87,6 @@ class GtkSol(object):
         # Carga datos de materiales, cerramientos y clima
         self.loadfile(TESTFILE)
 
-        self.edificiotv.set_cursor((0,))
-
     def loadfile(self, path=TESTFILE):
         """Carga archivo en el modelo y actualiza la interfaz"""
         self.model.file = path
@@ -109,6 +107,7 @@ class GtkSol(object):
                     self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
         self.histomeses.edificio = e
         self.histoelementos.edificio = e
+        self.edificiotv.set_cursor((0,)) # Seleccionar edificio para recargar
         self.sb.push(0, u'Cargado modelo: %s' % path)
 
     def showtextfile(self, button):
