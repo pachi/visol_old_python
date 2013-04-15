@@ -153,7 +153,7 @@ class HistoMeses(HistoBase):
         HistoBase.__init__(self, edificio, planta, zona, componente)
         self._modo = 'edificio'
 
-        self.title = u"Demanda mensual"
+        self.title = u"Demanda neta mensual"
         self.xlabel = u"Periodo"
         self.ylabel = u"Demanda [kWh/m²mes]"
 
@@ -207,7 +207,7 @@ class HistoMeses(HistoBase):
 
 
 class HistoElementos(HistoBase):
-    """Histograma de demandas por elementos
+    """Histograma de demandas netas o separadas por elementos
 
     Dibuja un histograma de demandas de una zona por elementos
     """
