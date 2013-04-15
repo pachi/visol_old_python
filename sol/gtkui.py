@@ -29,7 +29,7 @@
 #import gobject
 import gtk
 import util, resparser
-from widgets import HistoMeses, HistoElementos
+from widgets import HistoMeses, HistoElementos, PieGlobal
 
 TESTFILE = util.get_resource('data/test.res')
 EDIFICIOICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/edificioicono.png'))
@@ -78,6 +78,10 @@ class GtkSol(object):
         vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
         vb.pack_start(self.histoelementos)
 
+        self.globalchart = PieGlobal()
+        vb = self.ui.get_object('vbglobal')
+        vb.pack_start(self.globalchart)
+
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')
         ffilter.set_name('Archivos *.res')
@@ -107,6 +111,7 @@ class GtkSol(object):
                     self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
         self.histomeses.edificio = e
         self.histoelementos.edificio = e
+        self.globalchart.edificio = e
         self.edificiotv.set_cursor((0,)) # Seleccionar edificio para recargar
         self.sb.push(0, u'Cargado modelo: %s' % path)
 
@@ -124,9 +129,11 @@ class GtkSol(object):
         nombre, tipo, ed, pl, zn, comp, icon = tm[path]
         self.histomeses.data = (ed, pl, zn, comp)
         self.histoelementos.data = (ed, pl, zn, comp)
+        self.globalchart.data = (ed, pl, zn, comp)
         if tipo == 'edificio':
             self.histomeses.modo = 'edificio'
             self.histoelementos.modo = 'edificio'
+            self.globalchart.modo = 'edificio'
             objeto = self.model.edificio
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
@@ -134,6 +141,7 @@ class GtkSol(object):
         elif tipo == 'planta':
             self.histomeses.modo = 'planta'
             self.histoelementos.modo = 'planta'
+            self.globalchart.modo = 'planta'
             objeto = self.model.edificio[nombre]
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
@@ -141,6 +149,7 @@ class GtkSol(object):
         elif tipo == 'zona':
             self.histomeses.modo = 'zona'
             self.histoelementos.modo = 'zona'
+            self.globalchart.modo = 'zona'
             objeto = self.model.edificio[pl][zn]
             sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion

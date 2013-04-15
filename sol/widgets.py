@@ -36,6 +36,92 @@ from collections import OrderedDict
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
          'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
+class PieGlobal(FigureCanvasGTKCairo):
+    """Histograma de Matplotlib"""
+    __gtype_name__ = 'PieChart'
+
+    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
+        """Constructor
+
+        edificio - Edificio analizado (EdificioLIDER)
+        planta - Nombre de la planta "actual" analizada en el edificio (str)
+        zona - Nombre de la Zona "actual" analizada en la planta (str)
+        """
+        self.edificio = edificio
+        self.planta = planta
+        self.zona = zona
+        self.componente = componente
+
+        self.fig = Figure()
+        FigureCanvasGTKCairo.__init__(self, self.fig)
+        self.fig.set_facecolor('w')
+        self.ax1 = self.fig.add_subplot(111)
+        self.ax1.set_axis_bgcolor('#f6f6f6')
+        self.title = 'Tarta de datos'
+
+        # Tamaños de letra y transformaciones para etiquetas de barras
+        fontsize = matplotlib.rcParams['font.size']
+        labelscale = 0.7
+        self.labelfs = fontsize * labelscale
+        labeloffset = fontsize * (1.0 - labelscale)
+
+        # self.trneg = offset_copy(self.ax1.transData, fig=self.fig,
+        #                          x=0, y=-fontsize, units='points')
+        # self.trpos = offset_copy(self.ax1.transData, fig=self.fig,
+        #                          x=0, y=labeloffset, units='points')
+        self.dibuja() #XXX: mientras probamos...
+
+    @property
+    def modo(self):
+        return self._modo
+
+    @modo.setter
+    def modo(self, val):
+        self._modo = val
+        self.dibuja()
+
+    @property
+    def data(self):
+        return self.edificio, self.planta, self.zona, self.componente
+
+    @data.setter
+    def data(self, value):
+        edificio, planta, zona, componente = value
+        #self.edificio = edificio # Es el nombre, no el objeto edificio
+        self.planta = planta
+        self.zona = zona
+        self.componente = componente
+
+    def dibujaseries(self, ax):
+        """Dibuja series de datos"""
+        labels = 'Twice Daily', 'Daily', '3-4 times per week', 'Once per week','Occasionally'
+        fracs = [20,50,10,10,10]
+
+        #explode=(0, 0, 0, 0,0.1)
+        patches, texts, autotexts = ax.pie(fracs, labels=labels, #explode = explode,
+                                           autopct='%1.1f%%', shadow =False)
+
+    def dibuja(self, width=400, height=200):
+        """Dibuja elementos generales de la gráfica"""
+        ax1 = self.ax1
+        ax1.clear() # Limpia imagen de datos anteriores
+        #ax1.grid(True)
+        ax1.set_title(self.title, size='large')
+
+        self.dibujaseries(ax1)
+
+        self.set_size_request(width, height)
+        self.draw()
+
+    def pixbuf(self, destwidth=600):
+        """Obtén un pixbuf a partir del canvas actual"""
+        return get_pixbuf_from_canvas(self, destwidth)
+
+    def save(self, filename='condensacionesplot.png'):
+        """Guardar y mostrar gráfica"""
+        self.fig.savefig(filename)
+
+
 class HistoBase(FigureCanvasGTKCairo):
     """Histograma de Matplotlib"""
     __gtype_name__ = 'HistoBase'
