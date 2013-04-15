@@ -5,6 +5,12 @@
   <object class="GtkAction" id="actioncbelementos">
     <signal name="activate" handler="cbelementos" swapped="no"/>
   </object>
+  <object class="GtkAction" id="salir">
+    <property name="label" translatable="yes">Salir</property>
+    <property name="tooltip" translatable="yes">Salir de la aplicación</property>
+    <property name="stock_id">gtk-quit</property>
+    <signal name="activate" handler="quit" swapped="no"/>
+  </object>
   <object class="GtkAboutDialog" id="aboutdialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -39,12 +45,6 @@
         </child>
       </object>
     </child>
-  </object>
-  <object class="GtkAction" id="salir">
-    <property name="label" translatable="yes">Salir</property>
-    <property name="tooltip" translatable="yes">Salir de la aplicación</property>
-    <property name="stock_id">gtk-quit</property>
-    <signal name="activate" handler="quit" swapped="no"/>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog">
     <property name="can_focus">False</property>
@@ -149,6 +149,7 @@
               <object class="GtkToolButton" id="abrirbutton">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Abrir archivo de resultados de LIDER (.res)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">Abrir</property>
                 <property name="use_underline">True</property>
@@ -164,6 +165,7 @@
               <object class="GtkToggleToolButton" id="showtext">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Ver contenido del archivo de resultados actual</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">Texto</property>
                 <property name="use_underline">True</property>
@@ -190,6 +192,7 @@
               <object class="GtkToolButton" id="aboutbutton">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Créditos de VisoL</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">Acerca de</property>
                 <property name="use_underline">True</property>
@@ -344,6 +347,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de calefacción (exceso de calefacción)</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
@@ -357,6 +361,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de calefacción (necesidad de calefacción)</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
@@ -374,6 +379,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de refrigeración (necesidad de refrigeración)</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
@@ -391,6 +397,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
+                                <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de refrigeración (exceso de refrigeración)</property>
                                 <property name="related_action">actioncbelementos</property>
                                 <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
