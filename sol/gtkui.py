@@ -155,7 +155,7 @@ class GtkSol(object):
             ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto[5]
         else:
             raise ValueError("Tipo desconocido")
-        
+
         if tipo != 'componente':
             self.ui.get_object('vbmeses').show()
 
