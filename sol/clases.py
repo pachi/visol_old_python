@@ -57,11 +57,7 @@ class EdificioLIDER(OrderedDict):
              refrigeración +, refrigeración -, refrigeración neta)
         """
         if not grupos:
-            # Todas las zonas incluyen por defecto todos los grupos
-            plname = self.keys()[0]
-            zonaname = self[plname].keys()[0]
-            grupos = self[plname][zonaname].flujos.keys()
-            # TODO: se podría comprobar que grupos no es []
+            grupos = self.grupos
         if not isinstance(grupos, (list, tuple)):
             grupos = list(grupos)
         dic = OrderedDict()
@@ -72,6 +68,15 @@ class EdificioLIDER(OrderedDict):
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / self.superficie)
         return dic
+
+    @property
+    def grupos(self):
+        """Lista de nombres de grupos del edificio"""
+        # Todas las zonas incluyen por defecto todos los grupos
+        plname = self.keys()[0]
+        zonaname = self[plname].keys()[0]
+        grupos = self[plname][zonaname].flujos.keys()
+        return grupos
 
     def minmaxflujoszonas(self):
         """Flujo máximo y mínimo de todas las zonas del edificio  [kW/m²·año]"""
