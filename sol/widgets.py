@@ -265,16 +265,6 @@ class HistoMeses(HistoBase):
         self.xlabel = u"Periodo"
         self.ylabel = u"Demanda [kWh/m²mes]"
 
-    def minmaxdemandas(self):
-        """Mínimo y máximo en demanda por m2 del edificio.
-
-        Corresponde al mínimo y máximo de las zonas, ya que las plantas y edificio
-        solamente tienen que tener valores más bajos por m2
-        """
-        _min = min(min(zona.calefaccion_meses) for zona in self.edificio.zonas)
-        _max = max(max(zona.refrigeracion_meses) for zona in self.edificio.zonas)
-        return myround(_min, 5), myround(_max, 5)
-
     def dibujaseries(self, ax1):
         """Representa histograma de demanda mensual para una zona
 
@@ -308,7 +298,8 @@ class HistoMeses(HistoBase):
                          loc='lower left', prop={"size":'small'}, fancybox=True)
         leg.draw_frame(False)
         leg.get_frame().set_alpha(0.5)
-        _min, _max = self.minmaxdemandas()
+        _min, _max = self.edificio.minmaxdemandas()
+        _min, _max = myround(_min, 5), myround(_max, 5)
         ax1.set_ylim(_min - 10, _max + 10)
         self.autolabel(ax1, rects1)
         self.autolabel(ax1, rects2)
@@ -337,14 +328,6 @@ class HistoElementos(HistoBase):
         self.showcalneg = False
         self.showrefpos = False
         self.showrefneg = False
-
-    def minmaxflujoszonas(self):
-        """Mínimo y máximo de la escala vertical para todas las zonas del edificio"""
-        x_names = self.edificio.zonas[0].flujos.keys()
-        zonas = self.edificio.zonas
-        pmin = min(min(zona.flujos[name]) for zona in zonas for name in x_names)
-        pmax = max(max(zona.flujos[name]) for zona in zonas for name in x_names)
-        return myround(pmin, 10), myround(pmax, 10)
 
     def dibujaseries(self, ax1):
         """Representa histograma de demanda por elemento
@@ -383,7 +366,8 @@ class HistoElementos(HistoBase):
                              prop={"size":'small'}, fancybox=True)
             leg.draw_frame(False)
             leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
-            mind, maxd = self.minmaxflujoszonas()
+            mind, maxd = self.edificio.minmaxflujoszonas()
+            mind, maxd = myround(mind, 10), myround(maxd, 10)
             ax1.set_ylim(mind - 10, maxd + 10)
             ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
 

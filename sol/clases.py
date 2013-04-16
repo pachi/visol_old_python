@@ -73,6 +73,14 @@ class EdificioLIDER(OrderedDict):
             dic[grupo] = tuple(numpy.array(plist) / self.superficie)
         return dic
 
+    def minmaxflujoszonas(self):
+        """Flujo máximo y mínimo de todas las zonas del edificio  [kW/m²·año]"""
+        zonas = self.zonas
+        names = zonas[0].flujos.keys()
+        pmin = min(min(zona.flujos[name]) for zona in zonas for name in names)
+        pmax = max(max(zona.flujos[name]) for zona in zonas for name in names)
+        return pmin, pmax
+
     @property
     def demandas(self):
         """Demandas del edificio por grupos [kW/m²·año]
@@ -91,6 +99,18 @@ class EdificioLIDER(OrderedDict):
         d['grupos'] = self.flujos.keys()
         return d
         #calpos, calneg, calnet, refpos, refneg, refnet
+
+    def minmaxdemandas(self):
+        """Mínimo y máximo en demanda del edificio [kW/m²·año]
+
+        Corresponde al mínimo y máximo de las zonas, ya que las plantas y edificio
+        solamente tienen que tener valores más bajos por m².
+        """
+        zonas = self.zonas
+        _min = min(min(zona.calefaccion_meses) for zona in zonas)
+        _max = max(max(zona.refrigeracion_meses) for zona in zonas)
+        return _min, _max
+
 
 class PlantaLIDER(OrderedDict):
     """Planta de LIDER
