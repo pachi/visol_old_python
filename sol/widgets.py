@@ -21,6 +21,8 @@
 #   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #   02110-1301, USA.
 
+import math
+import itertools
 import gtk
 import numpy
 import matplotlib
@@ -57,6 +59,11 @@ class PieGlobal(FigureCanvasGTKCairo):
         #TODO: Dejar una sola tarta, con el reparto por componentes para calefacción y refrigeración
         #TODO: (otra opción es dos tartas, una para cal y otra de ref de componentes...)
         #TODO: y poner abajo un texto con % de cal y % de ref.
+
+        #XXX: Hacer tarta con total = abs(calnet) + abs(refnet)
+        #XXX: Ver cómo mostrar por grupos las pérdidas o ganancias de energía.
+
+
         self.title = 'Distribución de la demanda'
         self.fig = Figure()
         FigureCanvasGTKCairo.__init__(self, self.fig)
@@ -90,38 +97,90 @@ class PieGlobal(FigureCanvasGTKCairo):
 
     def dibujaseries(self, ax):
         """Dibuja series de datos"""
+        def color(tipo):
+            # cal, ref
+            steps = [30, 40]
+            colors = [(255, 0, 0), (0, 0, 255)]
+            while True:
+                colorcode = '#%02x%02x%02x' % colors[tipo]
+                a, b, c = colors[tipo]
+                colors[tipo] = (a, (b + steps[tipo]) % 256, c)
+                yield colorcode
+
         edificio = self.edificio
+        grupos = edificio.grupos[:-1]
+        colorcal, colorref = color(0), color(1)
+        labels, values, colors = [], [], []
+
         if self.modo == 'edificio' and edificio is not None:
-            labels1 = ["calef.\n%.1f\n[kW/h·m2·año]" % edificio.calefaccion,
-                      "refr.\n%.1f\n[kW/h·m2·año]" % edificio.refrigeracion]
-            demandas1 = [abs(edificio.calefaccion), abs(edificio.refrigeracion)]
+            # Grupos y demandas excluidas las totales
+            demandascal = edificio.demandas['cal'][:-1]
+            demandasref = edificio.demandas['ref'][:-1]
         elif self.modo == 'planta':
             planta = edificio[self.planta]
-            labels1 = ["calefacción\n(%.1f kW/h·m2·año)" % planta.calefaccion,
-                      "refrigeración\n (%.1f kW/h·m2·año)" % planta.refrigeracion]
-            demandas1 = [abs(planta.calefaccion), abs(planta.refrigeracion)]
+            demandascal = planta.demandas['cal'][:-1]
+            demandasref = planta.demandas['ref'][:-1]
         elif self.modo == 'zona' and self.zona is not None:
             zona = edificio[self.planta][self.zona]
-            labels1 = ["calefacción\n(%.1f kW/h·m2·año)" % zona.calefaccion,
-                      "refrigeración\n (%.1f kW/h·m2·año)" % zona.refrigeracion]
-            demandas1 = [abs(zona.calefaccion), abs(zona.refrigeracion)]
+            demandascal = zona.demandas['cal'][:-1]
+            demandasref = zona.demandas['ref'][:-1]
         elif self.modo == 'componente':
             componente = edificio[self.planta][self.zona][self.componente]
-            labels1 = ["calefacción\n(%.1f kW/h·m2·año)" % componente.calnet,
-                      "refrigeración\n (%.1f kW/h·m2·año)" % componente.refnet]
-            demandas1 = [abs(componente.calnet), abs(componente.refnet)]
+            demandascal = [componente.calnet]
+            demandasref = [componente.refnet]
         else:
             raise NameError("Modo de operación inesperado: %s" % self.modo)
 
-        colors = ['r', 'b']
-        patches, texts, autotexts = ax.pie(demandas1, labels=labels1, colors=colors,
+        for grupo, demanda in itertools.chain(zip([l + " cal" for l in grupos], demandascal),
+                                              zip([l + " ref" for l in grupos], demandasref)):
+            signo = '+' if demanda >= 0 else '-'
+            labels.append("\n".join(grupo.split()) + signo)
+            values.append(abs(demanda))
+            colors.append(colorref.next() if demanda>=0 else colorcal.next())
+
+        if not any(values):
+            ax.axis('off')
+            ax.annotate("Demanda nula", (0.5, 0.5), xycoords='axes fraction', ha='center')
+            return
+        patches, texts, autotexts = ax.pie(values, colors=colors, #labels=labels, #colors=colors,
                                            autopct="%1.1f%%", shadow =False)
+        # Coloca etiquetas
         for text in texts:
             size = text.get_size()
             text.set_fontsize(size*0.8)
         for text in autotexts:
             size = text.get_size()
             text.set_fontsize(size*0.8)
+
+        for patch, label in zip(patches, labels):
+            """Dibuja etiquetas para el conjunto de sectores circulares"""
+            r = patch.r # radio del sector
+            dr = r*0.1  # separación con el sector
+            t1, t2 = patch.theta1, patch.theta2 # ángulos inicial y final del sector
+            theta = (t1+t2)/2.
+
+            # centro del sector
+            xc, yc = r/2.*math.cos(theta/180.*math.pi), r/2.*math.sin(theta/180.*math.pi)
+            # inicio de la flecha
+            x1, y1 = (r+dr)*math.cos(theta/180.*math.pi), (r+dr)*math.sin(theta/180.*math.pi)
+            if x1 > 0 : # etiquetas a la derecha
+                x1 = r + 2*dr
+                ha, va = "left", "center"
+                #tt = -180
+                cstyle="angle,angleA=0,angleB=%f" % (theta,)
+            else: # etiquetas a la izquierda
+                x1 = -(r+2*dr)
+                ha, va = "right", "center"
+                #tt = 0
+                cstyle="angle,angleA=0,angleB=%f" % (theta,)
+
+            ax.annotate(label,
+                        (xc, yc), xycoords="data", size='small',
+                        xytext=(x1, y1), textcoords="data", ha=ha, va=va,
+                        arrowprops=dict(arrowstyle="-",
+                                        connectionstyle=cstyle,
+                                        patchB=patch))
+
 
     def dibuja(self, width=400, height=200):
         """Dibuja elementos generales de la gráfica"""
