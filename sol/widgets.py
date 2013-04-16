@@ -108,50 +108,45 @@ class PieGlobal(FigureCanvasGTKCairo):
                 yield colorcode
 
         edificio = self.edificio
-        grupos = edificio.grupos[:-1]
-        colorcal, colorref = color(0), color(1)
-        labels, values, colors = [], [], []
-
         if self.modo == 'edificio' and edificio is not None:
-            # Grupos y demandas excluidas las totales
-            demandascal = edificio.demandas['cal'][:-1]
-            demandasref = edificio.demandas['ref'][:-1]
+            demandas = edificio.demandas
         elif self.modo == 'planta':
-            planta = edificio[self.planta]
-            demandascal = planta.demandas['cal'][:-1]
-            demandasref = planta.demandas['ref'][:-1]
+            demandas = edificio[self.planta].demandas
         elif self.modo == 'zona' and self.zona is not None:
-            zona = edificio[self.planta][self.zona]
-            demandascal = zona.demandas['cal'][:-1]
-            demandasref = zona.demandas['ref'][:-1]
+            demandas = edificio[self.planta][self.zona].demandas
         elif self.modo == 'componente':
             componente = edificio[self.planta][self.zona][self.componente]
-            demandascal = [componente.calnet]
-            demandasref = [componente.refnet]
+            demandas = {'cal':[componente.calnet, ''], 'ref':[componente.refnet, '']}
         else:
             raise NameError("Modo de operación inesperado: %s" % self.modo)
 
-        for grupo, demanda in itertools.chain(zip([l + " cal" for l in grupos], demandascal),
-                                              zip([l + " ref" for l in grupos], demandasref)):
-            signo = '+' if demanda >= 0 else '-'
-            labels.append("\n".join(grupo.split()) + signo)
+        # Demandas netas por grupos y grupos, excluido el grupo 'TOTAL'
+        demandas = [x + y for x, y in zip(demandas['cal'], demandas['ref'])][:-1]
+        grupos = edificio.grupos[:-1]
+
+        colorcal, colorref = color(0), color(1)
+        labels, values, colors = [], [], []
+        for demanda, grupo in sorted(zip(demandas, grupos)):
+            if self.modo == 'componente':
+                labels.append("%4.1f" % demanda)
+            else:
+                labels.append("\n".join(grupo.split()) + "\n(%4.1f)" % demanda)
             values.append(abs(demanda))
-            colors.append(colorref.next() if demanda>=0 else colorcal.next())
+            colors.append(colorref.next() if demanda >= 0 else colorcal.next())
 
         if not any(values):
             ax.axis('off')
-            ax.annotate("Demanda nula", (0.5, 0.5), xycoords='axes fraction', ha='center')
+            ax.annotate("La demanda neta es nula", (0.5, 0.5), xycoords='axes fraction', ha='center')
             return
         patches, texts, autotexts = ax.pie(values, colors=colors, #labels=labels, #colors=colors,
                                            autopct="%1.1f%%", shadow =False)
-        # Coloca etiquetas
+        # Escala etiquetas
         for text in texts:
             size = text.get_size()
             text.set_fontsize(size*0.8)
-        for text in autotexts:
-            size = text.get_size()
-            text.set_fontsize(size*0.8)
 
+        data = []
+        yleft, yright = [], []
         for patch, label in zip(patches, labels):
             """Dibuja etiquetas para el conjunto de sectores circulares"""
             r = patch.r # radio del sector
@@ -159,26 +154,48 @@ class PieGlobal(FigureCanvasGTKCairo):
             t1, t2 = patch.theta1, patch.theta2 # ángulos inicial y final del sector
             theta = (t1+t2)/2.
 
-            # centro del sector
-            xc, yc = r/2.*math.cos(theta/180.*math.pi), r/2.*math.sin(theta/180.*math.pi)
-            # inicio de la flecha
+            # punta de la flecha
+            xc, yc = 1.02 * r/1.*math.cos(theta/180.*math.pi), 1.02 * r/1.*math.sin(theta/180.*math.pi)
+            # posición del texto
             x1, y1 = (r+dr)*math.cos(theta/180.*math.pi), (r+dr)*math.sin(theta/180.*math.pi)
-            if x1 > 0 : # etiquetas a la derecha
+            if x1 > 0 : # etiquetas a la derecha (alineación a la izquierda)
                 x1 = r + 2*dr
-                ha, va = "left", "center"
-                #tt = -180
-                cstyle="angle,angleA=0,angleB=%f" % (theta,)
-            else: # etiquetas a la izquierda
-                x1 = -(r+2*dr)
-                ha, va = "right", "center"
-                #tt = 0
-                cstyle="angle,angleA=0,angleB=%f" % (theta,)
+                ha = "left"
+                tdest = 0
+            else: # etiquetas a la izquierda (alineación a la derecha)
+                x1 = -(r + 2*dr)
+                ha = "right"
+                tdest = 180
+            data.append([label, (xc, yc), [x1, y1], ha, theta, tdest, patch])
 
+        # Colocación de las anotaciones para evitar solapes. Revisar heurística
+        leftdata = [[datum[2][1], datum] for datum in data if datum[3]=='right']
+        rightdata = [[datum[2][1], datum] for datum in data if datum[3]=='left']
+
+        ll = len(leftdata)
+        lr = len(rightdata)
+        if ll > 1:
+            step = min(2.0/(ll-1), .3)
+            ylmin = min(leftdata)[0]
+            for i, (y, datum) in enumerate(sorted(leftdata)):
+                datum[2][1] = ylmin + i*step
+        if lr > 1:
+            step = min(2.0/(lr-1), .3)
+            yrmin = min(rightdata)[0]
+            for i, (y, datum) in enumerate(sorted(rightdata)):
+                datum[2][1] = yrmin + i*step
+
+        for (label, xy, xytext, ha, theta, tdest, patch) in data:
+            x, y = xy
+            x0, y0 = xytext
+            torig = (math.atan((y0-y)/(x0-x))*180.0/math.pi)+180.0
             ax.annotate(label,
-                        (xc, yc), xycoords="data", size='small',
-                        xytext=(x1, y1), textcoords="data", ha=ha, va=va,
+                        xy, xycoords="data", size='small',
+                        xytext=xytext, textcoords="data", ha=ha, va='center',
                         arrowprops=dict(arrowstyle="-",
-                                        connectionstyle=cstyle,
+                                        connectionstyle="angle,angleA=%f,angleB=%f" % (torig, tdest),
+                                        #connectionstyle="angle, rad=0.0",
+                                        #connectionstyle="angle,angleA=0,angleB=%f" % theta,
                                         patchB=patch))
 
 
