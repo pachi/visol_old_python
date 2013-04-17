@@ -193,7 +193,9 @@ class PieGlobal(FigureCanvasGTKCairo):
                         xy, xycoords="data", size='small',
                         xytext=xytext, textcoords="data", ha=ha, va='center',
                         arrowprops=dict(arrowstyle="-",
-                                        connectionstyle="angle,angleA=%f,angleB=%f" % (torig, tdest),
+                                        facecolor='0.7',
+                                        edgecolor='0.7',
+                                        connectionstyle="angle3,angleA=%f,angleB=%f" % (torig, tdest),
                                         #connectionstyle="angle, rad=0.0",
                                         #connectionstyle="angle,angleA=0,angleB=%f" % theta,
                                         patchB=patch))
