@@ -130,7 +130,7 @@ class PieGlobal(FigureCanvasGTKCairo):
             if self.modo == 'componente':
                 labels.append("%4.1f" % demanda)
             else:
-                labels.append("\n".join(grupo.split()) + "\n(%4.1f)" % demanda)
+                labels.append("\n".join(grupo.split()) + "\n(%4.1f kWh/m²año)" % demanda)
             values.append(abs(demanda))
             colors.append(colorref.next() if demanda >= 0 else colorcal.next())
 
