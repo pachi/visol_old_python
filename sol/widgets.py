@@ -40,7 +40,12 @@ MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
          'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
 class PieGlobal(FigureCanvasGTKCairo):
-    """Histograma de Matplotlib"""
+    """Gráfico circular de Matplotlib
+
+    Representa el balance neto de energía para cada grupo de elementos del edificio, planta o zona.
+    Los elementos que en balance anual producen aportaciones de calor se indican en azul, y las
+    que producen pérdidas se indican en rojo.
+    """
     __gtype_name__ = 'PieChart'
 
     def __init__(self, edificio=None, planta=None, zona=None, componente=None):
