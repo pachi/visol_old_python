@@ -141,7 +141,7 @@ class PieGlobal(FigureCanvasGTKCairo):
         patches, texts, autotexts = ax.pie(values, colors=colors, #labels=labels, #colors=colors,
                                            autopct="%1.1f%%", shadow =False)
         # Escala etiquetas
-        for text in texts:
+        for text in autotexts:
             size = text.get_size()
             text.set_fontsize(size*0.8)
 
