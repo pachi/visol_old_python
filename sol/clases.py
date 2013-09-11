@@ -1,5 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+#   clases.py
+#   Clases para la representación de archivos de resultados de LIDER
+#
+#   Copyright (C) 2013 Rafael Villar Burke <pachi@ietcc.csic.es>
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the terms of the GNU General Public License
+#   as published by the Free Software Foundation; either version 2
+#   of the License, or (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+#   
 
 import numpy
 from collections import OrderedDict
@@ -182,6 +202,8 @@ class PlantaLIDER(OrderedDict):
             (calefacción +, calefacción -, calefacción neta,
              refrigeración +, refrigeración -, refrigeración neta)
         """
+        #TODO: El rendimiento de esta parte es crítico, y depende mucho
+        #TODO: de la creación de numpy.arrays y la suma de valores
         if not grupos:
             # Todas las zonas incluyen por defecto todos los grupos
             zonaname = self.keys()[0]
@@ -190,13 +212,15 @@ class PlantaLIDER(OrderedDict):
         if not isinstance(grupos, (list, tuple)):
             grupos = list(grupos)
 
+        superficieplanta = self.superficie
         dic = OrderedDict()
         for grupo in grupos:
             params = [self[zona].superficie *
                       self[zona].multiplicador *
                       numpy.array(self[zona].flujos[grupo]) for zona in self]
+            # XXX: Se podría hacer con numpy sumando arrays (que lo hace columna a columna)
             plist = [sum(lst) for lst in zip(*params)]
-            dic[grupo] = tuple(numpy.array(plist) / self.superficie)
+            dic[grupo] = tuple(numpy.array(plist) / superficieplanta)
         return dic
 
     @property
