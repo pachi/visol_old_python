@@ -1,14 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+#   resparser.py
+#   Analizador de archivos de resultados de LIDER
+#
+#   Copyright (C) 2013 Rafael Villar Burke <pachi@ietcc.csic.es>
+#
+#   This program is free software; you can redistribute it and/or
+#   modify it under the terms of the GNU General Public License
+#   as published by the Free Software Foundation; either version 2
+#   of the License, or (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+#   
+
 """
-Visor de archivos de resultados de LIDER
-========================================
+Parser de  archivos de resultados de LIDER
+==========================================
 """
 import codecs
 from collections import OrderedDict, namedtuple
 from clases import EdificioLIDER, PlantaLIDER, ZonaLIDER
 
-Componentevals = namedtuple('Componentevals', ['calpos', 'calneg', 'calnet', 'refpos', 'refneg', 'refnet'])
+COMPONENTS = ['calpos', 'calneg', 'calnet', 'refpos', 'refneg', 'refnet']
+Componentevals = namedtuple('Componentevals', COMPONENTS)
 
 def valores(linea):
     """Devuelve concepto y valores de líneas de detalle
@@ -151,11 +173,12 @@ def parsePlanta(block, nombreplanta, zonas):
                         if zline.startswith(u'Numero de Componentes'):
                             numcomponentes = int(next(iblock))
                             next(iblock) # títulos
-                            for j, zline in enumerate(iblock):
-                                componente, vals = valores(zline)
-                                zona[componente] = Componentevals._make(vals)
-                                if j == numcomponentes - 1:
-                                    break
+                            if numcomponentes: # Si hay más de 0 componentes...
+                                for j, zline in enumerate(iblock):
+                                    componente, vals = valores(zline)
+                                    zona[componente] = Componentevals._make(vals)
+                                    if j == numcomponentes - 1:
+                                        break
                             break
 
                     zonasencontradas += 1
@@ -180,6 +203,7 @@ def loadfile(resfile):
         edificio = parsefile(data)
         edificio.resdata = ''.join(data)
     except:
+        print "Errores procesando archivo", resfile
         raise
     return edificio
 
