@@ -78,9 +78,21 @@ class GtkSol(object):
         vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
         vb.pack_start(self.histoelementos)
 
-        self.globalchart = PieGlobal()
-        vb = self.ui.get_object('vbglobal')
-        vb.pack_start(self.globalchart)
+        self.calposchart = PieGlobal(tipodemanda='cal+')
+        vb = self.ui.get_object('vbcalpos')
+        vb.pack_start(self.calposchart)
+
+        self.calnegchart = PieGlobal(tipodemanda='cal-')
+        vb = self.ui.get_object('vbcalneg')
+        vb.pack_start(self.calnegchart)
+
+        self.refposchart = PieGlobal(tipodemanda='ref+')
+        vb = self.ui.get_object('vbrefpos')
+        vb.pack_start(self.refposchart)
+
+        self.refnegchart = PieGlobal(tipodemanda='ref-')
+        vb = self.ui.get_object('vbrefneg')
+        vb.pack_start(self.refnegchart)
 
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')
@@ -94,6 +106,7 @@ class GtkSol(object):
     def loadfile(self, path=TESTFILE):
         """Carga archivo en el modelo y actualiza la interfaz"""
         self.model.file = path
+        self.window.props.title = u"ViSOL [... %s]" % self.model.file[-40:]
         e = self.model.edificio
         self.tb.set_text(e.resdata)
         self.edificiots.clear()
@@ -111,7 +124,10 @@ class GtkSol(object):
                     self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
         self.histomeses.edificio = e
         self.histoelementos.edificio = e
-        self.globalchart.edificio = e
+        self.calposchart.edificio = e
+        self.calnegchart.edificio = e
+        self.refposchart.edificio = e
+        self.refnegchart.edificio = e
         self.edificiotv.set_cursor((0,)) # Seleccionar edificio para recargar
         self.sb.push(0, u'Cargado modelo: %s' % path)
 
@@ -129,11 +145,17 @@ class GtkSol(object):
         nombre, tipo, ed, pl, zn, comp, icon = tm[path]
         self.histomeses.data = (ed, pl, zn, comp)
         self.histoelementos.data = (ed, pl, zn, comp)
-        self.globalchart.data = (ed, pl, zn, comp)
+        self.calposchart.data = (ed, pl, zn, comp)
+        self.calnegchart.data = (ed, pl, zn, comp)
+        self.refposchart.data = (ed, pl, zn, comp)
+        self.refnegchart.data = (ed, pl, zn, comp)
         if tipo == 'edificio':
             self.histomeses.modo = 'edificio'
             self.histoelementos.modo = 'edificio'
-            self.globalchart.modo = 'edificio'
+            self.calposchart.modo = 'edificio'
+            self.calnegchart.modo = 'edificio'
+            self.refposchart.modo = 'edificio'
+            self.refnegchart.modo = 'edificio'
             objeto = self.model.edificio
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
@@ -141,7 +163,10 @@ class GtkSol(object):
         elif tipo == 'planta':
             self.histomeses.modo = 'planta'
             self.histoelementos.modo = 'planta'
-            self.globalchart.modo = 'planta'
+            self.calposchart.modo = 'planta'
+            self.calnegchart.modo = 'planta'
+            self.refposchart.modo = 'planta'
+            self.refnegchart.modo = 'planta'
             objeto = self.model.edificio[nombre]
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
@@ -149,7 +174,10 @@ class GtkSol(object):
         elif tipo == 'zona':
             self.histomeses.modo = 'zona'
             self.histoelementos.modo = 'zona'
-            self.globalchart.modo = 'zona'
+            self.calposchart.modo = 'zona'
+            self.calnegchart.modo = 'zona'
+            self.refposchart.modo = 'zona'
+            self.refnegchart.modo = 'zona'
             objeto = self.model.edificio[pl][zn]
             sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
@@ -158,7 +186,10 @@ class GtkSol(object):
             #self.histomeses.modo = 'componente'
             self.ui.get_object('vbmeses').hide()
             self.histoelementos.modo = 'componente'
-            self.globalchart.modo = 'componente'
+            self.calposchart.modo = 'componente'
+            self.calnegchart.modo = 'componente'
+            self.refposchart.modo = 'componente'
+            self.refnegchart.modo = 'componente'
             objeto = self.model.edificio[pl][zn][comp]
             sup = '\n'
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto[2]

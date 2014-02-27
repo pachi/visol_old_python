@@ -1,18 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <interface>
   <requires lib="gtk+" version="2.24"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkAction" id="actioncbelementos">
-    <signal name="activate" handler="cbelementos" swapped="no"/>
+    <signal name="activate" handler="cbelementos"/>
   </object>
   <object class="GtkAction" id="salir">
-    <property name="label" translatable="yes">Salir</property>
-    <property name="tooltip" translatable="yes">Salir de la aplicación</property>
+    <property name="label">Salir</property>
+    <property name="tooltip">Salir de la aplicaci&#xF3;n</property>
     <property name="stock_id">gtk-quit</property>
-    <signal name="activate" handler="quit" swapped="no"/>
+    <signal name="activate" handler="quit"/>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog">
-    <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="window_position">center-on-parent</property>
     <property name="type_hint">dialog</property>
@@ -25,43 +24,40 @@
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
         <property name="spacing">2</property>
+        <child>
+          <placeholder/>
+        </child>
         <child internal-child="action_area">
           <object class="GtkHButtonBox" id="dialog-action_area3">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
             <property name="layout_style">end</property>
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="fill">True</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog">
-    <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="title" translatable="yes">Seleccionar archivo...</property>
     <property name="type_hint">dialog</property>
-    <property name="filter">filefilter</property>
     <property name="preview_widget_active">False</property>
+    <property name="filter">filefilter</property>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
         <property name="spacing">2</property>
+        <child>
+          <placeholder/>
+        </child>
         <child internal-child="action_area">
           <object class="GtkHButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="buttoncancelar">
@@ -69,7 +65,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -84,7 +79,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_stock">True</property>
               </object>
               <packing>
@@ -96,13 +90,9 @@
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="fill">True</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
@@ -132,29 +122,24 @@
     </columns>
   </object>
   <object class="GtkWindow" id="window">
-    <property name="can_focus">False</property>
     <property name="title" translatable="yes">ViSOL</property>
     <property name="default_width">550</property>
     <property name="default_height">650</property>
-    <signal name="delete-event" handler="quit" swapped="no"/>
+    <signal name="delete_event" handler="quit"/>
     <child>
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
         <child>
           <object class="GtkToolbar" id="toolbar">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
             <child>
               <object class="GtkToolButton" id="abrirbutton">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Abrir archivo de resultados de LIDER (.res)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">Abrir</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-open</property>
-                <signal name="clicked" handler="openfile" swapped="no"/>
+                <signal name="clicked" handler="openfile"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -164,13 +149,11 @@
             <child>
               <object class="GtkToggleToolButton" id="showtext">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Ver contenido del archivo de resultados actual</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">Texto</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-file</property>
-                <signal name="toggled" handler="showtextfile" swapped="no"/>
+                <signal name="toggled" handler="showtextfile"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -180,8 +163,6 @@
             <child>
               <object class="GtkSeparatorToolItem" id="espacio">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="draw">False</property>
               </object>
               <packing>
@@ -191,13 +172,11 @@
             <child>
               <object class="GtkToolButton" id="aboutbutton">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="tooltip_text" translatable="yes">Créditos de VisoL</property>
-                <property name="use_action_appearance">False</property>
+                <property name="tooltip_text" translatable="yes">Cr&#xE9;ditos de VisoL</property>
                 <property name="label" translatable="yes">Acerca de</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-about</property>
-                <signal name="clicked" handler="about" swapped="no"/>
+                <signal name="clicked" handler="about"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -207,9 +186,7 @@
             <child>
               <object class="GtkToolButton" id="Salir">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <property name="related_action">salir</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">Salir</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-quit</property>
@@ -222,7 +199,6 @@
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="fill">True</property>
             <property name="position">0</property>
           </packing>
         </child>
@@ -246,15 +222,12 @@
                     <property name="headers_clickable">False</property>
                     <property name="search_column">0</property>
                     <property name="enable_tree_lines">True</property>
-                    <signal name="cursor-changed" handler="cursorchanged" swapped="no"/>
+                    <signal name="cursor_changed" handler="cursorchanged"/>
                     <child>
                       <object class="GtkTreeViewColumn" id="treeviewcol">
-                        <property name="title" translatable="yes">Tipo</property>
+                        <property name="title">Tipo</property>
                         <child>
-                          <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1">
-                            <property name="width">16</property>
-                            <property name="height">16</property>
-                          </object>
+                          <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1"/>
                           <attributes>
                             <attribute name="pixbuf">6</attribute>
                           </attributes>
@@ -263,7 +236,7 @@
                     </child>
                     <child>
                       <object class="GtkTreeViewColumn" id="treeviewcol1">
-                        <property name="title" translatable="yes">Nombre</property>
+                        <property name="title">Nombre</property>
                         <child>
                           <object class="GtkCellRendererText" id="cellrenderertext1"/>
                           <attributes>
@@ -284,18 +257,15 @@
               <object class="GtkVBox" id="vbox2">
                 <property name="width_request">600</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <child>
                   <object class="GtkLabel" id="labelzona">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Zona xxxx</property>
                     <property name="use_markup">True</property>
                     <property name="justify">center</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -321,7 +291,6 @@
                     <child type="tab">
                       <object class="GtkLabel" id="label1">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Texto</property>
                       </object>
                       <packing>
@@ -331,25 +300,32 @@
                     <child>
                       <object class="GtkVBox" id="vbelementos">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <child>
                           <placeholder/>
                         </child>
                         <child>
+                          <object class="GtkHSeparator" id="hseparator1">
+                            <property name="visible">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="pack_type">end</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkTable" id="table1">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
                             <property name="n_rows">2</property>
                             <property name="n_columns">2</property>
                             <child>
                               <object class="GtkCheckButton" id="cbcalpos">
-                                <property name="label" translatable="yes">Calefacción +</property>
+                                <property name="label" translatable="yes">Calefacci&#xF3;n +</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de calefacción (exceso de calefacción)</property>
+                                <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de calefacci&#xF3;n (exceso de calefacci&#xF3;n)</property>
                                 <property name="related_action">actioncbelementos</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
@@ -357,13 +333,12 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="cbcalneg">
-                                <property name="label" translatable="yes">Calefacción -</property>
+                                <property name="label" translatable="yes">Calefacci&#xF3;n -</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de calefacción (necesidad de calefacción)</property>
+                                <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de calefacci&#xF3;n (necesidad de calefacci&#xF3;n)</property>
                                 <property name="related_action">actioncbelementos</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
@@ -375,13 +350,12 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="cbrefpos">
-                                <property name="label" translatable="yes">Refrigeración +</property>
+                                <property name="label" translatable="yes">Refrigeraci&#xF3;n +</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de refrigeración (necesidad de refrigeración)</property>
+                                <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de refrigeraci&#xF3;n (necesidad de refrigeraci&#xF3;n)</property>
                                 <property name="related_action">actioncbelementos</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
@@ -393,13 +367,12 @@
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="cbrefneg">
-                                <property name="label" translatable="yes">Refrigeración -</property>
+                                <property name="label" translatable="yes">Refrigeraci&#xF3;n -</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">False</property>
-                                <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de refrigeración (exceso de refrigeración)</property>
+                                <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de refrigeraci&#xF3;n (exceso de refrigeraci&#xF3;n)</property>
                                 <property name="related_action">actioncbelementos</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
                                 <property name="draw_indicator">True</property>
@@ -414,21 +387,8 @@
                           </object>
                           <packing>
                             <property name="expand">False</property>
-                            <property name="fill">True</property>
                             <property name="pack_type">end</property>
                             <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkHSeparator" id="hseparator1">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="pack_type">end</property>
-                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
@@ -439,7 +399,6 @@
                     <child type="tab">
                       <object class="GtkLabel" id="label4">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Elementos</property>
                       </object>
                       <packing>
@@ -450,7 +409,6 @@
                     <child>
                       <object class="GtkVBox" id="vbmeses">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -462,7 +420,6 @@
                     <child type="tab">
                       <object class="GtkLabel" id="label2">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Meses</property>
                       </object>
                       <packing>
@@ -471,9 +428,8 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbglobal">
+                      <object class="GtkVBox" id="vbcalpos">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -485,18 +441,81 @@
                     <child type="tab">
                       <object class="GtkLabel" id="label3">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Globales</property>
+                        <property name="label" translatable="yes">Cal+</property>
                       </object>
                       <packing>
                         <property name="position">3</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkVBox" id="vbcalneg">
+                        <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                    <child type="tab">
+                      <object class="GtkLabel" id="label5">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Cal-</property>
+                      </object>
+                      <packing>
+                        <property name="position">4</property>
+                        <property name="tab_fill">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkVBox" id="vbrefpos">
+                        <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child type="tab">
+                      <object class="GtkLabel" id="label6">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Ref+</property>
+                      </object>
+                      <packing>
+                        <property name="position">5</property>
+                        <property name="tab_fill">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkVBox" id="vbrefneg">
+                        <property name="visible">True</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="position">6</property>
+                      </packing>
+                    </child>
+                    <child type="tab">
+                      <object class="GtkLabel" id="label7">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Ref-</property>
+                      </object>
+                      <packing>
+                        <property name="position">6</property>
+                        <property name="tab_fill">False</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -508,15 +527,12 @@
             </child>
           </object>
           <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
         </child>
         <child>
           <object class="GtkStatusbar" id="statusbar">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
             <property name="spacing">2</property>
             <child>
               <object class="GtkLinkButton" id="linkbutton1">
@@ -525,20 +541,17 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="has_tooltip">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="relief">none</property>
                 <property name="uri">http://www.codigotecnico.org</property>
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="fill">True</property>
             <property name="position">2</property>
           </packing>
         </child>

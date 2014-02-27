@@ -42,13 +42,14 @@ MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
 class PieGlobal(FigureCanvasGTKCairo):
     """Gráfico circular de Matplotlib
 
-    Representa el balance neto de energía para cada grupo de elementos del edificio, planta o zona.
-    Los elementos que en balance anual producen aportaciones de calor se indican en azul, y las
-    que producen pérdidas se indican en rojo.
+    Representa el balance neto de energía para cada componente del edificio.
+    Se representan ganancias o pérdidas de calor para las temporadas de
+    calefacción o refrigeración.
     """
     __gtype_name__ = 'PieChart'
 
-    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
+    def __init__(self, edificio=None, planta=None, zona=None, componente=None,
+                 tipodemanda='cal+'):
         """Constructor
 
         edificio - Edificio analizado (EdificioLIDER)
@@ -60,24 +61,18 @@ class PieGlobal(FigureCanvasGTKCairo):
         self.zona = zona
         self.componente = componente
         self._modo = 'edificio'
+        self.tipodemanda = tipodemanda
 
-        #TODO: Dejar una sola tarta, con el reparto por componentes para calefacción y refrigeración
-        #TODO: (otra opción es dos tartas, una para cal y otra de ref de componentes...)
-        #TODO: y poner abajo un texto con % de cal y % de ref.
+        self._titles = {'cal+': 'Periodo de calefacción. Ganancias térmicas',
+                        'cal-': 'Periodo de calefacción. Pérdidas térmicas',
+                        'ref+': 'Periodo de refrigeración. Ganancias térmicas',
+                        'ref-': 'Periodo de refrigeración. Pérdidas térmicas'}
 
-        #XXX: Hacer tarta con total = abs(calnet) + abs(refnet)
-        #XXX: Ver cómo mostrar por grupos las pérdidas o ganancias de energía.
-
-
-        self.title = 'Distribución de la demanda'
-        self.fig = Figure()
+        #self.title = self._titles[tipodemanda]
+        self.fig, _axes = plt.subplots(1, 1,
+                                           subplot_kw={'aspect':'equal'},
+                                           facecolor='w')
         FigureCanvasGTKCairo.__init__(self, self.fig)
-        self.fig.set_facecolor('w')
-        self.ax1 = self.fig.add_subplot(111, aspect='equal')
-        #gs = gridspec.GridSpec(1,2, width_ratios=[2,1])
-        #self.ax1 = self.fig.add_subplot(gs[0,0], aspect='equal')
-        #self.ax2 = self.fig.add_subplot(gs[0,1], aspect='equal')
-        #self.fig.subplots_adjust(left=0.14, right=0.87)#, wspace=0.3, hspace=0.3)
 
     @property
     def modo(self):
@@ -100,18 +95,9 @@ class PieGlobal(FigureCanvasGTKCairo):
         self.zona = zona
         self.componente = componente
 
-    def dibujaseries(self, ax):
-        """Dibuja series de datos"""
-        def color(tipo):
-            # cal, ref
-            steps = [30, 40]
-            colors = [(255, 0, 0), (0, 0, 255)]
-            while True:
-                colorcode = '#%02x%02x%02x' % colors[tipo]
-                a, b, c = colors[tipo]
-                colors[tipo] = (a, (b + steps[tipo]) % 256, c)
-                yield colorcode
-
+    @property
+    def demandas(self):
+        """Demandas según el modo activo"""
         edificio = self.edificio
         if self.modo == 'edificio' and edificio is not None:
             demandas = edificio.demandas
@@ -121,79 +107,121 @@ class PieGlobal(FigureCanvasGTKCairo):
             demandas = edificio[self.planta][self.zona].demandas
         elif self.modo == 'componente':
             componente = edificio[self.planta][self.zona][self.componente]
-            demandas = {'cal':[componente.calnet, ''], 'ref':[componente.refnet, '']}
+            demandas = {'cal':[componente.calnet, ''],
+                        'ref':[componente.refnet, ''],
+                        'cal+':[componente.calpos, ''],
+                        'cal-':[componente.calneg, ''],
+                        'ref+':[componente.refpos, ''],
+                        'ref-':[componente.refneg, '']}
         else:
             raise NameError("Modo de operación inesperado: %s" % self.modo)
+        return demandas
 
-        # Demandas netas por grupos y grupos, excluido el grupo 'TOTAL'
-        demandas = [x + y for x, y in zip(demandas['cal'], demandas['ref'])][:-1]
-        grupos = edificio.grupos[:-1]
+    def colors(self):
+        """Devuelve lista de colores en un rango"""
+        (aa, bb, cc), step = ((255, 0, 0), 30) if self.tipodemanda.startswith('cal') else ((0, 0, 255), 40)
+        colorlist = ['#%02x%02x%02x' % (aa, (bb + i*step) % 256, cc) for i in range(9)]
+        return colorlist
 
-        colorcal, colorref = color(0), color(1)
-        labels, values, colors = [], [], []
+    def dibujaseries(self):
+        """Dibuja series de datos"""
+        #TODO: No dibujar textos y flechas para abs(demanda) < 0.1
+        #TODO: Empezar a dibujar etiquetas desde el centro (en vertical)
+
+        # demandas y grupos, excluido el grupo 'TOTAL'
+        demandas = self.demandas[self.tipodemanda][:-1]
+        grupos = self.edificio.grupos[:-1]
+        total = sum(demandas)
+        titletext = (self._titles[self.tipodemanda] +
+                     u'\nTotal: %4.1f kWh/m²año' % total)
+
+        self.fig.clear()
+        ax = self.fig.gca(aspect='equal')
+        self.fig.text(0.5, 0.98, titletext,
+                      size='medium', ha='center', va='top')
+
+        # No damos esta información en modo componente
+        if self.modo == 'componente':
+            ax.axis('off')
+            ax.annotate("Información no disponible para componentes",
+                        (0.5, 0.5), xycoords='axes fraction', ha='center')
+            return
+
+        # Genera etiquetas y valores (absolutos) de demanda
+        labels, values = [], []
         for demanda, grupo in sorted(zip(demandas, grupos)):
-            if self.modo == 'componente':
-                labels.append("%4.1f" % demanda)
-            else:
-                labels.append("\n".join(grupo.split()) + "\n(%4.1f kWh/m²año)" % demanda)
+            demanda = demanda if demanda else 0.0
+            labels.append("\n".join(grupo.split()) + "\n(%4.1f kWh/m²año)" % demanda)
             values.append(abs(demanda))
-            colors.append(colorref.next() if demanda >= 0 else colorcal.next())
+
+        # Genera colores de sectores
+        colors = self.colors()[0:len(values)]
+        if total > 0:
+            colors.reverse()
 
         if not any(values):
             ax.axis('off')
-            ax.annotate("La demanda neta es nula", (0.5, 0.5), xycoords='axes fraction', ha='center')
+            ax.annotate("La demanda es nula",
+                        (0.5, 0.5), xycoords='axes fraction', ha='center')
             return
-        patches, texts, autotexts = ax.pie(values, colors=colors, #labels=labels, #colors=colors,
-                                           autopct="%1.1f%%", shadow =False)
-        # Escala etiquetas
+
+        patches, _texts, autotexts = ax.pie(values, colors=colors,
+                                            autopct="%1.1f%%", shadow =False)
+        # Reduce algo la escala de las etiquetas
         for text in autotexts:
             size = text.get_size()
             text.set_fontsize(size*0.8)
 
+        # Posicionado inicial de textos y flechas
         data = []
-        yleft, yright = [], []
-        for patch, label in zip(patches, labels):
-            """Dibuja etiquetas para el conjunto de sectores circulares"""
-            r = patch.r # radio del sector
-            dr = r*0.1  # separación con el sector
+        for patch, label, value in zip(patches, labels, values):
+            #Dibuja etiquetas para el conjunto de sectores circulares
+            rr = patch.r # radio del sector
+            dr = rr*0.1  # separación con el sector
             t1, t2 = patch.theta1, patch.theta2 # ángulos inicial y final del sector
             theta = (t1+t2)/2.
 
-            # punta de la flecha
-            xc, yc = 1.02 * r/1.*math.cos(theta/180.*math.pi), 1.02 * r/1.*math.sin(theta/180.*math.pi)
-            # posición del texto
-            x1, y1 = (r+dr)*math.cos(theta/180.*math.pi), (r+dr)*math.sin(theta/180.*math.pi)
-            if x1 > 0 : # etiquetas a la derecha (alineación a la izquierda)
-                x1 = r + 2*dr
+            # Coordenadas de la punta de la flecha apuntando al sector
+            xc, yc = 1.02 * rr/1.*math.cos(theta/180.*math.pi), 1.02 * rr/1.*math.sin(theta/180.*math.pi)
+            # Coordenadas inciales del texto, usando un círculo concéntrico
+            x1, y1 = (rr+dr)*math.cos(theta/180.*math.pi), (rr+dr)*math.sin(theta/180.*math.pi)
+            # Revisión de la posición x y alineación del texto, fijos para cada lado
+            if x1 > 0 : # etiquetas a la derecha
+                x1 = rr + 2*dr
                 ha = "left"
-                tdest = 0
-            else: # etiquetas a la izquierda (alineación a la derecha)
-                x1 = -(r + 2*dr)
+                tdest = 0 # ángulo tangente final de flecha
+            else: # etiquetas a la izquierda
+                x1 = -(rr + 2*dr)
                 ha = "right"
-                tdest = 180
-            data.append([label, (xc, yc), [x1, y1], ha, theta, tdest, patch])
+                tdest = 180 # ángulo tangente final de flecha
 
-        # Colocación de las anotaciones para evitar solapes. Revisar heurística
-        leftdata = [[datum[2][1], datum] for datum in data if datum[3]=='right']
-        rightdata = [[datum[2][1], datum] for datum in data if datum[3]=='left']
+            # Omitimos las demandas muy pequeñas (abs(demanda) < 0.1)
+            if value > 0.1:
+                data.append([label, (xc, yc), [x1, y1], ha, theta, tdest, patch])
 
-        ll = len(leftdata)
-        lr = len(rightdata)
-        if ll > 1:
-            step = min(2.0/(ll-1), .3)
+        # Recálculo de posición y de los textos de las anotaciones para evitar solapes.
+        # Posición y de los textos a la izquierda
+        leftdata = [[datum[2][1], datum] for datum in data if datum[3] == 'right']
+        lnl = len(leftdata)
+        if lnl > 1:
+            step = min(2.0/(lnl-1), .3)
             ylmin = min(leftdata)[0]
-            for i, (y, datum) in enumerate(sorted(leftdata)):
+            for i, (yval, datum) in enumerate(sorted(leftdata)):
                 datum[2][1] = ylmin + i*step
-        if lr > 1:
-            step = min(2.0/(lr-1), .3)
+        # Posición y de los textos a la derecha
+        rightdata = [[datum[2][1], datum] for datum in data if datum[3] == 'left']
+        lnr = len(rightdata)
+        if lnr > 1:
+            step = min(2.0/(lnr-1), .3)
             yrmin = min(rightdata)[0]
-            for i, (y, datum) in enumerate(sorted(rightdata)):
+            for i, (yval, datum) in enumerate(sorted(rightdata)):
                 datum[2][1] = yrmin + i*step
 
+        # Finalmente dibujamos las anotaciones: textos y flechas
         for (label, xy, xytext, ha, theta, tdest, patch) in data:
-            x, y = xy
+            xval, yval = xy
             x0, y0 = xytext
-            torig = (math.atan((y0-y)/(x0-x))*180.0/math.pi)+180.0
+            torig = (math.atan((y0-yval)/(x0-xval))*180.0/math.pi)+180.0
             ax.annotate(label,
                         xy, xycoords="data", size='small',
                         xytext=xytext, textcoords="data", ha=ha, va='center',
@@ -201,20 +229,11 @@ class PieGlobal(FigureCanvasGTKCairo):
                                         facecolor='0.7',
                                         edgecolor='0.7',
                                         connectionstyle="angle3,angleA=%f,angleB=%f" % (torig, tdest),
-                                        #connectionstyle="angle, rad=0.0",
-                                        #connectionstyle="angle,angleA=0,angleB=%f" % theta,
                                         patchB=patch))
-
 
     def dibuja(self, width=400, height=200):
         """Dibuja elementos generales de la gráfica"""
-        ax1 = self.ax1
-        self.fig.suptitle(self.title, size='large')
-        ax1.clear() # Limpia imagen de datos anteriores
-        ax1.set_title("Reparto por componentes", size='medium')
-
-        self.dibujaseries(ax1)
-
+        self.dibujaseries()
         self.set_size_request(width, height)
         self.draw()
 
@@ -225,7 +244,6 @@ class PieGlobal(FigureCanvasGTKCairo):
     def save(self, filename='condensacionesplot.png'):
         """Guardar y mostrar gráfica"""
         self.fig.savefig(filename)
-
 
 class HistoBase(FigureCanvasGTKCairo):
     """Histograma de Matplotlib"""
