@@ -22,19 +22,15 @@
 #   02110-1301, USA.
 
 import math
-import itertools
 import gtk
 import numpy
 import matplotlib
 matplotlib.use('GTKCairo')
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtkcairo import FigureCanvasGTKCairo
-from matplotlib.font_manager import FontProperties
 from matplotlib.transforms import offset_copy
-import matplotlib.gridspec as gridspec
 from util import myround
-from collections import OrderedDict
 
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
          'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
