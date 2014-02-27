@@ -177,7 +177,7 @@ class PieGlobal(FigureCanvasGTKCairo):
             t1, t2 = patch.theta1, patch.theta2 # ángulos inicial y final del sector
             theta = (t1+t2)/2.
 
-            # Coordenadas de la punta de la flecha apuntando al sector
+            # Coordenadas de la punta de la flecha apuntando al patch
             xc, yc = 1.02 * rr/1.*math.cos(theta/180.*math.pi), 1.02 * rr/1.*math.sin(theta/180.*math.pi)
             # Coordenadas inciales del texto, usando un círculo concéntrico
             x1, y1 = (rr+dr)*math.cos(theta/180.*math.pi), (rr+dr)*math.sin(theta/180.*math.pi)
@@ -199,27 +199,26 @@ class PieGlobal(FigureCanvasGTKCairo):
         # Posición y de los textos a la izquierda
         leftdata = [[datum[2][1], datum] for datum in data if datum[3] == 'right']
         lnl = len(leftdata)
-        if lnl > 1:
-            step = min(2.0/(lnl-1), .3)
-            ylmin = min(leftdata)[0]
-            for i, (yval, datum) in enumerate(sorted(leftdata)):
-                datum[2][1] = ylmin + i*step
+        lstep = min(2.0 / (lnl - 1), 0.3) if lnl > 1 else 0.3
+        ylmin = 0 - lstep * int(lnl / 2)
+        for i, (yval, datum) in enumerate(sorted(leftdata)):
+            datum[2][1] = ylmin + i*lstep
         # Posición y de los textos a la derecha
         rightdata = [[datum[2][1], datum] for datum in data if datum[3] == 'left']
         lnr = len(rightdata)
-        if lnr > 1:
-            step = min(2.0/(lnr-1), .3)
-            yrmin = min(rightdata)[0]
-            for i, (yval, datum) in enumerate(sorted(rightdata)):
-                datum[2][1] = yrmin + i*step
+        rstep = min(2.0 / (lnr - 1), .3) if lnr > 1 else 0.3
+        yrmin = 0 - rstep * int(lnr / 2)
+        for i, (yval, datum) in enumerate(sorted(rightdata)):
+            datum[2][1] = yrmin + i*rstep
 
         # Finalmente dibujamos las anotaciones: textos y flechas
-        for (label, xy, xytext, ha, theta, tdest, patch) in data:
-            xval, yval = xy
+        # Origen en el texto (A) y destino en el patch (B)
+        for (label, xypatch, xytext, ha, theta, tdest, patch) in data:
+            xval, yval = xypatch
             x0, y0 = xytext
-            torig = (math.atan((y0-yval)/(x0-xval))*180.0/math.pi)+180.0
+            torig = (math.atan((y0 - yval) / (x0 - xval)) * 180.0 / math.pi) + 180.0
             ax.annotate(label,
-                        xy, xycoords="data", size='small',
+                        xypatch, xycoords="data", size='small',
                         xytext=xytext, textcoords="data", ha=ha, va='center',
                         arrowprops=dict(arrowstyle="-",
                                         facecolor='0.7',
