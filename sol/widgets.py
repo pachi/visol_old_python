@@ -121,8 +121,6 @@ class PieGlobal(FigureCanvasGTKCairo):
 
     def dibujaseries(self):
         """Dibuja series de datos"""
-        #TODO: No dibujar textos y flechas para abs(demanda) < 0.1
-        #TODO: Empezar a dibujar etiquetas desde el centro (en vertical)
 
         # demandas y grupos, excluido el grupo 'TOTAL'
         demandas = self.demandas[self.tipodemanda][:-1]
@@ -177,8 +175,6 @@ class PieGlobal(FigureCanvasGTKCairo):
             t1, t2 = patch.theta1, patch.theta2 # ángulos inicial y final del sector
             theta = (t1+t2)/2.
 
-            # Coordenadas de la punta de la flecha apuntando al patch
-            xc, yc = 1.02 * rr/1.*math.cos(theta/180.*math.pi), 1.02 * rr/1.*math.sin(theta/180.*math.pi)
             # Coordenadas inciales del texto, usando un círculo concéntrico
             x1, y1 = (rr+dr)*math.cos(theta/180.*math.pi), (rr+dr)*math.sin(theta/180.*math.pi)
             # Revisión de la posición x y alineación del texto, fijos para cada lado
@@ -191,8 +187,22 @@ class PieGlobal(FigureCanvasGTKCairo):
                 ha = "right"
                 tdest = 180 # ángulo tangente final de flecha
 
+            # Coordenadas de la punta de la flecha apuntando al patch
+            # En los elementos de arriba y abajo bajamos las flechas un poco
+            if 30 < theta < 90:
+                ang = t1 + (t2 - t1) / 5.0
+            elif 90 < theta < 150:
+                ang = t1 + 4.0 * (t2 - t1) / 5.0
+            elif 210 < theta < 270:
+                ang = t1 + (t2 - t1) / 5.0
+            elif 270 < theta < 330:
+                ang = t1 + 4.0 * (t2 - t1) / 5.0
+            else:
+                ang = theta
+            xc, yc = 1.02 * rr/1.*math.cos(ang/180.*math.pi), 1.02 * rr/1.*math.sin(ang/180.*math.pi)
+
             # Omitimos las demandas muy pequeñas (abs(demanda) < 0.1)
-            if value > 0.1:
+            if value >= 0.1:
                 data.append([label, (xc, yc), [x1, y1], ha, theta, tdest, patch])
 
         # Recálculo de posición y de los textos de las anotaciones para evitar solapes.
@@ -214,9 +224,9 @@ class PieGlobal(FigureCanvasGTKCairo):
         # Finalmente dibujamos las anotaciones: textos y flechas
         # Origen en el texto (A) y destino en el patch (B)
         for (label, xypatch, xytext, ha, theta, tdest, patch) in data:
-            xval, yval = xypatch
-            x0, y0 = xytext
-            torig = (math.atan((y0 - yval) / (x0 - xval)) * 180.0 / math.pi) + 180.0
+            xdst, ydst = xypatch
+            xorg, yorg = xytext
+            torig = (math.atan((yorg - ydst) / (xorg - xdst)) * 180.0 / math.pi) + 180.0
             ax.annotate(label,
                         xypatch, xycoords="data", size='small',
                         xytext=xytext, textcoords="data", ha=ha, va='center',
