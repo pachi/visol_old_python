@@ -233,6 +233,7 @@ class PieGlobal(FigureCanvasGTKCairo):
                         arrowprops=dict(arrowstyle="-",
                                         facecolor='0.7',
                                         edgecolor='0.7',
+                                        relpos=(0. if ha=='left' else 1.0, 0.5),
                                         connectionstyle="angle3,angleA=%f,angleB=%f" % (torig, tdest),
                                         patchB=patch))
 
