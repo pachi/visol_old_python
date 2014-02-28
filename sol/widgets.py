@@ -207,14 +207,14 @@ class PieGlobal(FigureCanvasGTKCairo):
         # Posición y de los textos a la izquierda
         leftdata = [[datum[2][1], datum] for datum in data if datum[3] == 'right']
         lnl = len(leftdata)
-        lstep = min(2.0 / (lnl - 1), 0.3) if lnl > 1 else 0.3
+        lstep = min(1.8 / (lnl - 1), 0.5) if lnl > 1 else 0.5
         ylmin = 0 - lstep * int(lnl / 2)
         for i, (yval, datum) in enumerate(sorted(leftdata)):
             datum[2][1] = ylmin + i*lstep
         # Posición y de los textos a la derecha
         rightdata = [[datum[2][1], datum] for datum in data if datum[3] == 'left']
         lnr = len(rightdata)
-        rstep = min(2.0 / (lnr - 1), .3) if lnr > 1 else 0.3
+        rstep = min(1.8 / (lnr - 1), 0.5) if lnr > 1 else 0.5
         yrmin = 0 - rstep * int(lnr / 2)
         for i, (yval, datum) in enumerate(sorted(rightdata)):
             datum[2][1] = yrmin + i*rstep
@@ -222,15 +222,13 @@ class PieGlobal(FigureCanvasGTKCairo):
         # Finalmente dibujamos las anotaciones: textos y flechas
         # Origen en el texto (A) y destino en el patch (B)
         for (label, xypatch, xytext, ha, patch) in data:
-            xdst, ydst = xypatch
-            xorg, yorg = xytext
             ax.annotate(label,
                         xypatch, xycoords="data", size='small',
                         xytext=xytext, textcoords="data", ha=ha, va='center',
                         arrowprops=dict(arrowstyle="-",
                                         facecolor='0.7',
                                         edgecolor='0.7',
-                                        relpos=(0. if ha=='left' else 1.0, 0.5),
+                                        relpos=(0.0 if ha=='left' else 1.0, 0.5),
                                         patchB=patch))
 
     def dibuja(self, width=400, height=200):
