@@ -181,11 +181,9 @@ class PieGlobal(FigureCanvasGTKCairo):
             if x1 > 0 : # etiquetas a la derecha
                 x1 = rr + 2*dr
                 ha = "left"
-                tdest = 0 # ángulo tangente final de flecha
             else: # etiquetas a la izquierda
                 x1 = -(rr + 2*dr)
                 ha = "right"
-                tdest = 180 # ángulo tangente final de flecha
 
             # Coordenadas de la punta de la flecha apuntando al patch
             # En los elementos de arriba y abajo bajamos las flechas un poco
@@ -203,7 +201,7 @@ class PieGlobal(FigureCanvasGTKCairo):
 
             # Omitimos las demandas muy pequeñas (abs(demanda) < 0.1)
             if value >= 0.1:
-                data.append([label, (xc, yc), [x1, y1], ha, theta, tdest, patch])
+                data.append([label, (xc, yc), [x1, y1], ha, patch])
 
         # Recálculo de posición y de los textos de las anotaciones para evitar solapes.
         # Posición y de los textos a la izquierda
@@ -223,10 +221,9 @@ class PieGlobal(FigureCanvasGTKCairo):
 
         # Finalmente dibujamos las anotaciones: textos y flechas
         # Origen en el texto (A) y destino en el patch (B)
-        for (label, xypatch, xytext, ha, theta, tdest, patch) in data:
+        for (label, xypatch, xytext, ha, patch) in data:
             xdst, ydst = xypatch
             xorg, yorg = xytext
-            torig = (math.atan((yorg - ydst) / (xorg - xdst)) * 180.0 / math.pi) + 180.0
             ax.annotate(label,
                         xypatch, xycoords="data", size='small',
                         xytext=xytext, textcoords="data", ha=ha, va='center',
@@ -234,7 +231,6 @@ class PieGlobal(FigureCanvasGTKCairo):
                                         facecolor='0.7',
                                         edgecolor='0.7',
                                         relpos=(0. if ha=='left' else 1.0, 0.5),
-                                        connectionstyle="angle3,angleA=%f,angleB=%f" % (torig, tdest),
                                         patchB=patch))
 
     def dibuja(self, width=400, height=200):
