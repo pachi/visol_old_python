@@ -96,8 +96,8 @@ class GtkSol(object):
 
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')
-        ffilter.set_name('Archivos *.res')
-        ffilter.add_pattern('*.res')
+        ffilter.set_name('Archivos *.res, *.re2')
+        ffilter.add_pattern('*.re[s|2]')
 
         self.ui.connect_signals(self)
         # Carga datos de materiales, cerramientos y clima
