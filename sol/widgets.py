@@ -113,10 +113,12 @@ class PieGlobal(FigureCanvasGTKCairo):
             raise NameError("Modo de operación inesperado: %s" % self.modo)
         return demandas
 
-    def colors(self):
+    def colors(self, nelems, base=(255, 0, 0), reverse=False):
         """Devuelve lista de colores en un rango"""
-        (aa, bb, cc), step = ((255, 0, 0), 30) if self.tipodemanda.startswith('cal') else ((0, 0, 255), 40)
-        colorlist = ['#%02x%02x%02x' % (aa, (bb + i*step) % 256, cc) for i in range(9)]
+        step = int(255 / nelems)
+        step = -step if reverse else step
+        aa, bb, cc = base
+        colorlist = ['#%02x%02x%02x' % (aa, (bb + i*step) % 256, cc) for i in range(nelems)]
         return colorlist
 
     def dibujaseries(self):
@@ -148,10 +150,11 @@ class PieGlobal(FigureCanvasGTKCairo):
             labels.append("\n".join(grupo.split()) + "\n(%4.1f kWh/m²año)" % demanda)
             values.append(abs(demanda))
 
-        # Genera colores de sectores
-        colors = self.colors()[0:len(values)]
-        if total > 0:
-            colors.reverse()
+        # Genera colores de sectores (cuenta valores significativos)
+        ncolors = sum(1 for value in values if value>=0.1)
+        base = (255, 0, 0) if self.tipodemanda.startswith('cal') else (0, 0, 255)
+        reverse = self.tipodemanda.endswith('-')
+        colors = self.colors(ncolors, base, reverse)
 
         if not any(values):
             ax.axis('off')
