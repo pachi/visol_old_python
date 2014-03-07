@@ -14,6 +14,10 @@ data/
 *.png
 *.txt
 
+res/splash.jpg
+setup.nsi
+*-setup.exe
+
 # switch to regexp syntax.
 #syntax: regexp
 #^\.pc/
