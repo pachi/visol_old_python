@@ -22,14 +22,18 @@
 #   02110-1301, USA.
 """Configuración de SOL"""
 
-from setuptools import setup, find_packages
+from distutils.core import setup
 import py2exe
-import sys, os
+import sys, os, glob
+import matplotlib
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
+# DLL del VC++8 redistributable para Python
+# import sys
+# sys.path.append('C:\\WINDOWS\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_5090ab56bcba71c2'
 
 #gtk file inclusion
 import gtk
@@ -49,6 +53,7 @@ GTK_ICONS = os.path.join("share", "icons")
 GTK_LOCALE_DATA = os.path.join("share", "locale")
 
 # Receta sacada de http://stackoverflow.com/questions/7884959/bundling-gtk-resources-with-py2exe
+# para gtk3+ ver http://stackoverflow.com/questions/21002446/bundling-gtk3-with-py2exe
 def generate_data_files(prefix, tree, file_filter=None):
     """
     Walk the filesystem starting at "prefix" + "tree", producing a list of files
@@ -110,39 +115,34 @@ data_files = (
                 GTK_WIMP_DIR,
                 GTK_WIMP_DLL)
         ]),
-        ('ui', ['*jpg', '*.png', 'sol.ui']),
-        ('.', ['README.rst', 'NEWS.txt', 'HACKING.txt'])
-    ]
+        ('ui', glob.glob('ui/*.png')),
+        ('ui', glob.glob('ui/*.jpg')),
+        ('ui', ['ui/sol.ui']),
+        ('data', glob.glob('data/*.res') + glob.glob('data/*.re2')),
+        ('.', ['README.rst', 'NEWS.txt', 'HACKING.txt', 'COPYING.txt'])
+    ] +
+    matplotlib.get_py2exe_datafiles()
 )
-
-#data_files = [ 'ui/logo.jpg', 'ui/sol.ui', 'README.rst', 'NEWS.txt', 'HACKING.txt'
-               # If using GTK+'s built in SVG support, uncomment these
-               #os.path.join(GTK_RUNTIME_DIR, 'bin', 'gdk-pixbuf-query-loaders.exe'),
-               #os.path.join(GTK_RUNTIME_DIR, 'bin', 'libxml2-2.dll'),
-#           ]
-
 # you'll need to copy the etc, lib and share directories from your GTK+ install
 # from lib/ only all the *.dlls in the subtree are needed, and from
 # share/ only themes/ and locale/. saves lots of space 
 
+# share/icons/Tango se puede eliminar (26MB) cambiando el tema por defecto a hicolor
+# mirar si se puede reducir el mpl-data, que tiene muchos MB
+
 version = '1.0'
-
-install_requires = ['matplotlib', 'numpy', 'pygtk', 'pygobject'
-                    # List your project dependencies here.
-                    # For more details, see:
-                    # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
-                ]
-
-#entry_points = {'console_scripts': ['visol=bin/visol']}
 
 windows = [{'script': 'bin/visol',
             #'icon_resources': [(1, "visol.ico")],
 }]
 
 options = {'py2exe': { 'packages':'encodings',
+                       'dist_dir': 'dist',
                        # Optionally omit gio, gtk.keysyms, and/or rsvg if you're not using them
                        #'includes': 'cairo, pango, pangocairo, atk, gobject, gio, gtk.keysyms, rsvg',
-                       'includes': 'cairo, pango, pangocairo, atk, gobject, gio',
+                       'includes': 'cairo, pango, pangocairo, atk, gobject, gio' + ', matplotlib, numpy',
+                       'excludes': ['_gtkagg', '_tkagg', 'tcl', 'Tkinter'],
+                       "dll_excludes": ['tcl85.dll', 'tk85.dll'],
                    }
        }
 
@@ -168,12 +168,6 @@ setup(name='visol',
     author_email='pachi@rvburke.com',
     url='http://www.rvburke.com/software.html',
     license='GPL-2.0+',
-    packages=find_packages('sol'),
-    package_dir = {'': 'sol'},
-    include_package_data=True,
-    zip_safe=False,
-    install_requires=install_requires,
-    #entry_points=entry_points, # Esta es la alternativa a 'scripts' de setuptools
     windows=windows,
     options=options,
     data_files=data_files
