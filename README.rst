@@ -1,23 +1,22 @@
-This file requires editing
-==========================
+ViSol - Visor de achivos de resultados de LIDER
+===============================================
 
-Note to the author: Please add something informative to this README *before*
-releasing your software, as `a little documentation goes a long way`_.  Both
-README.rst (this file) and NEWS.txt (release notes) will be included in your
-package metadata which gets displayed in the PyPI page for your project.
+ViSol es un visor de los archivos de resultados generados por el programa LIDER,
+de verificación del DB-HE del CTE.
 
-You can take a look at the README.txt of other projects, such as repoze.bfg
-(http://bfg.repoze.org/trac/browser/trunk/README.txt) for some ideas.
+Una vez instalado, para su uso simplemente se requiere abrir un archivo de resultados,
+de extensión `.res` o `.re2`.
 
-.. _`a little documentation goes a long way`: http://www.martinaspeli.net/articles/a-little-documentation-goes-a-long-way
+Los resultados se pueden explorar a nivel de edificio, espacios o componentes y se
+aporta información en forma de ratios por m2 útil del edificio para cada uno de ellos.
 
-Credits
--------
+Créditos
+--------
 
-- `Distribute`_
-- `Buildout`_
-- `modern-package-template`_
+- `Rafael Villar Burke`_
 
-.. _Buildout: http://www.buildout.org/
-.. _Distribute: http://pypi.python.org/pypi/distribute
-.. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
+.. _Rafael Villar Burke: http://www.rvburke.com/software.html
+
+Si utilizas la aplicación en publicaciones o artículos científicos agradecería una cita de este tipo:
+
+VILLAR BURKE, RAFAEL; Visol: Visor de archivos de resultados de LIDER, http://www.rvburke.com/software.html, Madrid, 2014.
