@@ -4,3 +4,5 @@
 
 import resparser
 import clases
+
+__version__ = '1.0'
