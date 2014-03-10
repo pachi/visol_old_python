@@ -15,6 +15,7 @@ data/
 *.txt
 
 res/splash.jpg
+ui/splash.jpg
 setup.nsi
 *-setup.exe
 dist/
