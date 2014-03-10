@@ -17,6 +17,9 @@ data/
 res/splash.jpg
 setup.nsi
 *-setup.exe
+dist/
+build/
+README.html
 
 # switch to regexp syntax.
 #syntax: regexp
