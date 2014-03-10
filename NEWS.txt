@@ -1,0 +1,19 @@
+.. Archivo de Novedades con las notas de cada versión
+
+News
+====
+
+.. x.x
+.. ---
+..
+.. *Release date: UNRELEASED*
+..
+.. * Notas de la versión en desarrollo
+
+1.0
+---
+
+*Release date: 7-Mar-2014*
+
+* Versión inicial con soporte de archivos .res y .re2
+

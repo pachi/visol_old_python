@@ -1,0 +1,17 @@
+Uso en desarrollo
+=================
+
+  $ pip install -r requirements.txt
+  $ python bin/visol
+
+HOWTO para publicar nuevas versiones
+==================================
+
+Para publicar una nueva versión,
+
+  1) Actualizar fecha y versión en NEWS.txt y sol/__init__.py
+  2) Ejecutar 'python setup.py sdist'
+  3) Probar la versión generada en dist/
+  4) Subir a PyPI: 'python setup.py sdist register upload'
+  5) Subir la versión en sol/__init__.py (para la siguiente versión)
+

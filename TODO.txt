@@ -1,0 +1,52 @@
+TODO ViSOL
+==========
+
+- Convertir sol en librería reslib y quitar de ahí las partes de aplicación (utils.py, gtkui.py), dejando resparser y clases.
+  Así habría una aplicación en sol/ y una librería en reslib/
+- Ver si hay que unificar nombres de componentes de demanda cal+ -> calpos, etc entre clases y resparser
+- Mover apertura de archivo a resparser.parsefile ya que contiene información sobre encoding, etc.
+  Así se le podría pasar un nombre de archivo o un filehandle.
+- Permitir guardar imágenes (todas, o individuales)
+- Ver esquema alternativo en ../python-project-template  (https://code.google.com/p/python-project-template/), ../git/python-skel (https://github.com/inercia/python-skel.git) y también en ../git/python-project-template. El primero está orientado a poder hacer py2exe además de releases en PIPy, el segundo más orientado a linux RPM, y el tercero tiene docs con Sphinx.
+
+
+WISHLIST
+--------
+- El grupo "Suelos", en los grupos para los que se calculan los flujos, corresponde a flujo de calor con el terreno. Las cámaras sanitarias hacen que este valor sea cero al tener en contacto con el suelo un espacio no habitado. Interesaría calcular el flujo a través del primer forjado en contacto con ese espacio no habitado.
+- Comparador entre archivos .res
+- Cargar el archivo .CTE y el .ctexml o el archivo de calener para poder dar más información:
+
+    - por ejemplo, sobre el tipo de componente (ventana, muro, etc).
+
+DOCS LIDER
+----------
+
+- Los archivos .CTE tienen comandos (separados con = y con comillas dobles "" si tienen espacios) y luego valores hasta una linea con ".."
+- Ver los archivos .tbl que genera el LIDER. Incluyen información de Área, U,
+  orientación, factores solares, etc de los elementos, que pueden ser muy
+  útiles.
+  Cosas adivinadas hasta ahora:
+  1Âª línea: "Nombre"
+  2Âª línea: Lista de campos en elementos (A, U, p, f, fv, angNorte, tilt, tipo, codigo0, codigo1)
+  3Âª línea: nª de elementos (ne) y nª de zonas (nz)
+
+  ne bloques de 2 líneas describiendo los elementos
+     - Nombre de elemento entre comillas
+     - Propiedades según lista de campos
+       - A
+       - U
+       - p
+       - f
+       - fv
+       - angNorte
+       - tilt
+       - tipo
+       - codigo0
+       - codigo1
+  nz bloques de 2 líneas describiendo las zonas
+     - Nombre de zona
+     - Propiedades de la zona
+       - número (negativo, parece)
+       - superficie?
+       - altura?
+
