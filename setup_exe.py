@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 #encoding: utf-8
 #
-#   gtkui.py
-#   Programa Visor para el Sistema de Observación de LIDER
+#   Programa ViSol: Visor de archivos de resultados de LIDER
 #
-#   Copyright (C) 2011 Rafael Villar Burke <pachi@rvburke.com>
+#   Copyright (C) 2014 Rafael Villar Burke <pachi@rvburke.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -23,9 +22,10 @@
 """Configuración de SOL"""
 
 from distutils.core import setup
-import py2exe
 import sys, os, glob
+import py2exe
 import matplotlib
+from sol import __version__
 
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
@@ -47,10 +47,16 @@ GTK_GTKRC_DIR = os.path.join("etc", "gtk-2.0")
 GTK_GTKRC = "gtkrc"
 GTK_WIMP_DIR = os.path.join("lib", "gtk-2.0", "2.10.0", "engines")
 GTK_WIMP_DLL = "libwimp.dll"
-# For tango icons
-GTK_ICONS = os.path.join("share", "icons")
-# Localisation data
-GTK_LOCALE_DATA = os.path.join("share", "locale")
+#GTK_ICONS = os.path.join("share", "icons") # For tango icons
+GTK_ICONS = os.path.join("share", "icons", "hicolor") # To exclude Tango icons
+#GTK_LOCALE_DATA = os.path.join("share", "locale") # Localisation data
+GTK_LOCALE_DATA = os.path.join("share", "locale", "es") # Localisation data redux
+
+# you'll need to copy the etc, lib and share directories from your GTK+ install
+# from lib/ only all the *.dlls in the subtree are needed, and from
+# share/ only themes/ and locale/. saves lots of space
+
+# share/icons/Tango se puede eliminar (26MB) cambiando el tema por defecto a hicolor
 
 # Receta sacada de http://stackoverflow.com/questions/7884959/bundling-gtk-resources-with-py2exe
 # para gtk3+ ver http://stackoverflow.com/questions/21002446/bundling-gtk3-with-py2exe
@@ -123,17 +129,10 @@ data_files = (
     ] +
     matplotlib.get_py2exe_datafiles()
 )
-# you'll need to copy the etc, lib and share directories from your GTK+ install
-# from lib/ only all the *.dlls in the subtree are needed, and from
-# share/ only themes/ and locale/. saves lots of space 
-
-# share/icons/Tango se puede eliminar (26MB) cambiando el tema por defecto a hicolor
 # mirar si se puede reducir el mpl-data, que tiene muchos MB
 
-version = '1.0'
-
 windows = [{'script': 'bin/visol',
-            #'icon_resources': [(1, "visol.ico")],
+            'icon_resources': [(1, "res/visol.ico")],
 }]
 
 options = {'py2exe': { 'packages':'encodings',
@@ -147,7 +146,7 @@ options = {'py2exe': { 'packages':'encodings',
        }
 
 setup(name='visol',
-    version=version,
+    version=__version__,
     description="Visor de archivos de resultados de LIDER",
     long_description=README + '\n\n' + NEWS,
     classifiers=[

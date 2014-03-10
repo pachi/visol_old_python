@@ -1,5 +1,5 @@
-# fake Makefile copied fron the pywebsite project, to support the common
-# ./configure;make;make install
+# Makefile para la gestión del proyecto ViSol: Visor de archivos de LIDER
+# Rafael Villar Burke, 2014
 
 EXEBASE = /e/winp2
 PYTHON = python
@@ -14,9 +14,14 @@ KEYFILE = $(EXEBASE)/PuTTY/keys/pachi-key-putty.PPK
 
 #make windows installer by default
 
-winbuild: setup.nsi splash
+winbuild: py2exe nsiinstaller
+
+py2exe: setup_exe.py
 	$(PYTHON) setup_exe.py py2exe
 	sleep 5s
+
+nsiinstaller: setup.nsi splash
+	rst2html.py README.rst > README.html
 	$(MAKENSIS) setup.nsi
 
 build: setup.py splash
@@ -30,6 +35,15 @@ setup.nsi: setup.nsi.in
 
 splash:
 	$(PYTHON) ./res/makesplash.py -b ./res/background.png -o ./res/splash.jpg $(VERSION)
+	cp ./res/splash.jpg ./ui/splash.jpg
+
+#visol.ico: splash # necesita imagemagik
+#	convert image.png -bordercolor white -border 0 \
+#		\( -clone 0 -resize 16x16 \) \
+#		\( -clone 0 -resize 32x32 \) \
+#		\( -clone 0 -resize 48x48 \) \
+#		\( -clone 0 -resize 64x64 \) \
+#		-delete 0 -alpha off -colors 256 visol.ico
 
 test check tests:
 	unit2 discover
@@ -63,7 +77,7 @@ upload:
 	make clean
 	$(PYTHON) setup.py sdist upload --sign --identity="Rafael Villar Burke <pachid@rvburke.com>"
 
-sdist:
+sdist: splash
 	make clean
 #	make testall
 	$(PYTHON) setup.py sdist

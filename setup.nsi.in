@@ -1,5 +1,6 @@
 # Archivo de generación de Instalador para Nullsoft Installer (NSIS)
 # para el programa ViSol: visor de archivos de resultados de LIDER
+# Rafael Villar Burke, 2014
 
 Name Visol
 
@@ -16,8 +17,9 @@ SetCompressor /SOLID lzma
 !define VERSION @VERSION@
 !define COMPANY "Rafael Villar Burke <pachi@rvburke.com>"
 !define URL http://www.rvburke.com
-!define SPLASHIMAGE ui/splash.bmp
+!define SPLASHIMAGE "ui\splash.jpg"
 !define EXENAME "visol.exe"
+!define README_FILE $INSTDIR\README.html
 
 # MUI Symbol Definitions
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install-full.ico"
@@ -26,16 +28,17 @@ SetCompressor /SOLID lzma
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER ViSol
-!define MUI_FINISHPAGE_RUN $INSTDIR/$EXENAME
-!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.txt"
+!define MUI_FINISHPAGE_RUN $INSTDIR\${EXENAME}
+!define MUI_FINISHPAGE_SHOWREADME ${README_FILE}
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "Mostrar archivo README"
+#!define MUI_FINISHPAGE_SHOWREADME_FUNCTION showReadmeChangelog
+!define MUI_FINISHPAGE_LINK "Visita http://www.rvburke.com/software.html"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://www.rvburke.com/software.html"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall-full.ico"
 
 # Included files
 !include Sections.nsh
 !include MUI2.nsh
-
-# Reserved Files
-ReserveFile "${NSISDIR}\Plugins\AdvSplash.dll"
 
 # Variables
 Var StartMenuGroup
@@ -60,7 +63,7 @@ OutFile visol-${VERSION}-setup.exe
 InstallDir $PROGRAMFILES\ViSol
 CRCCheck on
 XPStyle on
-ShowInstDetails show
+ShowInstDetails hide
 VIProductVersion 1.0.0.0
 VIAddVersionKey ProductName "ViSol - Visor de resultados de LIDER"
 VIAddVersionKey ProductVersion "${VERSION}"
@@ -70,13 +73,19 @@ VIAddVersionKey FileVersion "${VERSION}"
 VIAddVersionKey FileDescription ""
 VIAddVersionKey LegalCopyright ""
 InstallDirRegKey HKLM "${REGKEY}" Path
-ShowUninstDetails show
+ShowUninstDetails hide
 
 # Installer sections
 Section -Main SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
     File /r dist\*
+    # Copiamos el archivo html para enseñar al final
+    File README.html
+    # y dejamos el .txt con finales de línea tipo DOS para ver en notepad
+    Push "$INSTDIR\README.rst"
+    Push "$INSTDIR\README.txt"
+    Call unix2dos
     WriteRegStr HKLM "${REGKEY}\Components" Main 1
 SectionEnd
 
@@ -138,10 +147,16 @@ Section -un.post UNSEC0001
 SectionEnd
 
 # Installer functions
+#Function showReadmeChangelog
+#    ExecShell "open" ${README_FILE}
+#FunctionEnd
+
 Function .onInit
     InitPluginsDir
     Push $R1
-    advsplash::show 1000 600 400 -1 ${SPLASHIMAGE}
+    File /oname=$PLUGINSDIR\splash.jpg ${SPLASHIMAGE}
+    newadvsplash::show 3000 600 400 -1 "$PLUGINSDIR\splash.jpg"
+    Delete $PLUGINSDIR\splash.jpg
     Pop $R1
     Pop $R1
 FunctionEnd
@@ -154,3 +169,61 @@ Function un.onInit
     !insertmacro SELECT_UNSECTION Main ${UNSEC0000}
 FunctionEnd
 
+# Custom functions
+
+Function unix2dos
+    ; strips all CRs
+    ; and then converts all LFs into CRLFs
+    ; (this is roughly equivalent to "cat file | dos2unix | unix2dos")
+    ;
+    ; usage:
+    ;    Push "infile"
+    ;    Push "outfile"
+    ;    Call unix2dos
+    ;
+    ; beware that this function destroys $0 $1 $2
+
+    ClearErrors
+
+    Pop $2
+    FileOpen $1 $2 w
+
+    Pop $2
+    FileOpen $0 $2 r
+
+    Push $2 ; save name for deleting
+
+    IfErrors unix2dos_done
+
+    ; $0 = file input (opened for reading)
+    ; $1 = file output (opened for writing)
+
+unix2dos_loop:
+    ; read a byte (stored in $2)
+    FileReadByte $0 $2
+    IfErrors unix2dos_done ; EOL
+    ; skip CR
+    StrCmp $2 13 unix2dos_loop
+    ; if LF write an extra CR
+    StrCmp $2 10 unix2dos_cr unix2dos_write
+
+unix2dos_cr:
+    FileWriteByte $1 13
+
+unix2dos_write:
+    ; write byte
+    FileWriteByte $1 $2
+    ; read next byte
+    Goto unix2dos_loop
+
+unix2dos_done:
+
+    ; close files
+    FileClose $0
+    FileClose $1
+
+    ; delete original
+    Pop $0
+    Delete $0
+
+FunctionEnd
