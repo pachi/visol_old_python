@@ -124,7 +124,8 @@ data_files = (
         ('ui', glob.glob('ui/*.png')),
         ('ui', glob.glob('ui/*.jpg')),
         ('ui', ['ui/sol.ui']),
-        ('data', glob.glob('data/*.res') + glob.glob('data/*.re2')),
+        ('data', ['data/test.res', 'data/test.re2']),
+        ('res', glob.glob('res/pantallazo*.png')),
         ('.', ['README.rst', 'NEWS.txt', 'HACKING.txt', 'COPYING.txt'])
     ] +
     matplotlib.get_py2exe_datafiles()

@@ -8,4 +8,5 @@ include TODO.txt
 include data/test.res
 include data/test.re2
 recursive-include ui *.png *.jpg *.ui
+recursive-include res pantallazo*.png
 #prune examples/sample?/build
