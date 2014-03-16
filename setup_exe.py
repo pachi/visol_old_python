@@ -126,7 +126,8 @@ data_files = (
         ('ui', ['ui/sol.ui']),
         ('data', ['data/test.res', 'data/test.re2']),
         ('res', glob.glob('res/pantallazo*.png')),
-        ('.', ['README.rst', 'NEWS.txt', 'HACKING.txt', 'COPYING.txt'])
+        ('.', ['README.rst', 'NEWS.txt', 'HACKING.txt', 'COPYING.txt']),
+        (".", glob.glob(r'C:\WINDOWS\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_5090ab56bcba71c2\*.*')) # dlls del MSVCCRT90
     ] +
     matplotlib.get_py2exe_datafiles()
 )
