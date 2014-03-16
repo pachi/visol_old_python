@@ -4,7 +4,7 @@
 EXEBASE = /e/winp2
 PYTHON = python
 
-GTKBASE = /e/winp2/Python27/Lib/site-packages/gtk-2.0/runtime/bin
+GTKBASE = $(EXEBASE)/Python27/Lib/site-packages/gtk-2.0/runtime/bin
 
 VERSION = $(shell python -c"from sol import __version__;print __version__")
 MAKENSIS = $(EXEBASE)/NSIS/makensis
