@@ -73,11 +73,16 @@ def generate_data_files(prefix, tree, file_filter=None):
 
     return non_empties
 
-data_files = ([('ui', ['*jpg', '*.png', 'sol.ui']),
-               ('.', ['COPYING.txt', 'README.rst', 'NEWS.txt', 'HACKING.txt', 'TODO.txt'])
+data_files = ([('ui', glob.glob('ui/*.png')),
+               ('ui', glob.glob('ui/*.jpg')),
+               ('ui', ['ui/sol.ui']),
+               ('data', ['data/test.res', 'data/test.re2']),
+               ('res', glob.glob('res/pantallazo*.png')),
+               ('.', ['COPYING.txt', 'README.rst', 'NEWS.txt', 'HACKING.txt', 'TODO.txt']),
 ])
 
-install_requires = ['matplotlib', 'numpy', 'pygtk', 'pygobject', 'pycairo', 'dateutils', 'six', 'pytz'
+install_requires = ['matplotlib', 'numpy', 'pygtk', 'gobject', 'cairo', 'pangocairo', 'atk', 'gio',
+                    'dateutils', 'six', 'pytz'
                     # List your project dependencies here.
                     # For more details, see:
                     # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
