@@ -1,7 +1,7 @@
 # Makefile para la gestión del proyecto ViSol: Visor de archivos de LIDER
 # Rafael Villar Burke, 2014
 
-EXEBASE = /e/winp2
+EXEBASE ?= /e/winp2
 PYTHON = python
 
 GTKBASE = $(EXEBASE)/Python27/Lib/site-packages/gtk-2.0/runtime/bin
