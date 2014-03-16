@@ -5,6 +5,7 @@ include NEWS.txt
 include README.rst
 include requirements.txt
 include TODO.txt
+include data/test.res
+include data/test.re2
 recursive-include ui *.png *.jpg *.ui
-recursive-include data *.res *.re2
 #prune examples/sample?/build
