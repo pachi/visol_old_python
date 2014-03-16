@@ -114,7 +114,7 @@ data_files = (
                          GTK_GTKRC_DIR,
                          GTK_GTKRC)
         ]),
-        
+
         (GTK_WIMP_DIR, [
             os.path.join(
                 GTK_RUNTIME_DIR,
