@@ -145,7 +145,7 @@ options = {'py2exe': { 'packages':'encodings',
                        'excludes': ['_gtkagg', '_tkagg', 'tcl', 'Tkinter',
                                     # Eliminamos unos cuantos de la stdlib y varios instalados habitualmente
                                     'doctest', 'pdb',
-                                    '_ssl', 'inspect', 'wx', 'pickle', 'calendar',
+                                    '_ssl', 'wx', 'pickle',
                                     'pythonwin', 'pywin32', 'pythoncom',
                                     'win32api', 'win32evtlog', 'win32', 'win32com', 'win32comext',
                                     'win32pdh', 'win32pipe', 'win32ui', 'PIL'],
