@@ -22,6 +22,15 @@ en el sistema.
 Esto facilita el uso de los resultados obtenidos con la herramienta LIDER o la
 herramienta unificada LIDER-CALENER para el diseño.
 
+Instalación
+-----------
+
+La herramienta funciona en sistemas GNU/Linux y MS-Windows.
+
+El instalador para su uso en la plataforma Windows está disponible en
+la `página de descargas <https://bitbucket.org/pachi/visol/downloads>`_
+del proyecto.
+
 Créditos
 --------
 
@@ -33,8 +42,8 @@ Si utilizas la aplicación en publicaciones o artículos científicos agradecer�
 
     VILLAR BURKE, RAFAEL, "Visol: Visor de archivos de resultados de LIDER", 2014. Disponible en: http://www.rvburke.com/software.html
 
-Breve descripción de la interfaz y pantallazos
-----------------------------------------------
+Descripción de la interfaz
+--------------------------
 
 * La pantalla inicial de ViSol, con resultados a nivel de edificio, con la pestaña `Elementos` activa,
   muestra las **componentes de la demanda** para el elemento seleccionado:
