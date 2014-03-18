@@ -30,6 +30,7 @@
 import gtk
 import util, resparser
 from widgets import HistoMeses, HistoElementos, PieGlobal
+import webbrowser
 
 TESTFILE = util.get_resource('data/test.res')
 EDIFICIOICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/edificioicono.png'))
@@ -100,6 +101,10 @@ class GtkSol(object):
         ffilter.add_pattern('*.re[s|2]')
 
         self.ui.connect_signals(self)
+        # Manejador del botón de enlace en la barra de tareas
+        gtk.link_button_set_uri_hook(lambda b, u: webbrowser.open(u))
+        # Manejador de enlaces en el diálogo "about"
+        gtk.about_dialog_set_url_hook(lambda d, l, u: webbrowser.open(l), None)
         # Carga datos de materiales, cerramientos y clima
         self.loadfile(TESTFILE)
 
