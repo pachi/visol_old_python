@@ -31,16 +31,22 @@ El instalador para su uso en la plataforma Windows está disponible en
 la `página de descargas <https://bitbucket.org/pachi/visol/downloads>`_
 del proyecto.
 
-Créditos
---------
+Créditos y licencia
+-------------------
 
-- Programa desarrollado por `Rafael Villar Burke`_.
+*ViSol* es un proyecto desarrollado por `Rafael Villar Burke`_ que se publica bajo una licencia libre, la licencia pública del proyecto GNU (GPLv2 o posterior), utilizada en programas como el sistema GNU/Linux y similar a las licencias empleadas en los proyecto Firefox o LibreOffice.
+
+Se puede consultar la licencia completa en el archivo `COPYING.txt` distribuido con el código fuente, o su versión original inglesa en la página del proyecto GNU, donde se proporciona también una versión no oficial en castellano.
+
+*ViSol* se distribuye con la esperanza de que resulte útil, pero SIN NINGUNA GARANTÍA, ni garantía MERCANTIL implícita ni la CONVENIENCIA PARA UN PROPÓSITO PARTICULAR.
 
 .. _Rafael Villar Burke: http://www.rvburke.com/software.html
 
-Si utilizas la aplicación en publicaciones o artículos científicos agradecería que hicieses una cita de este tipo:
+.. note::
 
-    VILLAR BURKE, RAFAEL, "Visol: Visor de archivos de resultados de LIDER", 2014. Disponible en: http://www.rvburke.com/software.html
+    Si utilizas la aplicación en publicaciones o artículos científicos agradecería que hicieses una cita de este tipo:
+
+        - VILLAR BURKE, RAFAEL, "Visol: Visor de archivos de resultados de LIDER", 2014. Disponible en: http://www.rvburke.com/software.html
 
 Descripción de la interfaz
 --------------------------
