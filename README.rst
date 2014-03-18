@@ -25,7 +25,7 @@ herramienta unificada LIDER-CALENER para el diseño.
 Créditos
 --------
 
-- `Rafael Villar Burke`_
+- Programa desarrollado por `Rafael Villar Burke`_.
 
 .. _Rafael Villar Burke: http://www.rvburke.com/software.html
 

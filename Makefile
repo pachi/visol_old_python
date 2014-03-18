@@ -4,13 +4,22 @@
 EXEBASE ?= /e/winp2
 PYTHON = python
 
-GTKBASE = $(EXEBASE)/Python27/Lib/site-packages/gtk-2.0/runtime/bin
+GTKBASE:=$(EXEBASE)/Python27/Lib/site-packages/gtk-2.0/runtime/bin
 
-VERSION = $(shell python -c"from sol import __version__;print __version__")
-MAKENSIS = $(EXEBASE)/NSIS/makensis
+VERSION=$(shell python -c"from sol import __version__;print __version__")
+MAKENSIS:=$(EXEBASE)/NSIS/makensis
 
-PAGEANT = $(EXEBASE)/PuTTY/pageant.exe
-KEYFILE = $(EXEBASE)/PuTTY/keys/pachi-key-putty.PPK
+PAGEANT:=$(EXEBASE)/PuTTY/pageant.exe
+KEYFILE:=$(EXEBASE)/PuTTY/keys/pachi-key-putty.PPK
+
+PYRSTEXISTS:=$(findstring .py, $(shell which rst2html.py))
+ifeq ($(PYRSTEXISTS), .py)
+$(info Encontrado rst2html.py)
+RST2HTML=rst2html.py
+else
+$(info Encontrado rst2html)
+RST2HTML=rst2html
+endif
 
 #make windows installer by default
 
@@ -20,8 +29,7 @@ py2exe: setup_exe.py
 	$(PYTHON) setup_exe.py py2exe
 	sleep 5s
 
-nsiinstaller: setup.nsi splash
-	rst2html.py README.rst > README.html
+nsiinstaller: README.html setup.nsi splash
 	$(MAKENSIS) setup.nsi
 
 build: setup.py splash
@@ -29,6 +37,9 @@ build: setup.py splash
 
 install: setup.py
 	$(PYTHON) setup.py install
+
+README.html: README.rst res/style.css
+	$(RST2HTML) --stylesheet=res/style.css README.rst > $@
 
 setup.nsi: setup.nsi.in
 	sed 's/@VERSION@/$(VERSION)/g' setup.nsi.in > setup.nsi
@@ -50,7 +61,7 @@ testall:
 #	$(MAKE) -C docs html
 
 clean:
-	rm -rf build dist MANIFEST setup.nsi
+	rm -rf build dist MANIFEST setup.nsi README.html res/splash.jpg ui/splash.jpg
 	find . -name *.pyc -exec rm {} \;
 	find . -name *.swp -exec rm {} \;
 #	$(PYTHON) setup.py clean
