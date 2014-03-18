@@ -34,6 +34,14 @@ NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 # DLL del VC++8 redistributable para Python
 #import sys
 #sys.path.append('C:\\WINDOWS\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_5090ab56bcba71c2')
+#("Microsoft.VC90.CRT", glob(r'C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\*.*'))]
+if os.path.exists(r'C:\WINDOWS\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_5090ab56bcba71c2'):
+    MSVCCRTGLOB = r'C:\WINDOWS\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_5090ab56bcba71c2\*.*'
+# También lo he visto aquí en un XP...
+elif os.path.exists(r'C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.4148_x-ww_d495ac4e'):
+    MSVCCRTGLOB = r'C:\WINDOWS\WinSxS\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.4148_x-ww_d495ac4e\*.*'
+else:
+    raise Exception("No se ha podido encontrar el MS VC90 CRT")
 
 #gtk file inclusion
 import gtk
@@ -127,7 +135,7 @@ data_files = (
         ('data', ['data/test.res', 'data/test.re2']),
         ('res', glob.glob('res/pantallazo*.png')),
         ('.', ['README.rst', 'NEWS.txt', 'HACKING.txt', 'COPYING.txt']),
-        (".", glob.glob(r'C:\WINDOWS\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4148_none_5090ab56bcba71c2\*.*')) # dlls del MSVCCRT90
+        (".", glob.glob(MSVCCRTGLOB)) # dlls del MSVCCRT90
     ] +
     matplotlib.get_py2exe_datafiles()
 )
