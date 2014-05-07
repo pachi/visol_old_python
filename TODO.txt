@@ -50,3 +50,6 @@ DOCS LIDER
        - superficie?
        - altura?
 
+JLMolina:
+
+Para vuestro conocimiento, esos archivos mezclan dos tipos de información: En los flujos de calor relativos a los conceptos y componentes para cada zona, la información se deriva de las ganancias a temperatura interior constante, mientras que a partir de los resultados "a nivel de edificio" la información es sobre las demandas con la temperatura interior variable de acuerdo a las condiciones de operación. Siempre hemos prestado más atención a esta segunda parte.
