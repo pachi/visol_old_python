@@ -43,6 +43,7 @@ class VISOLModel(object):
     def __init__(self, edificio=None):
         self.edificio = edificio
         self._file = None
+        self.modo = 'edificio' #TODO: usar desde aquí el modo en lugar de tenerlo desperdigado
 
     @property
     def file(self):
@@ -79,19 +80,23 @@ class GtkSol(object):
         vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
         vb.pack_start(self.histoelementos)
 
-        self.calposchart = PieGlobal(tipodemanda='cal+')
+        self.calposchart = PieGlobal(tipodemanda='cal+',
+                                     modelo=self.model)
         vb = self.ui.get_object('vbcalpos')
         vb.pack_start(self.calposchart)
 
-        self.calnegchart = PieGlobal(tipodemanda='cal-')
+        self.calnegchart = PieGlobal(tipodemanda='cal-',
+                                     modelo=self.model)
         vb = self.ui.get_object('vbcalneg')
         vb.pack_start(self.calnegchart)
 
-        self.refposchart = PieGlobal(tipodemanda='ref+')
+        self.refposchart = PieGlobal(tipodemanda='ref+',
+                                     modelo=self.model)
         vb = self.ui.get_object('vbrefpos')
         vb.pack_start(self.refposchart)
 
-        self.refnegchart = PieGlobal(tipodemanda='ref-')
+        self.refnegchart = PieGlobal(tipodemanda='ref-',
+                                     modelo=self.model)
         vb = self.ui.get_object('vbrefneg')
         vb.pack_start(self.refnegchart)
 
@@ -155,34 +160,40 @@ class GtkSol(object):
         self.refposchart.data = (ed, pl, zn, comp)
         self.refnegchart.data = (ed, pl, zn, comp)
         if tipo == 'edificio':
+            self.model.modo = 'edificio'
             self.histomeses.modo = 'edificio'
             self.histoelementos.modo = 'edificio'
-            self.calposchart.modo = 'edificio'
-            self.calnegchart.modo = 'edificio'
-            self.refposchart.modo = 'edificio'
-            self.refnegchart.modo = 'edificio'
+            # quitar haciendo que escuchen al modelo
+            self.calposchart.dibuja()
+            self.calnegchart.dibuja()
+            self.refposchart.dibuja()
+            self.refnegchart.dibuja()
             objeto = self.model.edificio
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
             ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
         elif tipo == 'planta':
+            self.model.modo = 'planta'
             self.histomeses.modo = 'planta'
             self.histoelementos.modo = 'planta'
-            self.calposchart.modo = 'planta'
-            self.calnegchart.modo = 'planta'
-            self.refposchart.modo = 'planta'
-            self.refnegchart.modo = 'planta'
+            #eliminar haciendo que escuchen al modelo
+            self.calposchart.dibuja()
+            self.calnegchart.dibuja()
+            self.refposchart.dibuja()
+            self.refnegchart.dibuja()
             objeto = self.model.edificio[nombre]
             sup = u'<i>%.2fm²</i>\n' % objeto.superficie
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
             ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
         elif tipo == 'zona':
+            self.model.modo = 'zona'
             self.histomeses.modo = 'zona'
             self.histoelementos.modo = 'zona'
-            self.calposchart.modo = 'zona'
-            self.calnegchart.modo = 'zona'
-            self.refposchart.modo = 'zona'
-            self.refnegchart.modo = 'zona'
+            # eliminar haciendo que escuchen al modelo
+            self.calposchart.dibuja()
+            self.calnegchart.dibuja()
+            self.refposchart.dibuja()
+            self.refnegchart.dibuja()
             objeto = self.model.edificio[pl][zn]
             sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
@@ -190,11 +201,13 @@ class GtkSol(object):
         elif tipo == 'componente':
             #self.histomeses.modo = 'componente'
             self.ui.get_object('vbmeses').hide()
+            self.model.modo = 'componente'
             self.histoelementos.modo = 'componente'
-            self.calposchart.modo = 'componente'
-            self.calnegchart.modo = 'componente'
-            self.refposchart.modo = 'componente'
-            self.refnegchart.modo = 'componente'
+            # eliminar haciendo que escuchen al modelo
+            self.calposchart.dibuja()
+            self.calnegchart.dibuja()
+            self.refposchart.dibuja()
+            self.refnegchart.dibuja()
             objeto = self.model.edificio[pl][zn][comp]
             sup = '\n'
             cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto[2]

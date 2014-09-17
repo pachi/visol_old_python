@@ -45,7 +45,7 @@ class PieGlobal(FigureCanvasGTKCairo):
     __gtype_name__ = 'PieChart'
 
     def __init__(self, edificio=None, planta=None, zona=None, componente=None,
-                 tipodemanda='cal+'):
+                 tipodemanda='cal+', modelo=None):
         """Constructor
 
         edificio - Edificio analizado (EdificioLIDER)
@@ -56,7 +56,7 @@ class PieGlobal(FigureCanvasGTKCairo):
         self.planta = planta
         self.zona = zona
         self.componente = componente
-        self._modo = 'edificio'
+        self.modelo = modelo
         self.tipodemanda = tipodemanda
 
         self._titles = {'cal+': 'Periodo de calefacción. Ganancias térmicas',
@@ -72,11 +72,11 @@ class PieGlobal(FigureCanvasGTKCairo):
 
     @property
     def modo(self):
-        return self._modo
+        return self.modelo.modo
 
     @modo.setter
     def modo(self, val):
-        self._modo = val
+        self.modelo.modo = val
         self.dibuja()
 
     @property
