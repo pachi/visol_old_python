@@ -31,7 +31,7 @@ NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 data_files = ([('ui', glob.glob('ui/*.png')),
                ('ui', glob.glob('ui/*.jpg')),
-               ('ui', ['ui/sol.ui']),
+               ('ui', ['ui/sol.ui', 'ui/visol.cfg']),
                ('data', ['data/test.res', 'data/test.re2']),
                ('res', glob.glob('res/pantallazo*.png')),
                ('.', ['COPYING.txt', 'README.rst', 'NEWS.txt', 'HACKING.txt', 'TODO.txt']),
