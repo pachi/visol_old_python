@@ -29,50 +29,6 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
-
-# Receta sacada de http://stackoverflow.com/questions/7884959/bundling-gtk-resources-with-py2exe
-def generate_data_files(prefix, tree, file_filter=None):
-    """
-    Walk the filesystem starting at "prefix" + "tree", producing a list of files
-    suitable for the data_files option to setup(). The prefix will be omitted
-    from the path given to setup(). For example, if you have
-
-        C:\Python26\Lib\site-packages\gtk-2.0\runtime\etc\...
-
-    ...and you want your "dist\" dir to contain "etc\..." as a subdirectory,
-    invoke the function as
-
-        generate_data_files(
-            r"C:\Python26\Lib\site-packages\gtk-2.0\runtime",
-            r"etc")
-
-    If, instead, you want it to contain "runtime\etc\..." use:
-
-        generate_data_files(
-            r"C:\Python26\Lib\site-packages\gtk-2.0",
-            r"runtime\etc")
-
-    Empty directories are omitted.
-
-    file_filter(root, fl) is an optional function called with a containing
-    directory and filename of each file. If it returns False, the file is
-    omitted from the results.
-    """
-    data_files = []
-    for root, dirs, files in os.walk(os.path.join(prefix, tree)):
-        to_dir = os.path.relpath(root, prefix)
-
-        if file_filter is not None:
-            file_iter = (fl for fl in files if file_filter(root, fl))
-        else:
-            file_iter = files
-
-        data_files.append((to_dir, [os.path.join(root, fl) for fl in file_iter]))
-
-    non_empties = [(to, fro) for (to, fro) in data_files if fro]
-
-    return non_empties
-
 data_files = ([('ui', glob.glob('ui/*.png')),
                ('ui', glob.glob('ui/*.jpg')),
                ('ui', ['ui/sol.ui']),
@@ -88,7 +44,7 @@ install_requires = ['matplotlib', 'numpy', 'pygtk', 'gobject', 'cairo', 'pangoca
                     # http://packages.python.org/distribute/setuptools.html#declaring-dependencies
                 ]
 
-entry_points = {'console_scripts': ['visol=bin/visol:main']}
+entry_points = {'gui_scripts': ['visol=bin/visol:main']}
 
 setup(name='visol',
     version=__version__,
