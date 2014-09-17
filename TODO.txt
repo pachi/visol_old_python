@@ -30,25 +30,30 @@ DOCS LIDER
   2Âª línea: Lista de campos en elementos (A, U, p, f, fv, angNorte, tilt, tipo, codigo0, codigo1)
   3Âª línea: nª de elementos (ne) y nª de zonas (nz)
 
-  ne bloques de 2 líneas describiendo los elementos
+  ne bloques de 2 líneas describiendo los elementos (total de ne*2 líneas)
      - Nombre de elemento entre comillas
-     - Propiedades según lista de campos
-       - A
-       - U
-       - p
-       - f
-       - fv
-       - angNorte
-       - tilt
-       - tipo
-       - codigo0
-       - codigo1
-  nz bloques de 2 líneas describiendo las zonas
+     - Propiedades del elemento separadas por espacios
+       - A: area (m2)
+       - U: U
+       - p: permeabilidad (en ventanas parece que es la permeabilidad según
+         ensayo, en opacos no se sabe si es el volumen total e infiltraciones?)
+       - f: ¿factor solar?
+       - fv: ¿factor solar?
+       - angNorte: ángulo respecto al norte	(0 -> exterior orientado al norte)
+       - tilt: inclinación respecto a la horizontal (90 = vertical)
+       - tipo: {0: muro, 1: ventana, -4: medianera, -2: partición interior
+         vertical, -5: forjado interior horizontal, -3: forjado terreno }
+       - codigo0: ¿En elementos de la envolvente: valor positivo que
+         identifica el elemento. En elementos interiores a
+         una zona: valor negativo que corresponde al código de la zona a la que pertenecen?
+       - codigo1: ¿zona a la que pertenece el elemento. Valores negativos?
+  nz bloques de 2 líneas describiendo las zonas (total de nz*2 líneas)
      - Nombre de zona
-     - Propiedades de la zona
-       - número (negativo, parece)
-       - superficie?
-       - altura?
+     - Propiedades de la zona separadas por espacios
+       - número (negativo): código de la zona
+       - grado de acondicionamiento?: 1 habitable, 2 no habitable
+       - superficie: área de la zona (m2)
+       - carga interna?
 
 JLMolina:
 
