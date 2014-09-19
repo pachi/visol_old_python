@@ -170,7 +170,7 @@ class PlantaLIDER(OrderedDict):
     @property
     def calefaccion_meses(self):
         """Demandas de calefacción mensuales por m² [kWh/m²·mes]"""
-        cal_planta = numpy.array([0.0] * 12)
+        cal_planta = numpy.zeros(12)
         for nzona in self:
             zona = self[nzona]
             cal_planta += numpy.array(zona.calefaccion_meses) * zona.superficie
@@ -184,7 +184,7 @@ class PlantaLIDER(OrderedDict):
     @property
     def refrigeracion_meses(self):
         """Demandas de refrigeración mensuales por m² [kWh/m²·mes]"""
-        ref_planta = numpy.array([0.0] * 12)
+        ref_planta = numpy.zeros(12)
         for nzona in self:
             zona = self[nzona]
             ref_planta += numpy.array(zona.refrigeracion_meses) * zona.superficie
@@ -271,8 +271,8 @@ class ZonaLIDER(OrderedDict):
         self.multiplicador = multiplicador
         self.calefaccion = calefaccion
         self.refrigeracion = refrigeracion
-        self.calefaccion_meses = []
-        self.refrigeracion_meses = []
+        self.calefaccion_meses = numpy.zeros(12)
+        self.refrigeracion_meses = numpy.zeros(12)
         # Elementos: incluyen información desglosada de flujos:
         # Calef. positivo, Calef. negativo, Calef. neto
         # Ref. poisitivo, Ref. negativo, Ref. neto
