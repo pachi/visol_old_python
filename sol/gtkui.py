@@ -28,33 +28,16 @@
 
 #import gobject
 import gtk
-import util, resparser
+import util
 from widgets import HistoMeses, HistoElementos, PieGlobal
 import webbrowser
+from solmodel import VISOLModel
 
 TESTFILE = util.get_resource('data/test.res')
 EDIFICIOICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/edificioicono.png'))
 PLANTAICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/plantaicono.png'))
 ZONAICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/zonaicono.png'))
 COMPONENTEICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/componenteicono.png'))
-
-class VISOLModel(object):
-    """Modelo para la aplicación ViSOL"""
-    def __init__(self, edificio=None):
-        self.edificio = edificio
-        self._file = None
-        self.modo = 'edificio' #TODO: usar desde aquí el modo en lugar de tenerlo desperdigado
-
-    @property
-    def file(self):
-        return self._file
-
-    @file.setter
-    def file(self, value):
-        if value != self.file:
-            self._file = value
-            self.edificio = resparser.loadfile(value)
-
 
 class GtkSol(object):
     """Aplicación Visor de archivos de LIDER"""
@@ -72,11 +55,11 @@ class GtkSol(object):
         self.tb = self.ui.get_object('textbuffer')
         self.nb = self.ui.get_object('notebook')
 
-        self.histomeses = HistoMeses()
+        self.histomeses = HistoMeses(modelo=self.model)
         vb = self.ui.get_object('vbmeses')
         vb.pack_start(self.histomeses)
 
-        self.histoelementos = HistoElementos()
+        self.histoelementos = HistoElementos(modelo=self.model)
         vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
         vb.pack_start(self.histoelementos)
 
@@ -116,29 +99,28 @@ class GtkSol(object):
     def loadfile(self, path=TESTFILE):
         """Carga archivo en el modelo y actualiza la interfaz"""
         self.model.file = path
-        self.window.props.title = u"ViSOL [... %s]" % self.model.file[-40:]
         e = self.model.edificio
-        self.tb.set_text(e.resdata)
-        self.edificiots.clear()
-        self.edificiotv.collapse_all()
-        # Modelo de plantas y zonas
         ed = e.nombre
-        edificioiter = self.edificiots.append(None, (ed, 'edificio', ed, '', '', '', EDIFICIOICON))
+
+        self.window.props.title = u"ViSOL [... %s]" % self.model.file[-40:]
+
+        self.tb.set_text(e.resdata)
+        ts = self.edificiots
+        tv = self.edificiotv
+        ts.clear()
+        tv.collapse_all()
+        # Modelo de plantas y zonas
+        edificioiter = ts.append(None, (ed, 'edificio', ed, '', '', '', EDIFICIOICON))
         for planta in e:
-            plantaiter = self.edificiots.append(edificioiter, (planta, 'planta', ed, planta, '', '', PLANTAICON))
+            plantaiter = ts.append(edificioiter, (planta, 'planta', ed, planta, '', '', PLANTAICON))
             zonas = e[planta]
             for zona in zonas:
-                zonaiter = self.edificiots.append(plantaiter, (zona, 'zona', ed, planta, zona, '', ZONAICON))
-                self.edificiotv.expand_to_path(self.edificiots.get_path(zonaiter))
+                zonaiter = ts.append(plantaiter, (zona, 'zona', ed, planta, zona, '', ZONAICON))
+                tv.expand_to_path(ts.get_path(zonaiter))
                 for componente in zonas[zona]:
-                    self.edificiots.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
-        self.histomeses.edificio = e
-        self.histoelementos.edificio = e
-        self.calposchart.edificio = e
-        self.calnegchart.edificio = e
-        self.refposchart.edificio = e
-        self.refnegchart.edificio = e
-        self.edificiotv.set_cursor((0,)) # Seleccionar edificio para recargar
+                    ts.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
+        tv.set_cursor((0,)) # Seleccionar edificio
+
         self.sb.push(0, u'Cargado modelo: %s' % path)
 
     def showtextfile(self, button):
@@ -152,76 +134,26 @@ class GtkSol(object):
         """Seleccionada una nueva fila de la vista de árbol"""
         path, col = tv.get_cursor()
         tm = tv.get_model()
-        nombre, tipo, ed, pl, zn, comp, icon = tm[path]
-        self.histomeses.data = (ed, pl, zn, comp)
-        self.histoelementos.data = (ed, pl, zn, comp)
-        self.calposchart.data = (ed, pl, zn, comp)
-        self.calnegchart.data = (ed, pl, zn, comp)
-        self.refposchart.data = (ed, pl, zn, comp)
-        self.refnegchart.data = (ed, pl, zn, comp)
-        if tipo == 'edificio':
-            self.model.modo = 'edificio'
-            self.histomeses.modo = 'edificio'
-            self.histoelementos.modo = 'edificio'
-            # quitar haciendo que escuchen al modelo
-            self.calposchart.dibuja()
-            self.calnegchart.dibuja()
-            self.refposchart.dibuja()
-            self.refnegchart.dibuja()
-            objeto = self.model.edificio
-            sup = u'<i>%.2fm²</i>\n' % objeto.superficie
-            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
-            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
-        elif tipo == 'planta':
-            self.model.modo = 'planta'
-            self.histomeses.modo = 'planta'
-            self.histoelementos.modo = 'planta'
-            #eliminar haciendo que escuchen al modelo
-            self.calposchart.dibuja()
-            self.calnegchart.dibuja()
-            self.refposchart.dibuja()
-            self.refnegchart.dibuja()
-            objeto = self.model.edificio[nombre]
-            sup = u'<i>%.2fm²</i>\n' % objeto.superficie
-            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
-            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
-        elif tipo == 'zona':
-            self.model.modo = 'zona'
-            self.histomeses.modo = 'zona'
-            self.histoelementos.modo = 'zona'
-            # eliminar haciendo que escuchen al modelo
-            self.calposchart.dibuja()
-            self.calnegchart.dibuja()
-            self.refposchart.dibuja()
-            self.refnegchart.dibuja()
-            objeto = self.model.edificio[pl][zn]
-            sup = u'<i>%d x %.2fm²</i>\n' % (objeto.multiplicador, objeto.superficie)
-            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto.calefaccion
-            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto.refrigeracion
-        elif tipo == 'componente':
-            #self.histomeses.modo = 'componente'
+        nombre, tipo, ed, pl, zn, comp = tuple(tm[path])[:6]
+        self.model.index = (ed, pl, zn, comp)
+        objeto = self.model.activo
+        if tipo == 'componente':
             self.ui.get_object('vbmeses').hide()
-            self.model.modo = 'componente'
-            self.histoelementos.modo = 'componente'
-            # eliminar haciendo que escuchen al modelo
-            self.calposchart.dibuja()
-            self.calnegchart.dibuja()
-            self.refposchart.dibuja()
-            self.refnegchart.dibuja()
-            objeto = self.model.edificio[pl][zn][comp]
-            sup = '\n'
-            cal = u'calefacción: %6.1f<i>kWh/m²año</i>, ' % objeto[2]
-            ref = u'refrigeración: %6.1f<i>kWh/m²año</i>' % objeto[5]
+            mul, sup = None, None
+            cal = objeto.calnet
+            ref = objeto.refnet
         else:
-            raise ValueError("Tipo desconocido")
-
-        if tipo != 'componente':
             self.ui.get_object('vbmeses').show()
+            mul = objeto.get('multiplicador', 1)
+            sup = objeto.superficie
+            cal = objeto.calefaccion
+            ref = objeto.refrigeracion
 
         txt1 = u'<big><b>%s</b></big> (%s)\n' % (nombre, tipo.capitalize())
-        txt1 += sup
-        txt1 += cal
-        txt1 += ref
+        if sup:
+            txt1 += u'<i>%d x %.2fm²</i>\n' % (mul, sup)
+        txt1 += u'calefacción: %6.1f<i>kWh/m²año</i>, ' % cal
+        txt1 += u'refrigeración: %6.1f<i>kWh/m²año</i>' % ref
         self.sb.push(0, u'Seleccionado %s: %s' % (tipo, nombre))
         self.ui.get_object('labelzona').props.label = txt1
 

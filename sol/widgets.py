@@ -31,11 +31,12 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtkcairo import FigureCanvasGTKCairo
 from matplotlib.transforms import offset_copy
 from util import myround
+from observer import Observer
 
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
          'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
-class PieGlobal(FigureCanvasGTKCairo):
+class PieGlobal(FigureCanvasGTKCairo, Observer):
     """Gráfico circular de Matplotlib
 
     Representa el balance neto de energía para cada componente del edificio.
@@ -44,19 +45,15 @@ class PieGlobal(FigureCanvasGTKCairo):
     """
     __gtype_name__ = 'PieChart'
 
-    def __init__(self, edificio=None, planta=None, zona=None, componente=None,
-                 tipodemanda='cal+', modelo=None):
+    def __init__(self, tipodemanda='cal+', modelo=None):
         """Constructor
 
         edificio - Edificio analizado (EdificioLIDER)
         planta - Nombre de la planta "actual" analizada en el edificio (str)
         zona - Nombre de la Zona "actual" analizada en la planta (str)
         """
-        self.edificio = edificio
-        self.planta = planta
-        self.zona = zona
-        self.componente = componente
-        self.modelo = modelo
+        Observer.__init__(self, modelo)
+
         self.tipodemanda = tipodemanda
 
         self._titles = {'cal+': 'Periodo de calefacción. Ganancias térmicas',
@@ -66,51 +63,26 @@ class PieGlobal(FigureCanvasGTKCairo):
 
         #self.title = self._titles[tipodemanda]
         self.fig, _axes = plt.subplots(1, 1,
-                                           subplot_kw={'aspect':'equal'},
-                                           facecolor='w')
+                                       subplot_kw={'aspect':'equal'},
+                                       facecolor='w')
         FigureCanvasGTKCairo.__init__(self, self.fig)
-
-    @property
-    def modo(self):
-        return self.modelo.modo
-
-    @modo.setter
-    def modo(self, val):
-        self.modelo.modo = val
-        self.dibuja()
-
-    @property
-    def data(self):
-        return self.edificio, self.planta, self.zona, self.componente
-
-    @data.setter
-    def data(self, value):
-        edificio, planta, zona, componente = value
-        #self.edificio = edificio # Es el nombre, no el objeto edificio
-        self.planta = planta
-        self.zona = zona
-        self.componente = componente
 
     @property
     def demandas(self):
         """Demandas según el modo activo"""
-        edificio = self.edificio
-        if self.modo == 'edificio' and edificio is not None:
-            demandas = edificio.demandas
-        elif self.modo == 'planta':
-            demandas = edificio[self.planta].demandas
-        elif self.modo == 'zona' and self.zona is not None:
-            demandas = edificio[self.planta][self.zona].demandas
-        elif self.modo == 'componente':
-            componente = edificio[self.planta][self.zona][self.componente]
-            demandas = {'cal':[componente.calnet, ''],
-                        'ref':[componente.refnet, ''],
-                        'cal+':[componente.calpos, ''],
-                        'cal-':[componente.calneg, ''],
-                        'ref+':[componente.refpos, ''],
-                        'ref-':[componente.refneg, '']}
+        obj = self.model.activo
+        modo = self.model.modo
+        if modo in ('edificio', 'planta', 'zona') and obj is not None:
+            demandas = obj.demandas
+        elif modo == 'componente' and obj is not None:
+            demandas = {'cal':[obj.calnet, ''],
+                        'ref':[obj.refnet, ''],
+                        'cal+':[obj.calpos, ''],
+                        'cal-':[obj.calneg, ''],
+                        'ref+':[obj.refpos, ''],
+                        'ref-':[obj.refneg, '']}
         else:
-            raise NameError("Modo de operación inesperado: %s" % self.modo)
+            raise NameError("Modo de operación inesperado: %s" % modo)
         return demandas
 
     def colors(self, nelems, base=(255, 0, 0), reverse=False):
@@ -126,7 +98,7 @@ class PieGlobal(FigureCanvasGTKCairo):
 
         # demandas y grupos, excluido el grupo 'TOTAL'
         demandas = self.demandas[self.tipodemanda][:-1]
-        grupos = self.edificio.grupos[:-1]
+        grupos = self.model.edificio.grupos[:-1]
         total = sum(demandas)
         titletext = (self._titles[self.tipodemanda] +
                      u'\nTotal: %4.1f kWh/m²año' % total)
@@ -137,7 +109,7 @@ class PieGlobal(FigureCanvasGTKCairo):
                       size='medium', ha='center', va='top')
 
         # No damos esta información en modo componente
-        if self.modo == 'componente':
+        if self.model.modo == 'componente':
             ax.axis('off')
             ax.annotate("Información no disponible para componentes",
                         (0.5, 0.5), xycoords='axes fraction', ha='center')
@@ -234,6 +206,10 @@ class PieGlobal(FigureCanvasGTKCairo):
                                         relpos=(0.0 if ha=='left' else 1.0, 0.5),
                                         patchB=patch))
 
+    #XXX: ver si aquí se mueve el contenido de dibuja
+    def update(self, subject, **kwargs):
+        self.dibuja()
+
     def dibuja(self, width=400, height=200):
         """Dibuja elementos generales de la gráfica"""
         self.dibujaseries()
@@ -248,21 +224,18 @@ class PieGlobal(FigureCanvasGTKCairo):
         """Guardar y mostrar gráfica"""
         self.fig.savefig(filename)
 
-class HistoBase(FigureCanvasGTKCairo):
+class HistoBase(FigureCanvasGTKCairo, Observer):
     """Histograma de Matplotlib"""
     __gtype_name__ = 'HistoBase'
 
-    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
+    def __init__(self, modelo=None):
         """Constructor
 
         edificio - Edificio analizado (EdificioLIDER)
         planta - Nombre de la planta "actual" analizada en el edificio (str)
         zona - Nombre de la Zona "actual" analizada en la planta (str)
         """
-        self.edificio = edificio
-        self.planta = planta
-        self.zona = zona
-        self.componente = componente
+        Observer.__init__(self, modelo)
 
         self.fig = Figure()
         FigureCanvasGTKCairo.__init__(self, self.fig)
@@ -284,27 +257,6 @@ class HistoBase(FigureCanvasGTKCairo):
         self.trpos = offset_copy(self.ax1.transData, fig=self.fig,
                                  x=0, y=labeloffset, units='points')
 
-    @property
-    def modo(self):
-        return self._modo
-
-    @modo.setter
-    def modo(self, val):
-        self._modo = val
-        self.dibuja()
-
-    @property
-    def data(self):
-        return self.edificio, self.planta, self.zona, self.componente
-
-    @data.setter
-    def data(self, value):
-        edificio, planta, zona, componente = value
-        #self.edificio = edificio # Es el nombre, no el objeto edificio
-        self.planta = planta
-        self.zona = zona
-        self.componente = componente
-
     def autolabel(self, ax, rects):
         """Etiquetar valores fuera de las barras"""
         for rect in rects:
@@ -322,6 +274,10 @@ class HistoBase(FigureCanvasGTKCairo):
                 ax.text(rect.get_x() + rect.get_width() / 2.0, rectbasey,
                         '%.1f' % (k*round(height, 1)), ha='center', va='bottom',
                         size=self.labelfs, transform=tr)
+
+    # ver si dibuja pasa a ser esto
+    def update(self, subject, **kwargs):
+        self.dibuja()
 
     def dibujaseries(self, ax):
         """Dibuja series de datos"""
@@ -349,7 +305,7 @@ class HistoBase(FigureCanvasGTKCairo):
         """Guardar y mostrar gráfica"""
         self.fig.savefig(filename)
 
-
+# XXX: casca al ver componentes
 class HistoMeses(HistoBase):
     """Histograma de demandas mensuales
 
@@ -357,13 +313,12 @@ class HistoMeses(HistoBase):
     """
     __gtype_name__ = 'HistoMeses'
 
-    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
+    def __init__(self, modelo=None):
         """Constructor
 
         zona - Zona analizada
         """
-        HistoBase.__init__(self, edificio, planta, zona, componente)
-        self._modo = 'edificio'
+        HistoBase.__init__(self, modelo)
 
         self.title = u"Demanda neta mensual"
         self.xlabel = u"Periodo"
@@ -383,17 +338,12 @@ class HistoMeses(HistoBase):
         ax1.set_xticks(ind)
         ax1.set_xticklabels(x_names, size='small', rotation=90)
         # Seleccionamos las demandas
-        if self.modo == 'edificio' and self.edificio is not None:
-            e = self.edificio
-            seriecal, serieref = e.calefaccion_meses, e.refrigeracion_meses
-        elif self.modo == 'planta':
-            pl = self.edificio[self.planta]
-            seriecal, serieref = pl.calefaccion_meses, pl.refrigeracion_meses
-        elif self.modo == 'zona' and self.zona:
-            zona = self.edificio[self.planta][self.zona]
-            seriecal, serieref = zona.calefaccion_meses, zona.refrigeracion_meses
+        obj = self.model.activo
+        if obj is not None and self.model.modo != 'componente':
+            seriecal = obj.calefaccion_meses
+            serieref = obj.refrigeracion_meses
         else:
-            seriecal, serieref = [], []
+            seriecal, serieref = numpy.zeros(12), numpy.zeros(12)
         # Dibujamos los rectángulos
         rects1 = ax1.bar(ind, seriecal, 1.0, align='center', fc='r', ec='k')
         rects2 = ax1.bar(ind, serieref, 1.0, align='center', fc='b', ec='k')
@@ -402,7 +352,7 @@ class HistoMeses(HistoBase):
                          loc='lower left', prop={"size":'small'}, fancybox=True)
         leg.draw_frame(False)
         leg.get_frame().set_alpha(0.5)
-        _min, _max = self.edificio.minmaxdemandas()
+        _min, _max = self.model.edificio.minmaxdemandas()
         _min, _max = myround(_min, 5), myround(_max, 5)
         ax1.set_ylim(_min - 10, _max + 10)
         self.autolabel(ax1, rects1)
@@ -416,13 +366,12 @@ class HistoElementos(HistoBase):
     """
     __gtype_name__ = 'HistoElementos'
 
-    def __init__(self, edificio=None, planta=None, zona=None, componente=None):
+    def __init__(self, modelo=None):
         """Constructor
 
         zona - Zona analizada
         """
-        HistoBase.__init__(self, edificio, planta, zona, componente)
-        self._modo = 'edificio'
+        HistoBase.__init__(self, modelo)
 
         self.title = u"Demandas por elemento"
         self.xlabel = u"Elemento"
@@ -470,32 +419,24 @@ class HistoElementos(HistoBase):
                              prop={"size":'small'}, fancybox=True)
             leg.draw_frame(False)
             leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
-            mind, maxd = self.edificio.minmaxflujoszonas()
+            mind, maxd = self.model.edificio.minmaxflujoszonas()
             mind, maxd = myround(mind, 10), myround(maxd, 10)
             ax1.set_ylim(mind - 10, maxd + 10)
             ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
 
         # Flujos por elementos
-        edificio = self.edificio
-        labelrotation = 90
-        if self.modo == 'edificio' and edificio is not None:
-            x_labels = ["\n".join(name.split()) for name in edificio.flujos]
-            demandas = edificio.demandas
-        elif self.modo == 'planta':
-            planta = edificio[self.planta]
-            x_labels = ["\n".join(name.split()) for name in planta.flujos]
-            demandas = planta.demandas
-        elif self.modo == 'zona' and self.zona is not None:
-            zona = edificio[self.planta][self.zona]
-            x_labels = ["\n".join(name.split()) for name in zona.flujos]
-            demandas = zona.demandas
-        elif self.modo == 'componente':
+        obj = self.model.activo
+        modo = self.model.modo
+        if modo in ('edificio', 'planta', 'zona') and obj is not None:
+            labelrotation = 90
+            x_labels = ["\n".join(name.split()) for name in obj.flujos]
+            demandas = obj.demandas
+        elif modo == 'componente' and obj is not None:
             labelrotation = 0
-            flujos = edificio[self.planta][self.zona][self.componente]
-            x_labels = [self.componente,]
-            demandas = dict(zip(('cal+', 'cal-', 'cal', 'ref+', 'ref-', 'ref'), flujos))
+            x_labels = [self.model.index.componente,]
+            demandas = dict(zip(('cal+', 'cal-', 'cal', 'ref+', 'ref-', 'ref'), obj))
         else:
-            raise NameError("Modo de operación inesperado: %s" % self.modo)
+            raise NameError("Modo de operación inesperado: %s" % modo)
 
         ind = numpy.arange(len(x_labels))
         barras(demandas)
