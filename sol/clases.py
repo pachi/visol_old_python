@@ -22,7 +22,7 @@
 #   
 
 import numpy
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 
 class EdificioLIDER(OrderedDict):
     """Edificio en LIDER
@@ -246,7 +246,7 @@ class PlantaLIDER(OrderedDict):
 class ZonaLIDER(OrderedDict):
     """Zona de edificio de LIDER
 
-    Diccionario de componentes, con los siguientes atributos:
+    Diccionario ordenado de componentes, con los siguientes atributos:
     Los componentes incluyen flujos de calor por componente
         (Hueco H1, muro M1...) [kWh/año]
 
@@ -273,7 +273,7 @@ class ZonaLIDER(OrderedDict):
         self.refrigeracion = refrigeracion
         self.calefaccion_meses = numpy.zeros(12)
         self.refrigeracion_meses = numpy.zeros(12)
-        # Elementos: incluyen información desglosada de flujos:
+        # Elementos/componentes: incluyen información desglosada de flujos:
         # Calef. positivo, Calef. negativo, Calef. neto
         # Ref. poisitivo, Ref. negativo, Ref. neto
         self.flujos = None
@@ -287,3 +287,7 @@ class ZonaLIDER(OrderedDict):
          d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
         d['grupos'] = self.flujos.keys()
         return d
+
+#TODO: convertir a clase con propiedad demanda y otras para hacer acceso uniforme
+COMPONENTS = ['calpos', 'calneg', 'calnet', 'refpos', 'refneg', 'refnet']
+ComponenteLIDER = namedtuple('ComponenteLIDER', COMPONENTS)
