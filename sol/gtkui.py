@@ -137,23 +137,18 @@ class GtkSol(object):
         nombre, tipo, ed, pl, zn, comp = tuple(tm[path])[:6]
         self.model.index = (ed, pl, zn, comp)
         objeto = self.model.activo
-        if tipo == 'componente':
-            self.ui.get_object('vbmeses').hide()
-            mul, sup = None, None
-            cal = objeto.calnet
-            ref = objeto.refnet
-        else:
-            self.ui.get_object('vbmeses').show()
-            mul = objeto.get('multiplicador', 1)
-            sup = objeto.superficie
-            cal = objeto.calefaccion
-            ref = objeto.refrigeracion
+        mul = getattr(objeto, 'multiplicador', 1)
+        sup = getattr(objeto, 'superficie', None)
+        cal = getattr(objeto, 'calefaccion', None)
+        ref = getattr(objeto, 'refrigeracion', None)
 
         txt1 = u'<big><b>%s</b></big> (%s)\n' % (nombre, tipo.capitalize())
-        if sup:
+        if self.model.modo != 'componente':
             txt1 += u'<i>%d x %.2fm²</i>\n' % (mul, sup)
-        txt1 += u'calefacción: %6.1f<i>kWh/m²año</i>, ' % cal
-        txt1 += u'refrigeración: %6.1f<i>kWh/m²año</i>' % ref
+            txt1 += u'calefacción: %6.1f<i>kWh/m²año</i>, ' % cal
+            txt1 += u'refrigeración: %6.1f<i>kWh/m²año</i>' % ref
+        else:
+            txt1 += u'\n'
         self.sb.push(0, u'Seleccionado %s: %s' % (tipo, nombre))
         self.ui.get_object('labelzona').props.label = txt1
 

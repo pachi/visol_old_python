@@ -102,8 +102,8 @@ class EdificioLIDER(OrderedDict):
         """Flujo máximo y mínimo de todas las zonas del edificio  [kW/m²·año]"""
         zonas = self.zonas
         names = zonas[0].flujos.keys()
-        pmin = min(min(zona.flujos[name]) for zona in zonas for name in names)
-        pmax = max(max(zona.flujos[name]) for zona in zonas for name in names)
+        pmin = min(min(zona.flujos[name].values) for zona in zonas for name in names)
+        pmax = max(max(zona.flujos[name].values) for zona in zonas for name in names)
         return pmin, pmax
 
     @property
@@ -117,13 +117,11 @@ class EdificioLIDER(OrderedDict):
         El orden de los valores corresponde al de los grupos en el diccionario
         self.flujos.keys().
         """
-        # XXX: Esto es dependiente del orden de values() y keys()...
         d = OrderedDict()
         (d['cal+'], d['cal-'], d['cal'],
          d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
         d['grupos'] = self.flujos.keys()
         return d
-        #calpos, calneg, calnet, refpos, refneg, refnet
 
     def minmaxdemandas(self):
         """Mínimo y máximo en demanda del edificio [kW/m²·año]
@@ -217,7 +215,7 @@ class PlantaLIDER(OrderedDict):
         for grupo in grupos:
             params = [self[zona].superficie *
                       self[zona].multiplicador *
-                      numpy.array(self[zona].flujos[grupo]) for zona in self]
+                      numpy.array(self[zona].flujos[grupo].values) for zona in self]
             # XXX: Se podría hacer con numpy sumando arrays (que lo hace columna a columna)
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / superficieplanta)
@@ -234,13 +232,11 @@ class PlantaLIDER(OrderedDict):
         El orden de los valores corresponde al de los grupos en el diccionario
         self.flujos.keys().
         """
-        # XXX: Esto es dependiente del orden de values() y keys()...
         d = OrderedDict()
         (d['cal+'], d['cal-'], d['cal'],
          d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
         d['grupos'] = self.flujos.keys()
         return d
-        #calpos, calneg, calnet, refpos, refneg, refnet
 
 
 class ZonaLIDER(OrderedDict):
@@ -281,13 +277,40 @@ class ZonaLIDER(OrderedDict):
     @property
     def demandas(self):
         """Demanda de la zona por elementos"""
-        # XXX: Esto es dependiente del orden de values() y keys()...
         d = OrderedDict()
-        (d['cal+'], d['cal-'], d['cal'],
-         d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
-        d['grupos'] = self.flujos.keys()
+        data = [[cc.nombre] + list(cc.values)
+                for cc in self.flujos.values()]
+        (d['grupos'], d['cal+'], d['cal-'], d['cal'],
+         d['ref+'], d['ref-'], d['ref']) = zip(*data)
         return d
 
-#TODO: convertir a clase con propiedad demanda y otras para hacer acceso uniforme
-COMPONENTS = ['calpos', 'calneg', 'calnet', 'refpos', 'refneg', 'refnet']
-ComponenteLIDER = namedtuple('ComponenteLIDER', COMPONENTS)
+class ComponenteLIDER(object):
+    """Componente del edificio en LIDER
+
+    nombre - Nombre del componente
+    calpos - Flujo positivo de energía en temporada de calefacción [kWh/año]
+    calneg - Flujo negativo de energía en temporada de calefacción [kWh/año]
+    calnet - Flujo neto de energía en temporada de calefacción [kWh/año]
+    refpos - Flujo positivo de energía en temporada de refrigeración [kWh/año]
+    refneg - Flujo negativo de energía en temporada de refrigeración [kWh/año]
+    refnet - Flujo neto de energía en temporada de refrigeración [kWh/año]
+
+    demandas - diccionario con un elemento con clave el nombre y valor
+               los flujos de calor del componente [kWh/año]
+    """
+    def __init__(self, nombre, calpos, calneg, calnet, refpos, refneg, refnet):
+        self.nombre = nombre
+        self.values = (calpos, calneg, calnet, refpos, refneg, refnet)
+
+    @property
+    def demandas(self):
+        """Demanda del componente"""
+        calpos, calneg, calnet, refpos, refneg, refnet = self.values
+        d = OrderedDict([('grupos', [self.nombre]),
+                         ('cal+', [calpos]),
+                         ('cal-', [calneg]),
+                         ('cal', [calnet]),
+                         ('ref+', [refpos]),
+                         ('ref-', [refneg]),
+                         ('ref', [refnet])])
+        return d

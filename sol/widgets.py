@@ -67,24 +67,6 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
                                        facecolor='w')
         FigureCanvasGTKCairo.__init__(self, self.fig)
 
-    @property
-    def demandas(self):
-        """Demandas según el modo activo"""
-        obj = self.model.activo
-        modo = self.model.modo
-        if modo in ('edificio', 'planta', 'zona') and obj is not None:
-            demandas = obj.demandas
-        elif modo == 'componente' and obj is not None:
-            demandas = {'cal':[obj.calnet, ''],
-                        'ref':[obj.refnet, ''],
-                        'cal+':[obj.calpos, ''],
-                        'cal-':[obj.calneg, ''],
-                        'ref+':[obj.refpos, ''],
-                        'ref-':[obj.refneg, '']}
-        else:
-            raise NameError("Modo de operación inesperado: %s" % modo)
-        return demandas
-
     def colors(self, nelems, base=(255, 0, 0), reverse=False):
         """Devuelve lista de colores en un rango"""
         step = int(255 / nelems)
@@ -97,7 +79,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         """Dibuja series de datos"""
 
         # demandas y grupos, excluido el grupo 'TOTAL'
-        demandas = self.demandas[self.tipodemanda][:-1]
+        demandas = self.model.activo.demandas[self.tipodemanda][:-1]
         grupos = self.model.edificio.grupos[:-1]
         total = sum(demandas)
         titletext = (self._titles[self.tipodemanda] +
@@ -305,7 +287,6 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
         """Guardar y mostrar gráfica"""
         self.fig.savefig(filename)
 
-# XXX: casca al ver componentes
 class HistoMeses(HistoBase):
     """Histograma de demandas mensuales
 
@@ -332,21 +313,21 @@ class HistoMeses(HistoBase):
         El eje horizontal representa los periodos [meses] y el eje vertical la
         demanda existente [kWh/m²mes]
         """
+        # No damos esta información en modo componente
+        if self.model.modo == 'componente':
+            ax1.axis('off')
+            ax1.annotate("Información no disponible para componentes",
+                         (0.5, 0.5), xycoords='axes fraction', ha='center')
+            return
         # Meses como etiquetas y localizamos los valores límite
         ind = numpy.arange(12)
         x_names = [mes[:3] for mes in MESES]
         ax1.set_xticks(ind)
         ax1.set_xticklabels(x_names, size='small', rotation=90)
-        # Seleccionamos las demandas
+        # Seleccionamos las demandas y dibujamos los rectángulos
         obj = self.model.activo
-        if obj is not None and self.model.modo != 'componente':
-            seriecal = obj.calefaccion_meses
-            serieref = obj.refrigeracion_meses
-        else:
-            seriecal, serieref = numpy.zeros(12), numpy.zeros(12)
-        # Dibujamos los rectángulos
-        rects1 = ax1.bar(ind, seriecal, 1.0, align='center', fc='r', ec='k')
-        rects2 = ax1.bar(ind, serieref, 1.0, align='center', fc='b', ec='k')
+        rects1 = ax1.bar(ind, obj.calefaccion_meses, 1.0, align='center', fc='r', ec='k')
+        rects2 = ax1.bar(ind, obj.refrigeracion_meses, 1.0, align='center', fc='b', ec='k')
         leg = ax1.legend((rects1[0], rects2[0]),
                          ('Calefacción', 'Refrigeración'),
                          loc='lower left', prop={"size":'small'}, fancybox=True)
@@ -426,18 +407,9 @@ class HistoElementos(HistoBase):
 
         # Flujos por elementos
         obj = self.model.activo
-        modo = self.model.modo
-        if modo in ('edificio', 'planta', 'zona') and obj is not None:
-            labelrotation = 90
-            x_labels = ["\n".join(name.split()) for name in obj.flujos]
-            demandas = obj.demandas
-        elif modo == 'componente' and obj is not None:
-            labelrotation = 0
-            x_labels = [self.model.index.componente,]
-            demandas = dict(zip(('cal+', 'cal-', 'cal', 'ref+', 'ref-', 'ref'), obj))
-        else:
-            raise NameError("Modo de operación inesperado: %s" % modo)
-
+        demandas = obj.demandas
+        x_labels = ["\n".join(name.split()) for name in obj.demandas['grupos']]
+        labelrotation = 0 if self.model.modo == 'componente' else 90
         ind = numpy.arange(len(x_labels))
         barras(demandas)
         ax1.set_xticks(ind + 0.5)
