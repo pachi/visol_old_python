@@ -30,11 +30,16 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtkcairo import FigureCanvasGTKCairo
 from matplotlib.transforms import offset_copy
-from util import myround
 from observer import Observer
 
 MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio',
          'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+
+def myround(x, base=5):
+    """Redondea al valor más próximo a base"""
+    return int(base * round(float(x)/base))
+
 
 class PieGlobal(FigureCanvasGTKCairo, Observer):
     """Gráfico circular de Matplotlib

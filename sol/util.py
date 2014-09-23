@@ -42,7 +42,3 @@ APPROOT = get_main_dir()
 def get_resource(*path_list):
     "Localiza un recurso del proyecto en base al directorio base del paquete"
     return os.path.abspath(os.path.join(APPROOT, *path_list))
-
-def myround(x, base=5):
-    """Redondea al valor más próximo a base"""
-    return int(base * round(float(x)/base))
