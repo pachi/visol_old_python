@@ -65,23 +65,16 @@ class EdificioLIDER(OrderedDict):
         return None
 
     @property
-    def flujos(self, grupos=None):
+    def flujos(self):
         """Flujos de calor de los grupos, para el edificio [kW/m²·año]
-
-        Si se indica una lista de grupos devuelve los flujos para esos grupos.
-        Si no se indica grupos se consideran todos los grupos posibles.
 
         Devuelve un diccionario indexado por grupo (p.e. u'Paredes exteriores')
         que contiene una tupla con las demandas de cada grupo:
             (calefacción +, calefacción -, calefacción neta,
              refrigeración +, refrigeración -, refrigeración neta)
         """
-        if not grupos:
-            grupos = self.gruposnombres
-        if not isinstance(grupos, (list, tuple)):
-            grupos = list(grupos)
         dic = OrderedDict()
-        for grupo in grupos:
+        for grupo in self.gruposnombres:
             params = [self[planta].superficie *
                       numpy.array(self[planta].flujos[grupo])
                       for planta in self]
@@ -91,11 +84,23 @@ class EdificioLIDER(OrderedDict):
 
     @property
     def gruposnombres(self):
-        """Lista de nombres de grupos del edificio"""
+        """Lista de nombres de grupos del edificio
+
+        Los grupos definidos en LIDER son:
+        - Paredes Exteriores
+        - Cubiertas
+        - Suelos
+        - Puentes Térmicos
+        - Solar Ventanas
+        - Transmisión Ventanas
+        - Fuentes Internas
+        - Infiltración
+        - TOTAL
+        """
         # Todas las zonas incluyen por defecto todos los grupos
         plname = self.keys()[0]
         zonaname = self[plname].keys()[0]
-        grupos = self[plname][zonaname].flujos.keys()
+        grupos = list(self[plname][zonaname].flujos.keys())
         return grupos
 
     def minmaxflujoszonas(self):
