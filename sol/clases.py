@@ -24,6 +24,29 @@
 import numpy
 from collections import OrderedDict, namedtuple
 
+
+def cached_property(f):
+    """Propiedad cacheada
+
+    Receta de: http://code.activestate.com/recipes/576563-cached-property/
+    """
+    def get(self):
+        try:
+            return self._property_cache[f]
+        except AttributeError:
+            self._property_cache = {}
+            x = self._property_cache[f] = f(self)
+            return x
+        except KeyError:
+            x = self._property_cache[f] = f(self)
+            return x
+    return property(get)
+
+GRUPOSLIDER = [u'Paredes Exteriores', u'Cubiertas', u'Suelos',
+               u'Puentes Térmicos', u'Solar Ventanas',
+               u'Transmisión Ventanas', u'Fuentes Internas',
+               u'Infiltración', u'TOTAL']
+
 class EdificioLIDER(OrderedDict):
     """Edificio en LIDER
 
@@ -39,6 +62,8 @@ class EdificioLIDER(OrderedDict):
     refrigeracion_meses - Demandas mensuales de refrigeración del edificio [kWh/m²/mes]
     resdata - Contenido del archivo .RES del edificio
     """
+    gruposlider = GRUPOSLIDER
+
     def __init__(self, nombre='Edificio1'):
         OrderedDict.__init__(self)
         self.nombre = nombre
@@ -51,21 +76,13 @@ class EdificioLIDER(OrderedDict):
         self.refrigeracion_meses = []
         self.resdata = ''
 
-    @property
+    @cached_property
     def zonas(self):
         """Devuelve las zonas del edificio"""
         return [self[planta][zona] for planta in self for zona in self[planta]]
 
-    def zona(self, nombrezona):
-        #BUG: esto falla si hay varias zonas con el mismo nombre
-        """Devuelve zona a partir del nombre"""
-        for planta in self:
-            if nombrezona in self[planta]:
-                return self[planta][nombrezona]
-        return None
-
-    @property
-    def flujos(self):
+    @cached_property
+    def grupos(self):
         """Flujos de calor de los grupos, para el edificio [kW/m²·año]
 
         Devuelve un diccionario indexado por grupo (p.e. u'Paredes exteriores')
@@ -73,45 +90,17 @@ class EdificioLIDER(OrderedDict):
             (calefacción +, calefacción -, calefacción neta,
              refrigeración +, refrigeración -, refrigeración neta)
         """
+        print 'grupos'
         dic = OrderedDict()
-        for grupo in self.gruposnombres:
+        for grupo in GRUPOSLIDER:
             params = [self[planta].superficie *
-                      numpy.array(self[planta].flujos[grupo])
+                      numpy.array(self[planta].grupos[grupo])
                       for planta in self]
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / self.superficie)
         return dic
 
-    @property
-    def gruposnombres(self):
-        """Lista de nombres de grupos del edificio
-
-        Los grupos definidos en LIDER son:
-        - Paredes Exteriores
-        - Cubiertas
-        - Suelos
-        - Puentes Térmicos
-        - Solar Ventanas
-        - Transmisión Ventanas
-        - Fuentes Internas
-        - Infiltración
-        - TOTAL
-        """
-        # Todas las zonas incluyen por defecto todos los grupos
-        plname = self.keys()[0]
-        zonaname = self[plname].keys()[0]
-        grupos = list(self[plname][zonaname].flujos.keys())
-        return grupos
-
-    def minmaxflujoszonas(self):
-        """Flujo máximo y mínimo de todas las zonas del edificio  [kW/m²·año]"""
-        zonas = self.zonas
-        names = zonas[0].flujos.keys()
-        pmin = min(min(zona.flujos[name].values) for zona in zonas for name in names)
-        pmax = max(max(zona.flujos[name].values) for zona in zonas for name in names)
-        return pmin, pmax
-
-    @property
+    @cached_property
     def demandas(self):
         """Demandas del edificio por grupos [kW/m²·año]
 
@@ -120,15 +109,23 @@ class EdificioLIDER(OrderedDict):
         que contienen el valor correspondiente para cada grupo del edificio.
 
         El orden de los valores corresponde al de los grupos en el diccionario
-        self.flujos.keys().
+        self.grupos.keys().
         """
         d = OrderedDict()
         (d['cal+'], d['cal-'], d['cal'],
-         d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
-        d['grupos'] = self.flujos.keys()
+         d['ref+'], d['ref-'], d['ref']) = zip(*self.grupos.values())
+        d['grupos'] = self.grupos.keys() # mismos elementos que self.gruposlider
         return d
 
-    def minmaxdemandas(self):
+    def minmaxgrupos(self):
+        """Flujo máximo y mínimo de grupos en todas las zonas del edificio  [kW/m²·año]"""
+        zonas = self.zonas
+        names = self.gruposlider
+        pmin = min(min(zona.grupos[name].values) for zona in zonas for name in names)
+        pmax = max(max(zona.grupos[name].values) for zona in zonas for name in names)
+        return pmin, pmax
+
+    def minmaxmeses(self):
         """Mínimo y máximo en demanda del edificio [kW/m²·año]
 
         Corresponde al mínimo y máximo de las zonas, ya que las plantas y edificio
@@ -152,15 +149,17 @@ class PlantaLIDER(OrderedDict):
     calefaccion_meses   - Demandas mensuales de calefacción de la planta [kWh/m²/mes]
     refrigeracion_meses - Demandas mensuales de refrigeración de la planta [kWh/m²/mes]
 
-    flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/m²año]
+    grupos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/m²año]
     demanda - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/m²año]
     componentes - Flujos de calor por componente (Hueco H1, muro M1...) [kWh/m²año]
     """
+    gruposlider = GRUPOSLIDER
+
     def __init__(self, nombre=''):
         OrderedDict.__init__(self)
         self.nombre = nombre
 
-    @property
+    @cached_property
     def superficie(self):
         """Superficie de la planta en m² [m²]"""
         return sum(self[zona].superficie * self[zona].multiplicador for zona in self)
@@ -170,7 +169,7 @@ class PlantaLIDER(OrderedDict):
         """Demanda anual de calefacción por m² [kWh/m²·año]"""
         return sum(self.calefaccion_meses)
 
-    @property
+    @cached_property
     def calefaccion_meses(self):
         """Demandas de calefacción mensuales por m² [kWh/m²·mes]"""
         cal_planta = numpy.zeros(12)
@@ -184,7 +183,7 @@ class PlantaLIDER(OrderedDict):
         """Demanda anual de refrigeración por m² [kWh/m²·año]"""
         return sum(self.refrigeracion_meses)
 
-    @property
+    @cached_property
     def refrigeracion_meses(self):
         """Demandas de refrigeración mensuales por m² [kWh/m²·mes]"""
         ref_planta = numpy.zeros(12)
@@ -193,12 +192,9 @@ class PlantaLIDER(OrderedDict):
             ref_planta += numpy.array(zona.refrigeracion_meses) * zona.superficie
         return ref_planta / self.superficie
 
-    @property
-    def flujos(self, grupos=None):
+    @cached_property
+    def grupos(self):
         """Flujos de calor de los grupos, para la planta [kW/m²·año]
-
-        Si se indica una lista de grupos devuelve los flujos para esos grupos.
-        Si no se indica grupos se consideran todos los grupos posibles.
 
         Devuelve un diccionario indexado por grupo (p.e. u'Paredes exteriores')
         que contiene una tupla con las demandas de cada grupo:
@@ -207,26 +203,18 @@ class PlantaLIDER(OrderedDict):
         """
         #TODO: El rendimiento de esta parte es crítico, y depende mucho
         #TODO: de la creación de numpy.arrays y la suma de valores
-        if not grupos:
-            # Todas las zonas incluyen por defecto todos los grupos
-            zonaname = self.keys()[0]
-            grupos = self[zonaname].flujos.keys()
-            # TODO: se podría comprobar que grupos no es []
-        if not isinstance(grupos, (list, tuple)):
-            grupos = list(grupos)
-
         superficieplanta = self.superficie
         dic = OrderedDict()
-        for grupo in grupos:
+        for grupo in self.gruposlider:
             params = [self[zona].superficie *
                       self[zona].multiplicador *
-                      numpy.array(self[zona].flujos[grupo].values) for zona in self]
+                      numpy.array(self[zona].grupos[grupo].values) for zona in self]
             # XXX: Se podría hacer con numpy sumando arrays (que lo hace columna a columna)
             plist = [sum(lst) for lst in zip(*params)]
             dic[grupo] = tuple(numpy.array(plist) / superficieplanta)
         return dic
 
-    @property
+    @cached_property
     def demandas(self):
         """Demandas de la planta por grupos [kW/m²·año]
 
@@ -235,12 +223,12 @@ class PlantaLIDER(OrderedDict):
         que contienen el valor correspondiente para cada grupo de la planta.
 
         El orden de los valores corresponde al de los grupos en el diccionario
-        self.flujos.keys().
+        self.grupos.keys().
         """
         d = OrderedDict()
         (d['cal+'], d['cal-'], d['cal'],
-         d['ref+'], d['ref-'], d['ref']) = zip(*self.flujos.values())
-        d['grupos'] = self.flujos.keys()
+         d['ref+'], d['ref-'], d['ref']) = zip(*self.grupos.values())
+        d['grupos'] = self.grupos.keys()
         return d
 
 
@@ -260,8 +248,11 @@ class ZonaLIDER(OrderedDict):
     refrigeracion - Demanda anual de refrigeración de la zona [kWh/m²/año]
     calefaccion_meses - Demanda mensual de calefacción de la zona [kWh/m²/mes]
     refrigeración_meses - Demanda mensual de refrigeración de la zona [kWh/m²/mes]
-    flujos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/año]
+    grupos - Flujos de calor por grupo (Paredes exteriores, Cubiertas...) [kWh/año]
+             (e.g. "'Paredes Exteriores': (0.0, 1.2, 1.2, 0.0, -1.0, -1.0)")
     """
+    gruposlider = GRUPOSLIDER
+
     def __init__(self, nombre=None, superficie=0.0, multiplicador=1.0,
                  calefaccion=0.0, refrigeracion=0.0):
         OrderedDict.__init__(self)
@@ -277,14 +268,14 @@ class ZonaLIDER(OrderedDict):
         # Elementos/componentes: incluyen información desglosada de flujos:
         # Calef. positivo, Calef. negativo, Calef. neto
         # Ref. poisitivo, Ref. negativo, Ref. neto
-        self.flujos = None
+        self.grupos = None
 
-    @property
+    @cached_property
     def demandas(self):
         """Demanda de la zona por elementos"""
         d = OrderedDict()
         data = [[cc.nombre] + list(cc.values)
-                for cc in self.flujos.values()]
+                for cc in self.grupos.values()]
         (d['grupos'], d['cal+'], d['cal-'], d['cal'],
          d['ref+'], d['ref-'], d['ref']) = zip(*data)
         return d
@@ -299,23 +290,16 @@ class ComponenteLIDER(object):
     refpos - Flujo positivo de energía en temporada de refrigeración [kWh/año]
     refneg - Flujo negativo de energía en temporada de refrigeración [kWh/año]
     refnet - Flujo neto de energía en temporada de refrigeración [kWh/año]
-
     demandas - diccionario con un elemento con clave el nombre y valor
                los flujos de calor del componente [kWh/año]
     """
     def __init__(self, nombre, calpos, calneg, calnet, refpos, refneg, refnet):
         self.nombre = nombre
         self.values = (calpos, calneg, calnet, refpos, refneg, refnet)
-
-    @property
-    def demandas(self):
-        """Demanda del componente"""
-        calpos, calneg, calnet, refpos, refneg, refnet = self.values
-        d = OrderedDict([('grupos', [self.nombre]),
-                         ('cal+', [calpos]),
-                         ('cal-', [calneg]),
-                         ('cal', [calnet]),
-                         ('ref+', [refpos]),
-                         ('ref-', [refneg]),
-                         ('ref', [refnet])])
-        return d
+        self.demandas = OrderedDict([('grupos', [self.nombre]),
+                                     ('cal+', [calpos]),
+                                     ('cal-', [calneg]),
+                                     ('cal', [calnet]),
+                                     ('ref+', [refpos]),
+                                     ('ref-', [refneg]),
+                                     ('ref', [refnet])])

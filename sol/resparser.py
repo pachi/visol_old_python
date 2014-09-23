@@ -127,7 +127,7 @@ def parsePlanta(block, nombreplanta, zonas):
     Se devuelve un diccionario de zonas por planta.
     Cada zona es un diccionario que incluye:
     - 'superficie':  la superficie de la zona.
-    - 'flujos':      flujos térmicos por elementos generales (suelos, paredes,
+    - 'grupos':      flujos térmicos por elementos generales (suelos, paredes,
                      infiltración...) y totales.
                      Es a su vez un diccionario de tuplas indexado por elementos
                      o 'TOTAL'.
@@ -154,16 +154,16 @@ def parsePlanta(block, nombreplanta, zonas):
                     zona.planta = nombreplanta
                     zona.superficie = float(next(iblock))
 
-                    # Procesamos los flujos de zona, que finalizan con el TOTAL
-                    flujos = OrderedDict()
+                    # Procesamos los flujos por grupo de la zona, que finalizan con el TOTAL
+                    grupos = OrderedDict()
                     for zline in iblock:
                         if zline.startswith(u'Concepto') or not zline:
                             continue
                         concepto, vals = valores(zline)
-                        flujos[concepto] = ComponenteLIDER(concepto, *vals)
+                        grupos[concepto] = ComponenteLIDER(concepto, *vals)
                         if zline.startswith(u'TOTAL'):
                             break
-                    zona.flujos = flujos
+                    zona.grupos = grupos
 
                     # Procesamos los componentes de zona, que están contados
                     for zline in iblock:
@@ -237,6 +237,6 @@ if __name__ == '__main__':
     print zona.superficie
     print zona.multiplicador
     print zona.keys()
-    print zona.flujos
+    print zona.grupos
     print zona.calefaccion
     print zona.refrigeracion

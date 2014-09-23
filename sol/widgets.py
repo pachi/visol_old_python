@@ -80,7 +80,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
 
         # demandas y grupos, excluido el grupo 'TOTAL'
         demandas = self.model.activo.demandas[self.tipodemanda][:-1]
-        grupos = self.model.edificio.gruposnombres[:-1]
+        grupos = self.model.edificio.gruposlider[:-1] # Quitamos TOTAL
         total = sum(demandas)
         titletext = (self._titles[self.tipodemanda] +
                      u'\nTotal: %4.1f kWh/m²año' % total)
@@ -333,7 +333,7 @@ class HistoMeses(HistoBase):
                          loc='lower left', prop={"size":'small'}, fancybox=True)
         leg.draw_frame(False)
         leg.get_frame().set_alpha(0.5)
-        _min, _max = self.model.edificio.minmaxdemandas()
+        _min, _max = self.model.edificio.minmaxmeses()
         _min, _max = myround(_min, 5), myround(_max, 5)
         ax1.set_ylim(_min - 10, _max + 10)
         self.autolabel(ax1, rects1)
@@ -400,7 +400,7 @@ class HistoElementos(HistoBase):
                              prop={"size":'small'}, fancybox=True)
             leg.draw_frame(False)
             leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
-            mind, maxd = self.model.edificio.minmaxflujoszonas()
+            mind, maxd = self.model.edificio.minmaxgrupos()
             mind, maxd = myround(mind, 10), myround(maxd, 10)
             ax1.set_ylim(mind - 10, maxd + 10)
             ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
