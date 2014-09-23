@@ -80,7 +80,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
 
         # demandas y grupos, excluido el grupo 'TOTAL'
         demandas = self.model.activo.demandas[self.tipodemanda][:-1]
-        grupos = self.model.edificio.grupos[:-1]
+        grupos = self.model.edificio.gruposnombres[:-1]
         total = sum(demandas)
         titletext = (self._titles[self.tipodemanda] +
                      u'\nTotal: %4.1f kWh/m²año' % total)

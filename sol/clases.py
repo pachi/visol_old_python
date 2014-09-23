@@ -77,7 +77,7 @@ class EdificioLIDER(OrderedDict):
              refrigeración +, refrigeración -, refrigeración neta)
         """
         if not grupos:
-            grupos = self.grupos
+            grupos = self.gruposnombres
         if not isinstance(grupos, (list, tuple)):
             grupos = list(grupos)
         dic = OrderedDict()
@@ -90,7 +90,7 @@ class EdificioLIDER(OrderedDict):
         return dic
 
     @property
-    def grupos(self):
+    def gruposnombres(self):
         """Lista de nombres de grupos del edificio"""
         # Todas las zonas incluyen por defecto todos los grupos
         plname = self.keys()[0]
