@@ -72,11 +72,11 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
                                        facecolor='w')
         FigureCanvasGTKCairo.__init__(self, self.fig)
 
-    def colors(self, nelems, base=(255, 0, 0), reverse=False):
+    def colors(self, nelems):
         """Devuelve lista de colores en un rango"""
-        step = int(255 / nelems)
-        step = -step if reverse else step
-        aa, bb, cc = base
+        sign = -1 if self.tipodemanda.endswith('-') else 1
+        step = int(255 / nelems) * sign
+        aa, bb, cc = (255, 0, 0) if self.tipodemanda.startswith('cal') else (0, 0, 255)
         colorlist = ['#%02x%02x%02x' % (aa, (bb + i*step) % 256, cc) for i in range(nelems)]
         return colorlist
 
@@ -86,13 +86,11 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         # demandas y grupos, excluido el grupo 'TOTAL'
         demandas = self.model.activo.demandas[self.tipodemanda][:-1]
         grupos = self.model.edificio.gruposlider[:-1] # Quitamos TOTAL
-        total = sum(demandas)
-        titletext = (self._titles[self.tipodemanda] +
-                     u'\nTotal: %4.1f kWh/m²año' % total)
-
         self.fig.clear()
         ax = self.fig.gca(aspect='equal')
-        self.fig.text(0.5, 0.98, titletext,
+        self.fig.text(0.5, 0.98,
+                      (self._titles[self.tipodemanda] +
+                       u'\nTotal: %4.1f kWh/m²año' % sum(demandas)),
                       size='medium', ha='center', va='top')
 
         # No damos esta información en modo componente
@@ -110,10 +108,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
             values.append(abs(demanda))
 
         # Genera colores de sectores (cuenta valores significativos)
-        ncolors = sum(1 for value in values if value>=0.1)
-        base = (255, 0, 0) if self.tipodemanda.startswith('cal') else (0, 0, 255)
-        reverse = self.tipodemanda.endswith('-')
-        colors = self.colors(ncolors, base, reverse)
+        colors = self.colors(sum(1 for value in values if value >= 0.1))
 
         if not any(values):
             ax.axis('off')
