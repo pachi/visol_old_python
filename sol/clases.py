@@ -76,7 +76,7 @@ class EdificioLIDER(OrderedDict):
         self.refrigeracion_meses = []
         self.resdata = ''
 
-    @cached_property
+    @property
     def zonas(self):
         """Devuelve las zonas del edificio"""
         return [self[planta][zona] for planta in self for zona in self[planta]]
@@ -159,7 +159,7 @@ class PlantaLIDER(OrderedDict):
         OrderedDict.__init__(self)
         self.nombre = nombre
 
-    @cached_property
+    @property
     def superficie(self):
         """Superficie de la planta en m² [m²]"""
         return sum(self[zona].superficie * self[zona].multiplicador for zona in self)
