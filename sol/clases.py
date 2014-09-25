@@ -90,7 +90,6 @@ class EdificioLIDER(OrderedDict):
             (calefacción +, calefacción -, calefacción neta,
              refrigeración +, refrigeración -, refrigeración neta)
         """
-        print 'grupos'
         dic = OrderedDict()
         for grupo in GRUPOSLIDER:
             params = [self[planta].superficie *
