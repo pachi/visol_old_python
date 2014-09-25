@@ -29,6 +29,15 @@ import codecs
 from collections import OrderedDict
 from clases import EdificioLIDER, PlantaLIDER, ZonaLIDER, ComponenteLIDER
 
+def nextblock(linesiter, startswith):
+    """Avanza el iterador hasta el siguiente bloque que empieza por startswith"""
+    linebuffer = []
+    for line in linesiter:
+        linebuffer.append(line)
+        if line.startswith(startswith):
+            break
+    return linebuffer
+
 def valores(linea):
     """Devuelve concepto y valores de líneas de detalle
 
@@ -43,82 +52,62 @@ def valores(linea):
     valores = [float(elem) for elem in elems[1:]]
     return concepto, valores
 
-def findblocks(resfile):
-    """Devuelve diccionario de bloques del archivo de resultados de LIDER"""
-    numplantas = 0
-    blocks = OrderedDict()
-    currentblock = None
-    linebuffer = []
-
-    for line in resfile:
-        line = line.strip()
-        if not line:
-            pass
-        elif line.startswith(u'Numero de plantas'):
-            numplantas = int(next(resfile))
-        elif ((line.startswith(u'"P') and ',' not in line) or
-              line.startswith(u'RESULTADOS A NIVEL EDIFICIO')):
-            blockname = line.strip('"') if line.startswith(u'"P') else u'Edificio'
-            if currentblock is not None:
-                blocks[currentblock] = linebuffer[:]
-                linebuffer = []
-            blocks[blockname] = []
-            currentblock = blockname
-        else:
-            linebuffer.append(line)
-    if currentblock is not None:
-        blocks[currentblock] = linebuffer[:]
-    return numplantas, blocks
-
 def parseEdificio(block):
-    """Interpreta bloque de datos del edificio de LIDER
+    """Interpreta bloque de resultados a nivel edificio de LIDER
 
-    El bloque de edificio devuelve un objeto de tipo edificio y un diccionario
+    Devuelve un objeto de tipo EdificioLIDER y un diccionario ordenado
     con datos de las zonas, que se pueden ensamblar luego en el edificio por
     plantas.
 
-    El diccionario de zonas contiene las claves: datos, calefaccion, refrigeracion
+    El diccionario de zonas contiene como claves los nombres de zona y
+    y valores un objeto zona con los atributos calefaccion_meses y
+    refrigeracion_meses.
     """
     edificio = EdificioLIDER()
-    zonas = OrderedDict()
-
     iblock = iter(block)
+
+    # Bloque de resultados a nivel de edificio
+    nextblock(iblock, u'Calefacción, Refrigeración anual')
+    cal, ref = next(iblock).split(',')
+    edificio.calefaccion = float(cal)
+    edificio.refrigeracion = float(ref)
+    next(iblock) # Línea de 'Calefacción mensual'
+    edificio.calefaccion_meses = [float(mes) for mes in next(iblock).split(',')]
+    next(iblock) # Línea de 'Refrigeración mensual'
+    edificio.refrigeracion_meses = [float(mes) for mes in next(iblock).split(',')]
+
+    # Encuentra bloque de número de zonas
+    nextblock(iblock, u'Numero de zonas')
+    numerozonas = int(next(iblock))
+
+    # Encuentra bloque de datos generales
+    nextblock(iblock, u'Nombre, m2')
+    zonas = OrderedDict()
+    superficietotalzonas = 0
     for line in iblock:
-        if line.startswith(u'Calefacción, Refrigeración anual'):
-            cal, ref = next(iblock).split(',')
-            edificio.calefaccion = float(cal)
-            edificio.refrigeracion = float(ref)
-            assert next(iblock).startswith(u'Calefacción mensual')
-            edificio.calefaccion_meses = [float(mes) for mes in next(iblock).split(',')]
-            assert next(iblock).startswith(u'Refrigeración mensual')
-            edificio.refrigeracion_meses = [float(mes) for mes in next(iblock).split(',')]
-        if line.startswith(u'Numero de zonas'):
-            edificio.numzonas = int(next(iblock))
-            # Linea de encabezados antes de datos por zonas
-            if not next(iblock).startswith(u'Nombre, m2'):
-                raise
-            for line in iblock:
-                # El bloque de zonas acaba con los totales
-                if line.startswith(u'TOTAL'):
-                    # TOTAL, m2, calefacción_total, refrigeracion
-                    vals = [float(d) for d in line.lstrip(u'TOTAL,').split(',')]
-                    edificio.superficie = vals[0]
-                    # Valores redundantes
-                    assert (vals[1] == edificio.calefaccion and
-                            vals[2] == edificio.refrigeracion)
-                    break
-                else:
-                    # nombrezona, m2, multiplicador, calefaccion, refrigeracion
-                    key, (sup, multip, cal, ref) = valores(line)
-                    zonas[key] = ZonaLIDER(key, sup, multip, cal, ref)
-        if line.startswith(u'Calefacción mensual por zonas'):
-            for i, (key, line) in enumerate(zip(zonas.keys(), iblock)):
-                if i == edificio.numzonas: break
-                zonas[key].calefaccion_meses = [float(d) for d in line.split(',')]
-        if line.startswith(u'Refrigeración mensual por zonas'):
-            for i, (key, line) in enumerate(zip(zonas.keys(), iblock)):
-                if i == edificio.numzonas: break
-                zonas[key].refrigeracion_meses = [float(d) for d in line.split(',')]
+        if line.startswith(u'TOTAL'):
+            # TOTAL, m2, calefacción_total, refrigeracion_total
+            # Aprovechamos solo la superficie total
+            superficietotalzonas = float(line.split(',')[1])
+            break
+        else:
+            # Nombre, m2, multiplicador, Calefacción, Refrigeración
+            key, (sup, multip, cal, ref) = valores(line)
+            zonas[key] = ZonaLIDER(key, sup, multip, cal, ref)
+
+    # Encuentra bloque de calefacción por meses de zonas
+    nextblock(iblock, u'Calefacción mensual por zonas')
+    for key, line in zip(zonas.keys(), iblock):
+        zonas[key].calefaccion_meses = [float(d) for d in line.split(',')]
+
+    # Encuentra bloque de refrigeración por meses de zonas
+    nextblock(iblock, u'Refrigeración mensual por zonas')
+    for key, line in zip(zonas.keys(), iblock):
+        zonas[key].refrigeracion_meses = [float(d) for d in line.split(',')]
+
+    edificio.numzonas = numerozonas
+    edificio.superficie = superficietotalzonas
+
     return edificio, zonas
 
 def parsePlanta(block, nombreplanta, zonas):
@@ -136,6 +125,33 @@ def parsePlanta(block, nombreplanta, zonas):
     Las cargas térmicas y los flujos se dan como tuplas con nombres del tipo
     Detalle -> 'Cal_positivo, Cal_negativo, Cal_neto, Ref_positivo, Ref_negativo, Ref_neto'
     """
+
+    def _parsegruposzona(iblock):
+        """Procesa flujos por grupo de la zona"""
+        grupos = OrderedDict()
+        for zline in iblock:
+            if zline.startswith(u'Concepto') or not zline:
+                continue
+            concepto, vals = valores(zline)
+            grupos[concepto] = ComponenteLIDER(concepto, *vals)
+            if zline.startswith(u'TOTAL'):
+                break
+        return grupos
+
+    def _parsecomponenteszona(iblock, zona):
+        """Procesa los componentes de la zona"""
+        for zline in iblock:
+            if zline.startswith(u'Numero de Componentes'):
+                numcomponentes = int(next(iblock))
+                next(iblock) # títulos
+                if numcomponentes: # Si hay más de 0 componentes...
+                    for j, zline in enumerate(iblock):
+                        componente, vals = valores(zline)
+                        zona[componente] = ComponenteLIDER(componente, *vals)
+                        if j == numcomponentes - 1:
+                            break
+                break
+
     iblock = iter(block)
     planta = PlantaLIDER(nombreplanta)
 
@@ -153,63 +169,56 @@ def parsePlanta(block, nombreplanta, zonas):
                     zona.numero = int(numzona)
                     zona.planta = nombreplanta
                     zona.superficie = float(next(iblock))
-
-                    # Procesamos los flujos por grupo de la zona, que finalizan con el TOTAL
-                    grupos = OrderedDict()
-                    for zline in iblock:
-                        if zline.startswith(u'Concepto') or not zline:
-                            continue
-                        concepto, vals = valores(zline)
-                        grupos[concepto] = ComponenteLIDER(concepto, *vals)
-                        if zline.startswith(u'TOTAL'):
-                            break
-                    zona.grupos = grupos
-
-                    # Procesamos los componentes de zona, que están contados
-                    for zline in iblock:
-                        if zline.startswith(u'Numero de Componentes'):
-                            numcomponentes = int(next(iblock))
-                            next(iblock) # títulos
-                            if numcomponentes: # Si hay más de 0 componentes...
-                                for j, zline in enumerate(iblock):
-                                    componente, vals = valores(zline)
-                                    zona[componente] = ComponenteLIDER(componente, *vals)
-                                    if j == numcomponentes - 1:
-                                        break
-                            break
-
+                    zona.grupos = _parsegruposzona(iblock)
+                    _parsecomponenteszona(iblock, zona)
                     zonasencontradas += 1
                     planta[nombrezona] = zona
     return planta
-
-def parsefile(resfile):
-    """Lee archivo y genera objeto edificio con datos generales y por plantas"""
-    numplantas, plantablocks = findblocks(iter(resfile))
-    edificio, zonas = parseEdificio(plantablocks.pop(u'Edificio'))
-    edificio.numplantas = numplantas
-    # Acopla plantas en edificio
-    for nombreplanta in plantablocks:
-        planta = parsePlanta(plantablocks[nombreplanta], nombreplanta, zonas)
-        edificio[nombreplanta] = planta
-    return edificio
 
 def loadfile(resfile):
     """Devuelve edificio y texto original del archivo en forma de lista"""
     try:
         data = codecs.open(resfile, "rU", "latin-1" ).readlines()
-        edificio = parsefile(data)
-        edificio.resdata = ''.join(data)
     except:
         print "Errores procesando archivo", resfile
         raise
-    return edificio
 
-def check(edificio):
-    """Comprueba que los datos del edificio son coherentes"""
-    # TODO: comprobar que el número de plantas del archivo es igual que el
-    # calculado, que las zonas están todas asignadas a plantas, que todas las
-    # zonas tienen todos los datos, que las sumas dan lo de los totales....
-    pass
+    lines = iter(data)
+
+    nextblock(lines, u'Numero de plantas')
+    numplantas = int(next(lines))
+
+    # Localiza bloques de plantas y de edificio
+    blocks = OrderedDict()
+    currentblock = None
+    linebuffer = []
+
+    for line in lines:
+        line = line.strip()
+        if ((line.startswith(u'"P') and ',' not in line) or
+              line.startswith(u'RESULTADOS A NIVEL EDIFICIO')):
+            blockname = line.strip().strip('"') if line.startswith(u'"P') else u'Edificio'
+            if currentblock is not None:
+                blocks[currentblock] = linebuffer[:]
+                linebuffer = []
+            blocks[blockname] = []
+            currentblock = blockname
+        elif line:
+            linebuffer.append(line)
+    if currentblock is not None:
+        blocks[currentblock] = linebuffer[:]
+
+
+    edificio, zonas = parseEdificio(blocks.pop(u'Edificio'))
+    edificio.numplantas = numplantas
+
+    # Acopla plantas en edificio y zonas en plantas
+    for nombreplanta in blocks:
+        planta = parsePlanta(blocks[nombreplanta], nombreplanta, zonas)
+        edificio[nombreplanta] = planta
+    edificio.resdata = ''.join(data)
+
+    return edificio
 
 if __name__ == '__main__':
     import argparse
