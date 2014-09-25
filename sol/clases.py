@@ -97,7 +97,7 @@ class EdificioLIDER(OrderedDict):
                       numpy.array(self[planta].grupos[grupo])
                       for planta in self]
             plist = [sum(lst) for lst in zip(*params)]
-            dic[grupo] = tuple(numpy.array(plist) / self.superficie)
+            dic[grupo] = numpy.array(plist) / self.superficie
         return dic
 
     @cached_property
@@ -208,10 +208,11 @@ class PlantaLIDER(OrderedDict):
         for grupo in self.gruposlider:
             params = [self[zona].superficie *
                       self[zona].multiplicador *
-                      numpy.array(self[zona].grupos[grupo].values) for zona in self]
+                      numpy.array(self[zona].grupos[grupo].values)
+                      for zona in self]
             # XXX: Se podría hacer con numpy sumando arrays (que lo hace columna a columna)
             plist = [sum(lst) for lst in zip(*params)]
-            dic[grupo] = tuple(numpy.array(plist) / superficieplanta)
+            dic[grupo] = numpy.array(plist) / superficieplanta
         return dic
 
     @cached_property
