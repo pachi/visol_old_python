@@ -60,7 +60,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         Observer.__init__(self, modelo)
 
         self.tipodemanda = tipodemanda
-        self.currindex = None
+        self.needsredraw = False
 
         self._titles = {'cal+': 'Periodo de calefacción. Ganancias térmicas',
                         'cal-': 'Periodo de calefacción. Pérdidas térmicas',
@@ -190,14 +190,18 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
                                         patchB=patch))
 
     def do_expose_event(self, event):
-        if self.currindex == self.model.index:
+        if not self.needsredraw:
             return False
-        self.currindex = self.model.index
+        self.needsredraw = False
         self.dibujaseries()
         self.draw()
         return False
 
     def update(self, subject, **kwargs):
+        if kwargs.get('label', None) in ['index']:
+            self.needsredraw = True
+        else:
+            self.needsredraw = False
         self.queue_draw()
 
     def pixbuf(self, destwidth=600):
@@ -229,7 +233,7 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
         self.title = ''
         self.xlabel = ''
         self.ylabel = ''
-        self.currindex = None
+        self.needsredraw = False
 
         # Tamaños de letra y transformaciones para etiquetas de barras
         fontsize = matplotlib.rcParams['font.size']
@@ -261,9 +265,9 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
                         size=self.labelfs, transform=tr)
 
     def do_expose_event(self, event):
-        if self.currindex == self.model.index:
+        if not self.needsredraw:
             return False
-        self.currindex = self.model.index
+        self.needsredraw = False
         ax1 = self.ax1
         ax1.clear() # Limpia imagen de datos anteriores
         ax1.grid(True)
@@ -276,6 +280,10 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
 
     # ver si dibuja pasa a ser esto
     def update(self, subject, **kwargs):
+        if kwargs.get('label', None) in ['grupos', 'index']:
+            self.needsredraw = True
+        else:
+            self.needsredraw = False
         self.queue_draw()
 
     def dibujaseries(self, ax):
@@ -361,10 +369,17 @@ class HistoElementos(HistoBase):
         self.xlabel = u"Elemento"
         self.ylabel = u"Demanda [kWh/m²·año]"
         # Muestra o no los distintos desgloses de calefacción y refrigeración
-        self.showcalpos = False
-        self.showcalneg = False
-        self.showrefpos = False
-        self.showrefneg = False
+        self._showelems = (False, False, False, False)
+        
+    @property
+    def showelems(self):
+        return self._showelems
+
+    @showelems.setter
+    def showelems(self, value):
+        if value != self._showelems:
+            self._showelems = value
+            self.model.notify(label='grupos')
 
     def dibujaseries(self, ax1):
         """Representa histograma de demanda por elemento
@@ -374,15 +389,16 @@ class HistoElementos(HistoBase):
         """
         def barras(demandas):
             """Dibuja las barras de demanda para las series activas"""
+            showcalpos, showcalneg, showrefpos, showrefneg = self.showelems
             seriesall = []
-            if self.showcalpos:
+            if showcalpos:
                 seriesall.append((demandas.get('cal+', []), '#FFBBFF', '0.5', 'Calefacción +'))
-            if self.showcalneg:
+            if showcalneg:
                 seriesall.append((demandas.get('cal-', []), '#FF6666', '0.5', 'Calefacción -'))
             seriesall.append((demandas.get('cal', []), '#FF0000', 'k', 'Calefacción'))
-            if self.showrefpos:
+            if showrefpos:
                 seriesall.append((demandas.get('ref+', []), '#6666FF', '0.5', 'Refrigeración +'))
-            if self.showrefneg:
+            if showrefneg:
                 seriesall.append((demandas.get('ref-', []), '#B3FFB3', '0.5', 'Refrigeración -'))
             seriesall.append((demandas.get('ref', []), '#0000FF', 'k', 'Refrigeración'))
 
