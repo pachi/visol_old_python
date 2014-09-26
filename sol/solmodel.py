@@ -25,6 +25,7 @@
 from collections import namedtuple
 from observer import Subject
 import resparser
+from config import config
 
 Index = namedtuple('Index', ['edificio', 'planta', 'zona', 'componente'])
 
@@ -35,6 +36,7 @@ class VISOLModel(Subject):
         Subject.__init__(self)
         self.edificio = edificio
         self.activo = None # Objeto activo
+        self.config = config
         self._modo = None  # Tipo del objeto activo
         self._index = None # Índice del objeto activo
         self._file = None
