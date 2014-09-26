@@ -60,6 +60,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         Observer.__init__(self, modelo)
 
         self.tipodemanda = tipodemanda
+        self.currindex = None
 
         self._titles = {'cal+': 'Periodo de calefacción. Ganancias térmicas',
                         'cal-': 'Periodo de calefacción. Pérdidas térmicas',
@@ -188,15 +189,16 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
                                         relpos=(0.0 if ha=='left' else 1.0, 0.5),
                                         patchB=patch))
 
-    #XXX: ver si aquí se mueve el contenido de dibuja
-    def update(self, subject, **kwargs):
-        self.dibuja()
-
-    def dibuja(self, width=400, height=200):
-        """Dibuja elementos generales de la gráfica"""
+    def do_expose_event(self, event):
+        if self.currindex == self.model.index:
+            return False
+        self.currindex = self.model.index
         self.dibujaseries()
-        self.set_size_request(width, height)
         self.draw()
+        return False
+
+    def update(self, subject, **kwargs):
+        self.queue_draw()
 
     def pixbuf(self, destwidth=600):
         """Obtén un pixbuf a partir del canvas actual"""
@@ -227,6 +229,7 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
         self.title = ''
         self.xlabel = ''
         self.ylabel = ''
+        self.currindex = None
 
         # Tamaños de letra y transformaciones para etiquetas de barras
         fontsize = matplotlib.rcParams['font.size']
@@ -257,27 +260,27 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
                         '%.1f' % (k*round(height, 1)), ha='center', va='bottom',
                         size=self.labelfs, transform=tr)
 
-    # ver si dibuja pasa a ser esto
-    def update(self, subject, **kwargs):
-        self.dibuja()
-
-    def dibujaseries(self, ax):
-        """Dibuja series de datos"""
-        pass
-
-    def dibuja(self, width=400, height=200):
-        """Dibuja elementos generales de la gráfica"""
+    def do_expose_event(self, event):
+        if self.currindex == self.model.index:
+            return False
+        self.currindex = self.model.index
         ax1 = self.ax1
         ax1.clear() # Limpia imagen de datos anteriores
         ax1.grid(True)
         ax1.set_title(self.title, size='large')
         ax1.set_xlabel(self.xlabel, fontdict=dict(color='0.5'))
         ax1.set_ylabel(self.ylabel, fontdict=dict(color='0.5'))
-
         self.dibujaseries(ax1)
-
-        self.set_size_request(width, height)
         self.draw()
+        return False
+
+    # ver si dibuja pasa a ser esto
+    def update(self, subject, **kwargs):
+        self.queue_draw()
+
+    def dibujaseries(self, ax):
+        """Dibuja series de datos"""
+        pass
 
     def pixbuf(self, destwidth=600):
         """Obtén un pixbuf a partir del canvas actual"""
@@ -400,9 +403,13 @@ class HistoElementos(HistoBase):
                              prop={"size":'small'}, fancybox=True)
             leg.draw_frame(False)
             leg.get_frame().set_alpha(0.5) # transparencia de la leyenda
-            mind, maxd = self.model.edificio.minmaxgrupos()
-            mind, maxd = myround(mind, 10), myround(maxd, 10)
-            ax1.set_ylim(mind - 10, maxd + 10)
+            if self.model.config['autolimits']:
+                mind, maxd = self.model.edificio.minmaxgrupos()
+                mind, maxd = myround(mind, 10) - 10, myround(maxd, 10) + 10
+            else:
+                mind = self.model.config['minlimit']
+                maxd = self.model.config['maxlimit']
+            ax1.set_ylim(mind, maxd)
             ax1.set_xlim(0, ind[-1] + active * w) # mismo ancho aunque los extremos valgan cero
 
         # Flujos por elementos
