@@ -155,11 +155,10 @@ class GtkSol(object):
     def cbelementos(self, action):
         """Modifica el número de flujos activos en la vista de elementos"""
         he = self.histoelementos
-        he.showcalpos = self.ui.get_object('cbcalpos').props.active
-        he.showcalneg = self.ui.get_object('cbcalneg').props.active
-        he.showrefpos = self.ui.get_object('cbrefpos').props.active
-        he.showrefneg = self.ui.get_object('cbrefneg').props.active
-        he.dibuja()
+        he.showelems = (self.ui.get_object('cbcalpos').props.active,
+                        self.ui.get_object('cbcalneg').props.active,
+                        self.ui.get_object('cbrefpos').props.active,
+                        self.ui.get_object('cbrefneg').props.active)
 
     #{ Funciones generales de aplicación
     def openfile(self, toolbutton):
