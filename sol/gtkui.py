@@ -27,10 +27,9 @@
 # En plantas muestra totales por planta e histograma por zonas de cal y ref.
 
 #import gobject
-from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf
 import util
 from widgets import HistoMeses, HistoElementos, PieGlobal
-import webbrowser
 from solmodel import VISOLModel
 
 TESTFILE = util.get_resource('data/test.res')
@@ -124,6 +123,16 @@ class GtkSol(object):
             self.ui.get_object('scrolledwindowtext').hide()
         else:
             self.ui.get_object('scrolledwindowtext').show()
+
+    def guardarbutton(self, button):
+        """Guarda imagen de la gráfica actual"""
+        idx = self.nb.get_current_page()
+        container = self.nb.get_nth_page(idx)
+        for child in container.get_children():
+            if child.__gtype_name__ in ['PieChart', 'Histomeses', 'HistoElementos']:
+                # TODO: Elegir nombre por defecto...
+                child.save()
+                break
 
     def cursorchanged(self, tv):
         """Seleccionada una nueva fila de la vista de árbol"""
