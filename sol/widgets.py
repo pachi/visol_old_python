@@ -22,11 +22,9 @@
 #   02110-1301, USA.
 
 import math
-from gi.repository import Gtk, Gdk
 import numpy
 import matplotlib
 matplotlib.use('GTK3Cairo')
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo
 from matplotlib.transforms import offset_copy
@@ -67,10 +65,8 @@ class PieGlobal(FigureCanvasGTK3Cairo, Observer):
                         'ref+': u'Periodo de refrigeración. Ganancias térmicas',
                         'ref-': u'Periodo de refrigeración. Pérdidas térmicas'}
 
-        #self.title = self._titles[tipodemanda]
-        self.fig, _axes = plt.subplots(1, 1,
-                                       subplot_kw={'aspect':'equal'},
-                                       facecolor='w')
+        self.fig = Figure()
+        self.fig.add_subplot(aspect='equal')
         FigureCanvasGTK3Cairo.__init__(self, self.fig)
 
     def colors(self, nelems):
@@ -204,13 +200,12 @@ class PieGlobal(FigureCanvasGTK3Cairo, Observer):
             self.needsredraw = False
         self.queue_draw()
 
-    def pixbuf(self, destwidth=600):
-        """Obtén un pixbuf a partir del canvas actual"""
-        return get_pixbuf_from_canvas(self, destwidth)
-
-    def save(self, filename='condensacionesplot.png'):
+    def save(self, filename='piechart.png'):
         """Guardar y mostrar gráfica"""
-        self.fig.savefig(filename)
+        self.fig.canvas.print_figure(filename,
+                                     format='png',
+                                     facecolor='w',
+                                     dpi=100)
 
 class HistoBase(FigureCanvasGTK3Cairo, Observer):
     """Histograma de Matplotlib"""
@@ -227,9 +222,7 @@ class HistoBase(FigureCanvasGTK3Cairo, Observer):
 
         self.fig = Figure()
         FigureCanvasGTK3Cairo.__init__(self, self.fig)
-        self.fig.set_facecolor('w')
         self.ax1 = self.fig.add_subplot(111)
-        self.ax1.set_axis_bgcolor('#f6f6f6')
         self.title = ''
         self.xlabel = ''
         self.ylabel = ''
@@ -290,13 +283,12 @@ class HistoBase(FigureCanvasGTK3Cairo, Observer):
         """Dibuja series de datos"""
         pass
 
-    def pixbuf(self, destwidth=600):
-        """Obtén un pixbuf a partir del canvas actual"""
-        return get_pixbuf_from_canvas(self, destwidth)
-
-    def save(self, filename='condensacionesplot.png'):
+    def save(self, filename='histobase.png'):
         """Guardar y mostrar gráfica"""
-        self.fig.savefig(filename)
+        self.fig.canvas.print_figure(filename,
+                                     format='png',
+                                     facecolor='w',
+                                     dpi=100)
 
 class HistoMeses(HistoBase):
     """Histograma de demandas mensuales
@@ -442,26 +434,3 @@ class HistoElementos(HistoBase):
         ax1.vlines(ind, ymin, ymax, color='gray')
         ax1.grid(False)
         self.fig.subplots_adjust(bottom=0.17, left=.15)
-
-def get_pixbuf_from_canvas(canvas, destwidth=None):
-    """Devuelve un pixbuf a partir de un canvas de Matplotlib
-
-    destwidth - ancho del pixbuf de destino
-    """
-    w, h = canvas.get_width_height()
-    destwidth = destwidth if destwidth else w
-    destheight = h * destwidth / w
-    #Antes de mostrarse la gráfica en una de las pestañas no existe el _pixmap
-    #pero al generar el informe queremos que se dibuje en uno fuera de pantalla
-    oldpixmap = canvas._pixmap if hasattr(canvas, '_pixmap') else None
-    pixmap = Gdk.Pixmap(None, w, h, depth=24)
-    canvas._renderer.set_pixmap(pixmap) # mpl backend_gtkcairo
-    canvas._render_figure(pixmap, w, h) # mpl backend_gtk
-    if oldpixmap:
-        canvas._renderer.set_pixmap(oldpixmap)
-    cm = pixmap.get_colormap()
-    pixbuf = Gdk.Pixbuf(Gdk.COLORSPACE_RGB, False, 8, w, h)
-    pixbuf.get_from_drawable(pixmap, cm, 0, 0, 0, 0, -1, -1)
-    scaledpixbuf = pixbuf.scale_simple(destwidth, destheight,
-                                       Gdk.INTERP_HYPER)
-    return scaledpixbuf
