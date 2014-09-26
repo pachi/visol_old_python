@@ -27,17 +27,17 @@
 # En plantas muestra totales por planta e histograma por zonas de cal y ref.
 
 #import gobject
-import gtk
+from gi.repository import Gtk, Gdk, GdkPixbuf
 import util
 from widgets import HistoMeses, HistoElementos, PieGlobal
 import webbrowser
 from solmodel import VISOLModel
 
 TESTFILE = util.get_resource('data/test.res')
-EDIFICIOICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/edificioicono.png'))
-PLANTAICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/plantaicono.png'))
-ZONAICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/zonaicono.png'))
-COMPONENTEICON = gtk.gdk.pixbuf_new_from_file(util.get_resource('ui/componenteicono.png'))
+EDIFICIOICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/edificioicono.png'))
+PLANTAICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/plantaicono.png'))
+ZONAICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/zonaicono.png'))
+COMPONENTEICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/componenteicono.png'))
 
 class GtkSol(object):
     """Aplicación Visor de archivos de LIDER"""
@@ -45,7 +45,7 @@ class GtkSol(object):
         """Inicialización de datos e interfaz"""
         self.model = VISOLModel()
 
-        self.ui = gtk.Builder()
+        self.ui = Gtk.Builder()
         self.ui.add_from_file(util.get_resource('ui', 'sol.ui'))
 
         self.window = self.ui.get_object('window')
@@ -57,31 +57,31 @@ class GtkSol(object):
 
         self.histomeses = HistoMeses(modelo=self.model)
         vb = self.ui.get_object('vbmeses')
-        vb.pack_start(self.histomeses)
+        vb.pack_start(self.histomeses, True, True, 0)
 
         self.histoelementos = HistoElementos(modelo=self.model)
         vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
-        vb.pack_start(self.histoelementos)
+        vb.pack_start(self.histoelementos, True, True, 0)
 
         self.calposchart = PieGlobal(tipodemanda='cal+',
                                      modelo=self.model)
         vb = self.ui.get_object('vbcalpos')
-        vb.pack_start(self.calposchart)
+        vb.pack_start(self.calposchart, True, True, 0)
 
         self.calnegchart = PieGlobal(tipodemanda='cal-',
                                      modelo=self.model)
         vb = self.ui.get_object('vbcalneg')
-        vb.pack_start(self.calnegchart)
+        vb.pack_start(self.calnegchart, True, True, 0)
 
         self.refposchart = PieGlobal(tipodemanda='ref+',
                                      modelo=self.model)
         vb = self.ui.get_object('vbrefpos')
-        vb.pack_start(self.refposchart)
+        vb.pack_start(self.refposchart, True, True, 0)
 
         self.refnegchart = PieGlobal(tipodemanda='ref-',
                                      modelo=self.model)
         vb = self.ui.get_object('vbrefneg')
-        vb.pack_start(self.refnegchart)
+        vb.pack_start(self.refnegchart, True, True, 0)
 
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')
@@ -89,11 +89,6 @@ class GtkSol(object):
         ffilter.add_pattern('*.re[s|2]')
 
         self.ui.connect_signals(self)
-        # Manejador del botón de enlace en la barra de tareas
-        gtk.link_button_set_uri_hook(lambda b, u: webbrowser.open(u))
-        # Manejador de enlaces en el diálogo "about"
-        gtk.about_dialog_set_url_hook(lambda d, l, u: webbrowser.open(l), None)
-        # Carga datos de materiales, cerramientos y clima
         self.loadfile(TESTFILE)
 
     def loadfile(self, path=TESTFILE):
@@ -133,6 +128,8 @@ class GtkSol(object):
     def cursorchanged(self, tv):
         """Seleccionada una nueva fila de la vista de árbol"""
         path, col = tv.get_cursor()
+        if not path: # Al cargar archivos en un momento path es None
+            return
         tm = tv.get_model()
         nombre, tipo, ed, pl, zn, comp = tuple(tm[path])[:6]
         self.model.index = (ed, pl, zn, comp)
@@ -167,10 +164,10 @@ class GtkSol(object):
         chooser.set_filename(self.model.file)
         response = chooser.run()
 
-        if response == gtk.RESPONSE_ACCEPT:
+        if response == Gtk.ResponseType.ACCEPT:
             self.loadfile(chooser.get_filename())
             self.sb.push(0, u'Seleccionado archivo: %s' % self.model.file)
-        elif response == gtk.RESPONSE_CANCEL:
+        elif response == Gtk.ResponseType.CANCEL:
             self.sb.push(0, u'Carga de archivo cancelada')
         chooser.hide()
 
@@ -182,9 +179,10 @@ class GtkSol(object):
 
     def quit(self, w, *args):
         """Salir de la aplicación"""
-        gtk.main_quit()
+        # self.model.config.save()
+        Gtk.main_quit()
 
     def main(self):
         """Arranca la aplicación"""
         self.ui.get_object('window').show_all()
-        gtk.main()
+        Gtk.main()

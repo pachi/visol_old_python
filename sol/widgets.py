@@ -22,13 +22,13 @@
 #   02110-1301, USA.
 
 import math
-import gtk
+from gi.repository import Gtk, Gdk
 import numpy
 import matplotlib
-matplotlib.use('GTKCairo')
+matplotlib.use('GTK3Cairo')
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_gtkcairo import FigureCanvasGTKCairo
+from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo
 from matplotlib.transforms import offset_copy
 from observer import Observer
 
@@ -41,7 +41,7 @@ def myround(x, base=5):
     return int(base * round(float(x)/base))
 
 
-class PieGlobal(FigureCanvasGTKCairo, Observer):
+class PieGlobal(FigureCanvasGTK3Cairo, Observer):
     """Gráfico circular de Matplotlib
 
     Representa el balance neto de energía para cada componente del edificio.
@@ -62,16 +62,16 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         self.tipodemanda = tipodemanda
         self.needsredraw = False
 
-        self._titles = {'cal+': 'Periodo de calefacción. Ganancias térmicas',
-                        'cal-': 'Periodo de calefacción. Pérdidas térmicas',
-                        'ref+': 'Periodo de refrigeración. Ganancias térmicas',
-                        'ref-': 'Periodo de refrigeración. Pérdidas térmicas'}
+        self._titles = {'cal+': u'Periodo de calefacción. Ganancias térmicas',
+                        'cal-': u'Periodo de calefacción. Pérdidas térmicas',
+                        'ref+': u'Periodo de refrigeración. Ganancias térmicas',
+                        'ref-': u'Periodo de refrigeración. Pérdidas térmicas'}
 
         #self.title = self._titles[tipodemanda]
         self.fig, _axes = plt.subplots(1, 1,
                                        subplot_kw={'aspect':'equal'},
                                        facecolor='w')
-        FigureCanvasGTKCairo.__init__(self, self.fig)
+        FigureCanvasGTK3Cairo.__init__(self, self.fig)
 
     def colors(self, nelems):
         """Devuelve lista de colores en un rango"""
@@ -97,7 +97,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         # No damos esta información en modo componente
         if self.model.modo == 'componente':
             ax.axis('off')
-            ax.annotate("Información no disponible para componentes",
+            ax.annotate(u"Información no disponible para componentes",
                         (0.5, 0.5), xycoords='axes fraction', ha='center')
             return
 
@@ -105,7 +105,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         labels, values = [], []
         for demanda, grupo in sorted(zip(demandas, grupos)):
             demanda = demanda if demanda else 0.0
-            labels.append("\n".join(grupo.split()) + "\n(%4.1f kWh/m²año)" % demanda)
+            labels.append(u"\n".join(grupo.split()) + u"\n(%4.1f kWh/m²año)" % demanda)
             values.append(abs(demanda))
 
         # Genera colores de sectores (cuenta valores significativos)
@@ -113,7 +113,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
 
         if not any(values):
             ax.axis('off')
-            ax.annotate("La demanda es nula",
+            ax.annotate(u"La demanda es nula",
                         (0.5, 0.5), xycoords='axes fraction', ha='center')
             return
 
@@ -189,7 +189,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
                                         relpos=(0.0 if ha=='left' else 1.0, 0.5),
                                         patchB=patch))
 
-    def do_expose_event(self, event):
+    def do_draw(self, cr):
         if not self.needsredraw:
             return False
         self.needsredraw = False
@@ -212,7 +212,7 @@ class PieGlobal(FigureCanvasGTKCairo, Observer):
         """Guardar y mostrar gráfica"""
         self.fig.savefig(filename)
 
-class HistoBase(FigureCanvasGTKCairo, Observer):
+class HistoBase(FigureCanvasGTK3Cairo, Observer):
     """Histograma de Matplotlib"""
     __gtype_name__ = 'HistoBase'
 
@@ -226,7 +226,7 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
         Observer.__init__(self, modelo)
 
         self.fig = Figure()
-        FigureCanvasGTKCairo.__init__(self, self.fig)
+        FigureCanvasGTK3Cairo.__init__(self, self.fig)
         self.fig.set_facecolor('w')
         self.ax1 = self.fig.add_subplot(111)
         self.ax1.set_axis_bgcolor('#f6f6f6')
@@ -264,7 +264,7 @@ class HistoBase(FigureCanvasGTKCairo, Observer):
                         '%.1f' % (k*round(height, 1)), ha='center', va='bottom',
                         size=self.labelfs, transform=tr)
 
-    def do_expose_event(self, event):
+    def do_draw(self, cr):
         if not self.needsredraw:
             return False
         self.needsredraw = False
@@ -327,7 +327,7 @@ class HistoMeses(HistoBase):
         # No damos esta información en modo componente
         if self.model.modo == 'componente':
             ax1.axis('off')
-            ax1.annotate("Información no disponible para componentes",
+            ax1.annotate(u"Información no disponible para componentes",
                          (0.5, 0.5), xycoords='axes fraction', ha='center')
             return
         # Meses como etiquetas y localizamos los valores límite
@@ -340,7 +340,7 @@ class HistoMeses(HistoBase):
         rects1 = ax1.bar(ind, obj.calefaccion_meses, 1.0, align='center', fc='r', ec='k')
         rects2 = ax1.bar(ind, obj.refrigeracion_meses, 1.0, align='center', fc='b', ec='k')
         leg = ax1.legend((rects1[0], rects2[0]),
-                         ('Calefacción', 'Refrigeración'),
+                         (u'Calefacción', u'Refrigeración'),
                          loc='lower left', prop={"size":'small'}, fancybox=True)
         leg.draw_frame(False)
         leg.get_frame().set_alpha(0.5)
@@ -392,15 +392,15 @@ class HistoElementos(HistoBase):
             showcalpos, showcalneg, showrefpos, showrefneg = self.showelems
             seriesall = []
             if showcalpos:
-                seriesall.append((demandas.get('cal+', []), '#FFBBFF', '0.5', 'Calefacción +'))
+                seriesall.append((demandas.get('cal+', []), '#FFBBFF', '0.5', u'Calefacción +'))
             if showcalneg:
-                seriesall.append((demandas.get('cal-', []), '#FF6666', '0.5', 'Calefacción -'))
-            seriesall.append((demandas.get('cal', []), '#FF0000', 'k', 'Calefacción'))
+                seriesall.append((demandas.get('cal-', []), '#FF6666', '0.5', u'Calefacción -'))
+            seriesall.append((demandas.get('cal', []), '#FF0000', 'k', u'Calefacción'))
             if showrefpos:
-                seriesall.append((demandas.get('ref+', []), '#6666FF', '0.5', 'Refrigeración +'))
+                seriesall.append((demandas.get('ref+', []), '#6666FF', '0.5', u'Refrigeración +'))
             if showrefneg:
-                seriesall.append((demandas.get('ref-', []), '#B3FFB3', '0.5', 'Refrigeración -'))
-            seriesall.append((demandas.get('ref', []), '#0000FF', 'k', 'Refrigeración'))
+                seriesall.append((demandas.get('ref-', []), '#B3FFB3', '0.5', u'Refrigeración -'))
+            seriesall.append((demandas.get('ref', []), '#0000FF', 'k', u'Refrigeración'))
 
             active = len(seriesall) # total active series
             w = 1.0 / active # width of each active serie
@@ -412,7 +412,7 @@ class HistoElementos(HistoBase):
                 rects = ax1.bar(ind+(ii+0.5)*w, serie, w, align='center', fc=fc, ec=ec)
                 seriesd.append(rects[0])
                 labelsd.append(label)
-                if label == 'Calefacción' or label == 'Refrigeración':
+                if label == u'Calefacción' or label == u'Refrigeración':
                     self.autolabel(ax1, rects)
 
             leg = ax1.legend(seriesd, labelsd, loc='lower left',
@@ -431,7 +431,7 @@ class HistoElementos(HistoBase):
         # Flujos por elementos
         obj = self.model.activo
         demandas = obj.demandas
-        x_labels = ["\n".join(name.split()) for name in obj.demandas['grupos']]
+        x_labels = [u"\n".join(name.split()) for name in obj.demandas['grupos']]
         labelrotation = 0 if self.model.modo == 'componente' else 90
         ind = numpy.arange(len(x_labels))
         barras(demandas)
@@ -454,14 +454,14 @@ def get_pixbuf_from_canvas(canvas, destwidth=None):
     #Antes de mostrarse la gráfica en una de las pestañas no existe el _pixmap
     #pero al generar el informe queremos que se dibuje en uno fuera de pantalla
     oldpixmap = canvas._pixmap if hasattr(canvas, '_pixmap') else None
-    pixmap = gtk.gdk.Pixmap(None, w, h, depth=24)
+    pixmap = Gdk.Pixmap(None, w, h, depth=24)
     canvas._renderer.set_pixmap(pixmap) # mpl backend_gtkcairo
     canvas._render_figure(pixmap, w, h) # mpl backend_gtk
     if oldpixmap:
         canvas._renderer.set_pixmap(oldpixmap)
     cm = pixmap.get_colormap()
-    pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, w, h)
+    pixbuf = Gdk.Pixbuf(Gdk.COLORSPACE_RGB, False, 8, w, h)
     pixbuf.get_from_drawable(pixmap, cm, 0, 0, 0, 0, -1, -1)
     scaledpixbuf = pixbuf.scale_simple(destwidth, destheight,
-                                       gtk.gdk.INTERP_HYPER)
+                                       Gdk.INTERP_HYPER)
     return scaledpixbuf
