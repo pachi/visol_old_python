@@ -26,11 +26,10 @@
 # en calef y refrig. También datos por meses (cal y ref)
 # En plantas muestra totales por planta e histograma por zonas de cal y ref.
 
-#import gobject
 from gi.repository import Gtk, GdkPixbuf
-import util
 from widgets import HistoMeses, HistoElementos, PieGlobal
 from solmodel import VISOLModel
+import util
 
 TESTFILE = util.get_resource('data/test.res')
 EDIFICIOICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/edificioicono.png'))
