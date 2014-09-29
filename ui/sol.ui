@@ -153,7 +153,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
                 <property name="tooltip_text" translatable="yes">Abrir archivo de resultados de LIDER (.res)</property>
                 <property name="label" translatable="yes">Abrir</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-open</property>
+                <property name="icon_name">document-open</property>
                 <signal name="clicked" handler="openfile" swapped="no"/>
               </object>
               <packing>
@@ -168,7 +168,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
                 <property name="tooltip_text" translatable="yes">Ver contenido del archivo de resultados actual</property>
                 <property name="label" translatable="yes">Texto</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-file</property>
+                <property name="icon_name">text-x-generic</property>
                 <signal name="toggled" handler="showtextfile" swapped="no"/>
               </object>
               <packing>
@@ -182,7 +182,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Guardar</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-save</property>
+                <property name="icon_name">camera-photo</property>
                 <signal name="clicked" handler="guardarbutton" swapped="no"/>
               </object>
               <packing>
@@ -208,7 +208,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
                 <property name="tooltip_text" translatable="yes">Créditos de VisoL</property>
                 <property name="label" translatable="yes">Acerca de</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-about</property>
+                <property name="icon_name">help-about</property>
                 <signal name="clicked" handler="about" swapped="no"/>
               </object>
               <packing>
@@ -223,7 +223,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Salir</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-quit</property>
+                <property name="icon_name">application-exit</property>
               </object>
               <packing>
                 <property name="expand">False</property>
