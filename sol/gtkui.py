@@ -61,31 +61,31 @@ class GtkSol(object):
 
         self.histomeses = HistoMeses(modelo=self.model)
         vb = self.ui.get_object('vbmeses')
-        vb.pack_start(self.histomeses, True, True, 0)
+        vb.add(self.histomeses)
 
         self.histoelementos = HistoElementos(modelo=self.model)
         vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
-        vb.pack_start(self.histoelementos, True, True, 0)
+        vb.add(self.histoelementos)
 
         self.calposchart = PieGlobal(tipodemanda='cal+',
                                      modelo=self.model)
         vb = self.ui.get_object('vbcalpos')
-        vb.pack_start(self.calposchart, True, True, 0)
+        vb.add(self.calposchart)
 
         self.calnegchart = PieGlobal(tipodemanda='cal-',
                                      modelo=self.model)
         vb = self.ui.get_object('vbcalneg')
-        vb.pack_start(self.calnegchart, True, True, 0)
+        vb.add(self.calnegchart)
 
         self.refposchart = PieGlobal(tipodemanda='ref+',
                                      modelo=self.model)
         vb = self.ui.get_object('vbrefpos')
-        vb.pack_start(self.refposchart, True, True, 0)
+        vb.add(self.refposchart)
 
         self.refnegchart = PieGlobal(tipodemanda='ref-',
                                      modelo=self.model)
         vb = self.ui.get_object('vbrefneg')
-        vb.pack_start(self.refnegchart, True, True, 0)
+        vb.add(self.refnegchart)
 
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')
