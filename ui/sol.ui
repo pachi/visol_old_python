@@ -238,7 +238,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
           </packing>
         </child>
         <child>
-          <object class="GtkHPaned" id="hpaned1">
+          <object class="GtkPaned" id="hpaned1">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <child>
@@ -345,11 +345,9 @@ http://spdx.org/licenses/GPL-2.0+</property>
                           <placeholder/>
                         </child>
                         <child>
-                          <object class="GtkTable" id="table1">
+                          <object class="GtkGrid" id="grid1">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="n_rows">2</property>
-                            <property name="n_columns">2</property>
                             <child>
                               <object class="GtkCheckButton" id="cbcalpos">
                                 <property name="label" translatable="yes">Calefacción +</property>
@@ -363,6 +361,12 @@ http://spdx.org/licenses/GPL-2.0+</property>
                                 <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
+                              </packing>
                             </child>
                             <child>
                               <object class="GtkCheckButton" id="cbcalneg">
@@ -378,8 +382,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
-                                <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
                               </packing>
                             </child>
                             <child>
@@ -396,8 +402,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
-                                <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">1</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
                               </packing>
                             </child>
                             <child>
@@ -415,9 +423,9 @@ http://spdx.org/licenses/GPL-2.0+</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
-                                <property name="right_attach">2</property>
                                 <property name="top_attach">1</property>
-                                <property name="bottom_attach">2</property>
+                                <property name="width">1</property>
+                                <property name="height">1</property>
                               </packing>
                             </child>
                           </object>
