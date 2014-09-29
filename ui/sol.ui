@@ -358,7 +358,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                                 <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de calefacción (exceso de calefacción)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
-                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -378,7 +377,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                                 <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de calefacción (necesidad de calefacción)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
-                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -398,7 +396,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                                 <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de refrigeración (necesidad de refrigeración)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
-                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -418,7 +415,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                                 <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de refrigeración (exceso de refrigeración)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
-                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
