@@ -59,33 +59,33 @@ class GtkSol(object):
         self.tb = self.ui.get_object('textbuffer')
         self.nb = self.ui.get_object('notebook')
 
-        self.histomeses = HistoMeses(modelo=self.model)
-        vb = self.ui.get_object('vbmeses')
-        vb.add(self.histomeses)
-
         self.histoelementos = HistoElementos(modelo=self.model)
-        vb = self.ui.get_object('vbelementos') #self.nb.get_nth_page(1)
-        vb.add(self.histoelementos)
+        vb = self.ui.get_object('belementos') #self.nb.get_nth_page(1)
+        vb.pack_start(self.histoelementos, expand=True, fill=True, padding=0)
+
+        self.histomeses = HistoMeses(modelo=self.model)
+        vb = self.ui.get_object('bmeses')
+        vb.pack_start(self.histomeses, expand=True, fill=True, padding=0)
 
         self.calposchart = PieGlobal(tipodemanda='cal+',
                                      modelo=self.model)
-        vb = self.ui.get_object('vbcalpos')
-        vb.add(self.calposchart)
+        vb = self.ui.get_object('bcalpos')
+        vb.pack_start(self.calposchart, expand=True, fill=True, padding=0)
 
         self.calnegchart = PieGlobal(tipodemanda='cal-',
                                      modelo=self.model)
-        vb = self.ui.get_object('vbcalneg')
-        vb.add(self.calnegchart)
+        vb = self.ui.get_object('bcalneg')
+        vb.pack_start(self.calnegchart, expand=True, fill=True, padding=0)
 
         self.refposchart = PieGlobal(tipodemanda='ref+',
                                      modelo=self.model)
-        vb = self.ui.get_object('vbrefpos')
-        vb.add(self.refposchart)
+        vb = self.ui.get_object('brefpos')
+        vb.pack_start(self.refposchart, expand=True, fill=True, padding=0)
 
         self.refnegchart = PieGlobal(tipodemanda='ref-',
                                      modelo=self.model)
-        vb = self.ui.get_object('vbrefneg')
-        vb.add(self.refnegchart)
+        vb = self.ui.get_object('brefneg')
+        vb.pack_start(self.refnegchart, expand=True, fill=True, padding=0)
 
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')

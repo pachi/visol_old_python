@@ -138,9 +138,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
     <property name="default_height">650</property>
     <signal name="delete-event" handler="quit" swapped="no"/>
     <child>
-      <object class="GtkVBox" id="vbox1">
+      <object class="GtkBox" id="box1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkToolbar" id="toolbar">
             <property name="visible">True</property>
@@ -289,10 +290,11 @@ http://spdx.org/licenses/GPL-2.0+</property>
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="vbox2">
+              <object class="GtkBox" id="box2">
                 <property name="width_request">600</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkLabel" id="labelzona">
                     <property name="visible">True</property>
@@ -335,9 +337,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbelementos">
+                      <object class="GtkBox" id="belementos">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -454,9 +457,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbmeses">
+                      <object class="GtkBox" id="bmeses">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -477,9 +481,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbcalpos">
+                      <object class="GtkBox" id="bcalpos">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -500,9 +505,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbcalneg">
+                      <object class="GtkBox" id="bcalneg">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -523,9 +529,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbrefpos">
+                      <object class="GtkBox" id="brefpos">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -546,9 +553,10 @@ http://spdx.org/licenses/GPL-2.0+</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkVBox" id="vbrefneg">
+                      <object class="GtkBox" id="brefneg">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
                         <child>
                           <placeholder/>
                         </child>
