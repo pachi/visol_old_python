@@ -111,9 +111,9 @@ executables = [
 buildOptions = dict(
     compressed=False,
     includes=["gi"],
-    excludes=["Tkinter", "tcl", "PyQt5"],
+    excludes=["Tkinter", "tcl", "PyQt5", "_ssl", "doctest", "ssl", "tarfile"],
     packages=["gi"],
-    include_files=include_files
+    include_files=include_files,
     icon='res/visol.ico'
     )
 
