@@ -4,7 +4,9 @@
 EXEBASE ?= /e/winp2
 PYTHON = python
 
-GTKBASE:=$(EXEBASE)/Python27/Lib/site-packages/gtk-2.0/runtime/bin
+# Escapamos / con \/ para sed y \ con \\ para make
+UPXPATH='E:\\/winp2\\/UPX\\/upx.exe'
+DISTDIR='build\\/exe.mingw-2.7'
 
 VERSION=$(shell python -c"from sol import __version__;print __version__")
 MAKENSIS:=$(EXEBASE)/NSIS/makensis
@@ -42,7 +44,7 @@ README.html: README.rst res/style.css
 	$(RST2HTML) --stylesheet=res/style.css README.rst > $@
 
 setup.nsi: setup.nsi.in
-	sed 's/@VERSION@/$(VERSION)/g' setup.nsi.in > setup.nsi
+	sed 's/@VERSION@/$(VERSION)/g; s/@UPXPATH@/$(UPXPATH)/g; s/@DISTDIR@/$(DISTDIR)/g' setup.nsi.in > setup.nsi
 
 splash:
 	$(PYTHON) ./res/makesplash.py -b ./res/background.png -o ./res/splash.jpg $(VERSION)
