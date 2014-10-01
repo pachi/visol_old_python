@@ -28,6 +28,7 @@
 
 from gi.repository import Gtk, GdkPixbuf
 from widgets import HistoMeses, HistoElementos, PieGlobal
+import sol
 from solmodel import VISOLModel
 import util
 
@@ -58,6 +59,7 @@ class GtkSol(object):
         self.edificiotv = self.ui.get_object('treeview')
         self.tb = self.ui.get_object('textbuffer')
         self.nb = self.ui.get_object('notebook')
+        self.ui.get_object('aboutdialog').set_version(sol.__version__)
 
         self.histoelementos = HistoElementos(modelo=self.model)
         vb = self.ui.get_object('belementos') #self.nb.get_nth_page(1)
@@ -193,7 +195,6 @@ class GtkSol(object):
 
     def quit(self, w, *args):
         """Salir de la aplicación"""
-        # self.model.config.save()
         Gtk.main_quit()
 
     def main(self):
