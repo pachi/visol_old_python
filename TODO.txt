@@ -18,6 +18,11 @@ WISHLIST
 
     - por ejemplo, sobre el tipo de componente (ventana, muro, etc).
 
+PORTING TO GTK+3
+----------------
+
+http://wiki.sugarlabs.org/go/Features/GTK3/Porting
+
 DOCS LIDER
 ----------
 

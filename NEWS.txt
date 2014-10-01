@@ -10,3 +10,14 @@ News
 
 * Versión inicial con soporte de archivos .res y .re2
 
+2.0
+---
+
+* Release date: 1-Oct-2014 *
+
+* Versión con GTK+3
+* Incluidos enlaces a página web
+* Actualización de los créditos
+* Posibilidad de configurar algunos aspectos del programa en el archivo ui/visol.cfg
+  - determinación de los límites de las gráficas de demanda por grupos
+* Mejoras del rendimiento de la aplicación
