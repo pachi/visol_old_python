@@ -1,18 +1,19 @@
 # Makefile para la gestión del proyecto ViSol: Visor de archivos de LIDER
 # Rafael Villar Burke, 2014
 
-EXEBASE ?= /e/winp2
+# Para la generación del instalador para Win32 es necesaria la instalación de:
+# - NSIS installer (makensis)
+# - Plugin NewAdvSplash de NSIS
+# - Compresor UPX
+# La creación del instalador para Win32 se puede hacer en Windows o Linux
+# La versión para win32 se hace con MSYS2
+
 PYTHON = python
 
-# Escapamos / con \/ para sed y \ con \\ para make
-UPXPATH='E:\\/winp2\\/UPX\\/upx.exe'
-DISTDIR='build\\/exe.mingw-2.7'
-
 VERSION=$(shell python -c"from sol import __version__;print __version__")
-MAKENSIS:=$(EXEBASE)/NSIS/makensis
-
-PAGEANT:=$(EXEBASE)/PuTTY/pageant.exe
-KEYFILE:=$(EXEBASE)/PuTTY/keys/pachi-key-putty.PPK
+UPXPATH?=$(subst /,\/,$(shell which upx))
+DISTDIR?=$(subst /,\/,build/exe.mingw-2.7)
+MAKENSIS?=$(shell which makensis)
 
 PYRSTEXISTS:=$(findstring .py, $(shell which rst2html.py))
 ifeq ($(PYRSTEXISTS), .py)
@@ -25,13 +26,13 @@ endif
 
 #make windows installer by default
 
-winbuild: py2exe nsiinstaller
+winbuild: freeze installer
 
-py2exe: setup_exe.py
-	$(PYTHON) setup_exe.py py2exe
+freeze: setup_exe.py
+	$(PYTHON) setup_exe.py build
 	sleep 5s
 
-nsiinstaller: README.html setup.nsi splash
+installer: README.html setup.nsi splash
 	$(MAKENSIS) setup.nsi
 
 build: setup.py splash
@@ -69,6 +70,9 @@ clean:
 #	$(PYTHON) setup.py clean
 
 # push changes to hg
+EXEBASE ?= /e/winp2
+PAGEANT:=$(EXEBASE)/PuTTY/pageant.exe
+KEYFILE:=$(EXEBASE)/PuTTY/keys/pachi-key-putty.PPK
 push:
 	$(PAGEANT) $(KEYFILE) &
 	hg push ssh://hg@bitbucket.org/pachi/visol/
@@ -104,4 +108,4 @@ profile:
 	echo "Profiling data saved in profile.stats"
 
 # Los phony son los que hay que considerar siempre no actualizados (rebuild)
-.PHONY = winbuild build sdist clean testall test check tests
+.PHONY = setup.nsi winbuild build sdist clean testall test check tests
