@@ -7,20 +7,21 @@ Name Visol
 # Solicitar instalación como admin para copiar enlaces en carpeta de sistema
 RequestExecutionLevel admin
 
-# Usar lzma para comprimir - Lo seleccionamos en las preferencias
-SetCompressor /SOLID lzma
-# Usar UPX para reducir tamaño del instalador
-!packhdr "$%TEMP%\exehead.tmp" '"@UPXPATH@" "$%TEMP%\exehead.tmp"'
-
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
 !define VERSION @VERSION@
+!define DISTDIR @DISTDIR@
+!define UPXPATH @UPXPATH@
 !define COMPANY "Rafael Villar Burke <pachi@rvburke.com>"
 !define URL http://www.rvburke.com
 !define SPLASHIMAGE "ui\splash.jpg"
 !define EXENAME "visol.exe"
 !define README_FILE $INSTDIR\README.html
-!define DISTIR @DISTDIR@
+
+# Usar lzma para comprimir - Lo seleccionamos en las preferencias
+SetCompressor /SOLID lzma
+# Usar UPX para reducir tamaño del instalador
+!packhdr "./exehead.tmp" '"$UPXPATH" "./exehead.tmp"'
 
 # MUI Symbol Definitions
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install-full.ico"
