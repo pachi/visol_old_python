@@ -3,13 +3,6 @@
 News
 ====
 
-.. x.x
-.. ---
-..
-.. *Release date: UNRELEASED*
-..
-.. * Notas de la versión en desarrollo
-
 1.0
 ---
 
