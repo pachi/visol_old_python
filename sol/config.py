@@ -22,7 +22,25 @@
 #   02110-1301, USA.
 """Configuración la herramienta ViSol"""
 
-config = {'autolimits': False, # Límite automático de demanda
-          'maxlimit': 100,    # Límite superior
-          'minlimit': -500,   # Límite inferior
-}
+from util import get_resource
+
+config = {}
+
+validkeys = ['autolimits', # Límite automático de demanda
+             'maxlimit',   # Límite superior
+             'minlimit'    # Límite inferior
+]
+
+keys = []
+for line in open(get_resource('ui/visol.cfg')):
+    line = line.strip()
+    if not line or line.startswith('#'):
+        continue
+    else:
+        key, value = line.split('=')
+        key, value = key.strip(), value.strip()
+        if key in validkeys:
+            if key == 'autolimits':
+                config[key] = bool(value)
+            else:
+                config[key] = int(value)
