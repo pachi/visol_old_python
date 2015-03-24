@@ -41,6 +41,8 @@ for line in open(get_resource('ui/visol.cfg')):
         key, value = key.strip(), value.strip()
         if key in validkeys:
             if key == 'autolimits':
+                if value in ('False', 'No', 'false', 'f'):
+                    value = False
                 config[key] = bool(value)
             else:
                 config[key] = int(value)
