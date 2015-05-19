@@ -42,11 +42,12 @@ missing_dll = ['libgtk-3-0.dll',
                'libatk-1.0-0.dll',
                'libcairo-gobject-2.dll',
                #'libcroco-0.6-3.dll', #SVG
+               'libepoxy-0.dll',
                'libffi-6.dll',
                'libgcrypt-20.dll',
                'libgdk_pixbuf-2.0-0.dll',
                'libgirepository-1.0-1.dll',
-               'libgnutls-28.dll',
+               'libgnutls-30.dll',
                'libjpeg-8.dll',
                #'liblzma-5.dll', #SVG
                'libp11-kit-0.dll',
