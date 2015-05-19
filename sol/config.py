@@ -26,10 +26,13 @@ from util import get_resource
 
 config = {}
 
-validkeys = ['autolimits', # Límite automático de demanda
-             'maxlimit',   # Límite superior
-             'minlimit'    # Límite inferior
-]
+_validkeys = dict([('autolimits', 'bool'), # Límite automático de demanda
+                   ('maxlimit', 'int'),   # Límite superior escalas
+                   ('minlimit', 'int'),    # Límite inferior escalas
+                   ('out_dpi', 'int'), # Resolución salida pantallazos
+                   ('out_fmt', 'str'), # Formato fecha/hora pantallazos
+                   ('out_basename', 'str'), # Nombre base pantallazos
+])
 
 keys = []
 for line in open(get_resource('ui/visol.cfg')):
@@ -39,10 +42,15 @@ for line in open(get_resource('ui/visol.cfg')):
     else:
         key, value = line.split('=')
         key, value = key.strip(), value.strip()
-        if key in validkeys:
-            if key == 'autolimits':
+        if key in _validkeys:
+            ktype = _validkeys[key]
+            if ktype == 'bool':
                 if value in ('False', 'No', 'false', 'f'):
                     value = False
                 config[key] = bool(value)
-            else:
+            elif ktype == 'int':
                 config[key] = int(value)
+            elif ktype == 'float':
+                config[key] = float(value)
+            else:
+                config[key] = value
