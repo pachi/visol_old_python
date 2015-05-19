@@ -6,9 +6,10 @@ TODO ViSOL
 - Ver si hay que unificar nombres de componentes de demanda cal+ -> calpos, etc entre clases y resparser
 - Mover apertura de archivo a resparser.parsefile ya que contiene información sobre encoding, etc.
   Así se le podría pasar un nombre de archivo o un filehandle.
-- Permitir guardar imágenes (todas, o individuales)
 - Ver esquema alternativo en ../python-project-template  (https://code.google.com/p/python-project-template/), ../git/python-skel (https://github.com/inercia/python-skel.git) y también en ../git/python-project-template. El primero está orientado a poder hacer py2exe además de releases en PIPy, el segundo más orientado a linux RPM, y el tercero tiene docs con Sphinx.
 - El sol.ico hay que guardarlo en GIMP con las capas ordenadas de mayor a menor resolución para que el icono se pueda ver en windows Vista o superior. También las capas de iconos mayores se guardan en formato png comprimido, al contrario que las más pequeñas, que no pueden estar así para ser compatibles con las versiones anteriores de windows.
+- Manejar medidor de edificios
+- Aprovechar informe.xml
 
 WISHLIST
 --------
