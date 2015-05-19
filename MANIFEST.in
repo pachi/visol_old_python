@@ -7,6 +7,6 @@ include requirements.txt
 include TODO.txt
 include data/test.res
 include data/test.re2
-recursive-include ui *.png *.jpg *.ui
+recursive-include ui *.png *.jpg *.ui *.cfg
 recursive-include res pantallazo*.png
 #prune examples/sample?/build
