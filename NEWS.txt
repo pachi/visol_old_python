@@ -13,11 +13,12 @@ News
 2.0
 ---
 
-* Release date: 1-Oct-2014 *
+* Release date: 18-May-2015 *
 
 * Versión con GTK+3
 * Incluidos enlaces a página web
 * Actualización de los créditos
 * Posibilidad de configurar algunos aspectos del programa en el archivo ui/visol.cfg
   - determinación de los límites de las gráficas de demanda por grupos
+  - resolución y nombre de los archivos de salida de capturas de pantalla
 * Mejoras del rendimiento de la aplicación
