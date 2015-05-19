@@ -49,7 +49,7 @@ def splashimage(version='1.0', bgfile='background.png', outfile='splash.jpg'):
     PNGFILE = f + '.png'
     JPGFILE = f + '.jpg'
     
-    TXT = (u"<span size='8000'>%s</span><span size='4000'> v.%s\n"
+    TXT = (u"<span size='8000'>%s</span><span size='3000'> v.%s\n"
            u"%s\n%s\n\n</span><span size='2100' weight='bold'>%s</span>\n"
            u"<span size='2000'>%s</span>"
            % (APPNAME, version, COPYTXT, WEBTXT, APPDESC, IMGCRED))
