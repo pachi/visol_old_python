@@ -4,7 +4,7 @@
 #   clases.py
 #   Clases para la representación de archivos de resultados de LIDER
 #
-#   Copyright (C) 2013 Rafael Villar Burke <pachi@ietcc.csic.es>
+#   Copyright (C) 2014-15 Rafael Villar Burke <pachi@ietcc.csic.es>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License

@@ -4,7 +4,7 @@
 #   makesplash.py
 #   Script to generate application splash image using a png background
 #
-#   Copyright (C) 2009-2010 Rafael Villar Burke <pachi@rvburke.com>
+#   Copyright (C) 2009-2015 Rafael Villar Burke <pachi@rvburke.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ import pango, pangocairo
 from PIL import Image #PIL
 
 APPNAME = u"ViSol"
-COPYTXT = u'© 2014 Rafael Villar Burke [GPL v2+]'
+COPYTXT = u'© 2014-15 Rafael Villar Burke, Daniel Jiménez González [GPL v2+]'
 WEBTXT = u'http://www.rvburke.com'
 APPDESC = u"Aplicación para la visualización de archivos de resultados de LIDER/CALENER"
 IMGCRED = u"Fotografía: Dominio Público"

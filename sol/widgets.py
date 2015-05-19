@@ -4,7 +4,7 @@
 #   widgets.py
 #   Programa Visor para el Sistema de Observación de LIDER
 #
-#   Copyright (C) 2011 Rafael Villar Burke <pachi@rvburke.com>
+#   Copyright (C) 2014-15 Rafael Villar Burke <pachi@rvburke.com>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public License
