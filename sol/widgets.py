@@ -200,12 +200,12 @@ class PieGlobal(FigureCanvasGTK3Cairo, Observer):
             self.needsredraw = False
         self.queue_draw()
 
-    def save(self, filename='piechart.png'):
+    def save(self, filename='piechart.png', dpi=100):
         """Guardar y mostrar gráfica"""
         self.fig.canvas.print_figure(filename,
                                      format='png',
                                      facecolor='w',
-                                     dpi=100)
+                                     dpi=dpi)
 
 class HistoBase(FigureCanvasGTK3Cairo, Observer):
     """Histograma de Matplotlib"""
@@ -283,12 +283,12 @@ class HistoBase(FigureCanvasGTK3Cairo, Observer):
         """Dibuja series de datos"""
         pass
 
-    def save(self, filename='histobase.png'):
+    def save(self, filename='histobase.png', dpi=100):
         """Guardar y mostrar gráfica"""
         self.fig.canvas.print_figure(filename,
                                      format='png',
                                      facecolor='w',
-                                     dpi=100)
+                                     dpi=dpi)
 
 class HistoMeses(HistoBase):
     """Histograma de demandas mensuales
@@ -342,11 +342,17 @@ class HistoMeses(HistoBase):
         self.autolabel(ax1, rects1)
         self.autolabel(ax1, rects2)
 
+    def save(self, filename='meseschart.png', dpi=100):
+        """Guardar y mostrar gráfica"""
+        self.fig.canvas.print_figure(filename,
+                                     format='png',
+                                     facecolor='w',
+                                     dpi=dpi)
 
 class HistoElementos(HistoBase):
-    """Histograma de demandas netas o separadas por elementos
+    """Histograma de demandas netas o separadas por componentes de la demanda
 
-    Dibuja un histograma de demandas de una zona por elementos
+    Dibuja un histograma de demandas de una zona por componentes
     """
     __gtype_name__ = 'HistoElementos'
 
@@ -357,8 +363,8 @@ class HistoElementos(HistoBase):
         """
         HistoBase.__init__(self, modelo)
 
-        self.title = u"Demandas por elemento"
-        self.xlabel = u"Elemento"
+        self.title = u"Demandas por componente"
+        self.xlabel = u"Componente"
         self.ylabel = u"Demanda [kWh/m²·año]"
         # Muestra o no los distintos desgloses de calefacción y refrigeración
         self._showelems = (False, False, False, False)

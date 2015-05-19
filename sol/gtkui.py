@@ -26,6 +26,8 @@
 # en calef y refrig. También datos por meses (cal y ref)
 # En plantas muestra totales por planta e histograma por zonas de cal y ref.
 
+import os
+import datetime
 from gi.repository import Gtk, GdkPixbuf
 from widgets import HistoMeses, HistoElementos, PieGlobal
 import sol
@@ -135,10 +137,16 @@ class GtkSol(object):
         """Guarda imagen de la gráfica actual"""
         idx = self.nb.get_current_page()
         container = self.nb.get_nth_page(idx)
+        out_dpi = self.model.config.get('out_dpi', 100)
+        out_fmt = self.model.config.get('out_fmt', '%Y%m%d_%H%M%S')
+        out_basename = self.model.config.get('out_basename', 'ViSol')
         for child in container.get_children():
             if child.__gtype_name__ in ['PieChart', 'Histomeses', 'HistoElementos']:
-                # TODO: Elegir nombre por defecto...
-                child.save()
+                timestamp = datetime.datetime.now().strftime(out_fmt)
+                filename = "%s-%s-%s.png" % (timestamp, out_basename, self.model.filename)
+                pathname = os.path.join(self.model.dirname, filename)
+                child.save(pathname, dpi=out_dpi)
+                self.sb.push(0, u'Guardando captura de pantalla: %s' % pathname)
                 break
 
     def cursorchanged(self, tv):
