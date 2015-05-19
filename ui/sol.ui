@@ -1,110 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.16.1 -->
+<!-- Generated with glade 3.18.1 -->
 <interface>
-  <requires lib="gtk+" version="3.10"/>
-  <object class="GtkAboutDialog" id="aboutdialog">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="window_position">center-on-parent</property>
-    <property name="type_hint">dialog</property>
-    <property name="program_name">VisoL</property>
-    <property name="version">1.0</property>
-    <property name="copyright" translatable="yes">(c) 2014 Rafael Villar Burke, Daniel Jiménez González
-Publicado bajo licencia GNU GPL v2.0 o posterior
-http://spdx.org/licenses/GPL-2.0+</property>
-    <property name="comments" translatable="yes">Visor de archivos de resultados de LIDER</property>
-    <property name="website">http://www.rvburke.com/visorlider.html</property>
-    <property name="website_label" translatable="yes">http://www.rvburke.com/visorlider.html</property>
-    <property name="logo">splash.jpg</property>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox3">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area3">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-  </object>
+  <requires lib="gtk+" version="3.16"/>
   <object class="GtkAction" id="actioncbelementos">
     <signal name="activate" handler="cbelementos" swapped="no"/>
   </object>
   <object class="GtkFileFilter" id="filefilter"/>
-  <object class="GtkFileChooserDialog" id="filechooserdialog">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="title" translatable="yes">Seleccionar archivo...</property>
-    <property name="type_hint">dialog</property>
-    <property name="filter">filefilter</property>
-    <property name="preview_widget_active">False</property>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox1">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="buttoncancelar">
-                <property name="label">gtk-cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="buttonaceptar">
-                <property name="label">gtk-ok</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-6">buttoncancelar</action-widget>
-      <action-widget response="-3">buttonaceptar</action-widget>
-    </action-widgets>
-  </object>
   <object class="GtkAction" id="salir">
     <property name="label">Salir</property>
     <property name="tooltip">Salir de la aplicación</property>
@@ -251,6 +152,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
                     <property name="can_focus">True</property>
                     <property name="model">treestore</property>
                     <property name="headers_clickable">False</property>
+                    <property name="expander_column">treeviewcol</property>
                     <property name="search_column">0</property>
                     <property name="enable_tree_lines">True</property>
                     <signal name="cursor-changed" handler="cursorchanged" swapped="no"/>
@@ -361,8 +263,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                               <packing>
                                 <property name="left_attach">0</property>
                                 <property name="top_attach">0</property>
-                                <property name="width">1</property>
-                                <property name="height">1</property>
                               </packing>
                             </child>
                             <child>
@@ -380,8 +280,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                               <packing>
                                 <property name="left_attach">1</property>
                                 <property name="top_attach">0</property>
-                                <property name="width">1</property>
-                                <property name="height">1</property>
                               </packing>
                             </child>
                             <child>
@@ -399,8 +297,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                               <packing>
                                 <property name="left_attach">0</property>
                                 <property name="top_attach">1</property>
-                                <property name="width">1</property>
-                                <property name="height">1</property>
                               </packing>
                             </child>
                             <child>
@@ -418,8 +314,6 @@ http://spdx.org/licenses/GPL-2.0+</property>
                               <packing>
                                 <property name="left_attach">1</property>
                                 <property name="top_attach">1</property>
-                                <property name="width">1</property>
-                                <property name="height">1</property>
                               </packing>
                             </child>
                           </object>
@@ -451,7 +345,7 @@ http://spdx.org/licenses/GPL-2.0+</property>
                       <object class="GtkLabel" id="label4">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Elementos</property>
+                        <property name="label" translatable="yes">Componentes</property>
                       </object>
                       <packing>
                         <property name="position">1</property>
@@ -628,5 +522,108 @@ http://spdx.org/licenses/GPL-2.0+</property>
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAboutDialog" id="aboutdialog">
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="type">popup</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">window</property>
+    <property name="program_name">VisoL</property>
+    <property name="version">1.0</property>
+    <property name="copyright" translatable="yes">(c) 2014-15 Rafael Villar Burke, Daniel Jiménez González
+Publicado bajo licencia GNU GPL v2.0 o posterior
+http://spdx.org/licenses/GPL-2.0+</property>
+    <property name="comments" translatable="yes">Visor de archivos de resultados de LIDER</property>
+    <property name="website">http://www.rvburke.com/visorlider.html</property>
+    <property name="website_label" translatable="yes">http://www.rvburke.com/visorlider.html</property>
+    <property name="logo">splash.jpg</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox3">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkFileChooserDialog" id="filechooserdialog">
+    <property name="can_focus">False</property>
+    <property name="can_default">True</property>
+    <property name="type">popup</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">window</property>
+    <property name="filter">filefilter</property>
+    <property name="preview_widget_active">False</property>
+    <property name="use_preview_label">False</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="filechooserdialog-vbox">
+        <property name="can_focus">False</property>
+        <property name="can_default">True</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="filechooserdialog-action_area2">
+            <property name="can_focus">False</property>
+            <property name="can_default">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="buttoncancelar1">
+                <property name="label">Cancelar</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="buttonaceptar1">
+                <property name="label">Aceptar</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">buttoncancelar1</action-widget>
+      <action-widget response="-3">buttonaceptar1</action-widget>
+    </action-widgets>
   </object>
 </interface>
