@@ -5,6 +5,7 @@
 # - NSIS installer (makensis)
 # - Plugin NewAdvSplash de NSIS
 # - Compresor UPX
+# - Docutils (para rst2html)
 # La creación del instalador para Win32 se puede hacer en Windows o Linux
 # La versión para win32 se hace con MSYS2
 
