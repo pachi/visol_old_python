@@ -22,6 +22,7 @@
 #   02110-1301, USA.
 """Modelo de datos de la herramienta ViSol"""
 
+import os
 from collections import namedtuple
 from observer import Subject
 import resparser
@@ -83,3 +84,12 @@ class VISOLModel(Subject):
         if value != self.file:
             self._file = value
             self.edificio = resparser.loadfile(value)
+
+    @property
+    def filename(self):
+        root, ext = os.path.splitext(os.path.basename(self.file))
+        return root
+
+    @property
+    def dirname(self):
+        return os.path.dirname(self.file)
