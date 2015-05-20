@@ -18,7 +18,9 @@ News
 * Versión con GTK+3
 * Incluidos enlaces a página web
 * Actualización de los créditos
+* Herramienta de captura de pantalla que guarda gráfica activa en el directorio del
+  archivo de resultados
 * Posibilidad de configurar algunos aspectos del programa en el archivo ui/visol.cfg
   - determinación de los límites de las gráficas de demanda por grupos
-  - resolución y nombre de los archivos de salida de capturas de pantalla
+  - resolución y nombre de los archivos de salida de las capturas de pantalla
 * Mejoras del rendimiento de la aplicación
