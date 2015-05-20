@@ -141,7 +141,7 @@ class GtkSol(object):
         out_fmt = self.model.config.get('out_fmt', '%Y%m%d_%H%M%S')
         out_basename = self.model.config.get('out_basename', 'ViSol')
         for child in container.get_children():
-            if child.__gtype_name__ in ['PieChart', 'Histomeses', 'HistoElementos']:
+            if child.__gtype_name__ in ['PieChart', 'HistoMeses', 'HistoElementos']:
                 timestamp = datetime.datetime.now().strftime(out_fmt)
                 filename = "%s-%s-%s.png" % (timestamp, out_basename, self.model.filename)
                 pathname = os.path.join(self.model.dirname, filename)
