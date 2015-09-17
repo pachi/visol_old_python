@@ -106,8 +106,6 @@ class GtkSol(object):
             self.sb.push(0, u'Seleccionado archivo: %s' % self.model.file)
 
             e = self.model.edificio
-            ed = e.nombre
-
             self.window.props.title = u"ViSOL [... %s]" % self.model.file[-40:]
 
             self.tb.set_text(e.resdata)
@@ -116,6 +114,7 @@ class GtkSol(object):
             ts.clear()
             tv.collapse_all()
             # Modelo de plantas y zonas
+            ed = e.nombre
             edificioiter = ts.append(None, (ed, 'edificio', ed, '', '', '', EDIFICIOICON))
             for planta in e:
                 plantaiter = ts.append(edificioiter, (planta, 'planta', ed, planta, '', '', PLANTAICON))
