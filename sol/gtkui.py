@@ -189,7 +189,7 @@ class GtkSol(object):
         response = chooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
-            self.loadfile(chooser.get_filename())
+            self.loadfile(chooser.get_filename().decode('utf8'))
             self.sb.push(0, u'Seleccionado archivo: %s' % self.model.file)
         elif response == Gtk.ResponseType.CANCEL:
             self.sb.push(0, u'Carga de archivo cancelada')
