@@ -26,6 +26,7 @@ import os
 from collections import namedtuple
 from observer import Subject
 import resparser
+import binparser
 from config import config
 
 Index = namedtuple('Index', ['edificio', 'planta', 'zona', 'componente'])
@@ -82,14 +83,35 @@ class VISOLModel(Subject):
     @file.setter
     def file(self, value):
         if value != self.file:
+            if not os.path.exists(value):
+                return
             self._file = value
             self.edificio = resparser.loadfile(value)
+            # Probamos primero a ver si hay un bin con el mismo nombre que el res,
+            # luego uno con ResumenRCC_nombrearchivores.bin y
+            # finalmente el primero que encuentre.
+            respathdir = self.dirname
+            binfiles = [ff for ff in os.listdir(respathdir) if ff.lower().endswith('.bin')]
+            if binfiles:
+                samename = self.filename + '.bin'
+                resumenrccname = 'ResumenRCC_' + self.filename + '.bin'
+                if samename in binfiles:
+                    binfile = samename
+                elif resumenrccname in binfiles:
+                    binfile = resumenrccname
+                else:
+                    binfile = binfiles[0]
+                self._binfile = os.path.join(respathdir, binfile)
+                self.bindata = binparser.readBIN(self._binfile)
+            else:
+                self._binfile = None
+                self.bindata = None
 
     @property
     def filename(self):
-        root, ext = os.path.splitext(os.path.basename(self.file))
+        root, ext = os.path.splitext(os.path.basename(self._file))
         return root
 
     @property
     def dirname(self):
-        return os.path.dirname(self.file)
+        return os.path.dirname(self._file)

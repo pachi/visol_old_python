@@ -3,7 +3,7 @@
 """Biblioteca de interpretación de archivos de resultados de LIDER"""
 
 import resparser
+import binparser
 import clases
-import pybinlider
 
 __version__ = '2.0'
