@@ -101,30 +101,35 @@ class GtkSol(object):
 
     def loadfile(self, path=TESTFILE):
         """Carga archivo en el modelo y actualiza la interfaz"""
-        self.model.file = path
-        e = self.model.edificio
-        ed = e.nombre
+        try:
+            self.model.file = path
+            self.sb.push(0, u'Seleccionado archivo: %s' % self.model.file)
 
-        self.window.props.title = u"ViSOL [... %s]" % self.model.file[-40:]
+            e = self.model.edificio
+            ed = e.nombre
 
-        self.tb.set_text(e.resdata)
-        ts = self.edificiots
-        tv = self.edificiotv
-        ts.clear()
-        tv.collapse_all()
-        # Modelo de plantas y zonas
-        edificioiter = ts.append(None, (ed, 'edificio', ed, '', '', '', EDIFICIOICON))
-        for planta in e:
-            plantaiter = ts.append(edificioiter, (planta, 'planta', ed, planta, '', '', PLANTAICON))
-            zonas = e[planta]
-            for zona in zonas:
-                zonaiter = ts.append(plantaiter, (zona, 'zona', ed, planta, zona, '', ZONAICON))
-                tv.expand_to_path(ts.get_path(zonaiter))
-                for componente in zonas[zona]:
-                    ts.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
-        tv.set_cursor((0,)) # Seleccionar edificio
+            self.window.props.title = u"ViSOL [... %s]" % self.model.file[-40:]
 
-        self.sb.push(0, u'Cargado modelo: %s' % path)
+            self.tb.set_text(e.resdata)
+            ts = self.edificiots
+            tv = self.edificiotv
+            ts.clear()
+            tv.collapse_all()
+            # Modelo de plantas y zonas
+            edificioiter = ts.append(None, (ed, 'edificio', ed, '', '', '', EDIFICIOICON))
+            for planta in e:
+                plantaiter = ts.append(edificioiter, (planta, 'planta', ed, planta, '', '', PLANTAICON))
+                zonas = e[planta]
+                for zona in zonas:
+                    zonaiter = ts.append(plantaiter, (zona, 'zona', ed, planta, zona, '', ZONAICON))
+                    tv.expand_to_path(ts.get_path(zonaiter))
+                    for componente in zonas[zona]:
+                        ts.append(zonaiter, (componente, 'componente', ed, planta, zona, componente, COMPONENTEICON))
+            tv.set_cursor((0,)) # Seleccionar edificio
+
+            self.sb.push(0, u'Cargado modelo: %s' % path)
+        except:
+            self.sb.push(0, u'Error al leer archivo: %s' % self.model.file)
 
     def showtextfile(self, button):
         """Cambia la visibilidad de la pestaña de texto"""
@@ -190,7 +195,6 @@ class GtkSol(object):
 
         if response == Gtk.ResponseType.ACCEPT:
             self.loadfile(chooser.get_filename().decode('utf8'))
-            self.sb.push(0, u'Seleccionado archivo: %s' % self.model.file)
         elif response == Gtk.ResponseType.CANCEL:
             self.sb.push(0, u'Carga de archivo cancelada')
         chooser.hide()
