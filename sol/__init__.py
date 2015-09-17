@@ -4,5 +4,6 @@
 
 import resparser
 import clases
+import pybinlider
 
 __version__ = '2.0'
