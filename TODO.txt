@@ -19,6 +19,14 @@ WISHLIST
 
     - por ejemplo, sobre el tipo de componente (ventana, muro, etc).
 
+INSTALLER
+---------
+
+Ver archivos de gedit:
+https://git.gnome.org/browse/gedit/tree/win32/make-gedit-installer  -> create_archive()
+https://git.gnome.org/browse/gedit/tree/win32
+
+
 PORTING TO GTK+3
 ----------------
 
@@ -64,3 +72,9 @@ DOCS LIDER
 JLMolina:
 
 Para vuestro conocimiento, esos archivos mezclan dos tipos de información: En los flujos de calor relativos a los conceptos y componentes para cada zona, la información se deriva de las ganancias a temperatura interior constante, mientras que a partir de los resultados "a nivel de edificio" la información es sobre las demandas con la temperatura interior variable de acuerdo a las condiciones de operación. Siempre hemos prestado más atención a esta segunda parte.
+
+BUGS
+----
+
+- No se muestran los iconos de expansión en árbol de elementos en windows
+

@@ -368,7 +368,7 @@ class HistoElementos(HistoBase):
         self.ylabel = u"Demanda [kWh/m²·año]"
         # Muestra o no los distintos desgloses de calefacción y refrigeración
         self._showelems = (False, False, False, False)
-        
+
     @property
     def showelems(self):
         return self._showelems

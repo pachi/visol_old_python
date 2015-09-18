@@ -34,7 +34,7 @@
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">ViSOL</property>
-    <property name="default_height">650</property>
+    <property name="default_height">651</property>
     <signal name="delete-event" handler="quit" swapped="no"/>
     <child>
       <object class="GtkBox" id="box1">
@@ -213,6 +213,9 @@
                   <object class="GtkNotebook" id="notebook">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="scrollable">True</property>
+                    <property name="enable_popup">True</property>
+                    <property name="group_name">nbpages</property>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwindowtext">
                         <property name="can_focus">True</property>
@@ -258,6 +261,7 @@
                                 <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de calefacción (exceso de calefacción)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
+                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -275,6 +279,7 @@
                                 <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de calefacción (necesidad de calefacción)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
+                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -292,6 +297,7 @@
                                 <property name="tooltip_text" translatable="yes">Demanda positiva en periodo de refrigeración (necesidad de refrigeración)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
+                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -309,6 +315,7 @@
                                 <property name="tooltip_text" translatable="yes">Demanda negativa en periodo de refrigeración (exceso de refrigeración)</property>
                                 <property name="use_underline">True</property>
                                 <property name="focus_on_click">False</property>
+                                <property name="xalign">0.5</property>
                                 <property name="draw_indicator">True</property>
                               </object>
                               <packing>
@@ -469,6 +476,30 @@
                       </object>
                       <packing>
                         <property name="position">6</property>
+                        <property name="tab_fill">False</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="bzonas">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="position">7</property>
+                      </packing>
+                    </child>
+                    <child type="tab">
+                      <object class="GtkLabel" id="label8">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Zonas</property>
+                      </object>
+                      <packing>
+                        <property name="position">7</property>
                         <property name="tab_fill">False</property>
                       </packing>
                     </child>

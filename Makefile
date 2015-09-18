@@ -11,6 +11,20 @@
 
 PYTHON = python
 
+# Not used yet. Ideas from gedit's installer
+_thisdir="$(dirname $0)"
+_arch=$(uname -m)
+_date=$(date +'%Y%m%d')
+_version=@VERSION@
+_filename=visol-${_arch}-${_version}.exe
+
+if [ "${_arch}" = "x86_64" ]; then
+  _bitness=64
+else
+  _bitness=32
+fi
+#
+
 VERSION=$(shell python -c"from sol import __version__;print __version__")
 UPXPATH?=$(subst /,\/,$(shell which upx))
 DISTDIR?=$(subst /,\/,build/exe.mingw-2.7)

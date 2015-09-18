@@ -3,17 +3,17 @@
 News
 ====
 
-1.0
+2.1
 ---
 
-*Release date: 7-Mar-2014*
+*Release date: xx-xxx-2015*
 
-* Versión inicial con soporte de archivos .res y .re2
+* Corregir error de apertura de archivos con acentos
 
 2.0
 ---
 
-* Release date: 18-May-2015 *
+*Release date: 18-May-2015*
 
 * Versión con GTK+3
 * Incluidos enlaces a página web
@@ -24,3 +24,10 @@ News
   - determinación de los límites de las gráficas de demanda por grupos
   - resolución y nombre de los archivos de salida de las capturas de pantalla
 * Mejoras del rendimiento de la aplicación
+
+1.0
+---
+
+*Release date: 7-Mar-2014*
+
+* Versión inicial con soporte de archivos .res y .re2

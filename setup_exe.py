@@ -36,7 +36,7 @@ from cx_Freeze import setup, Executable
 from sol import __version__
 
 ## Collect the list of missing dll when cx_freeze builds the app
-include_dll_path = os.path.abspath(r'C:\msys32\mingw32\bin') 
+include_dll_path = os.path.abspath(r'C:\msys32\mingw32\bin')
 missing_dll = ['libgtk-3-0.dll',
                'libgdk-3-0.dll',
                'libatk-1.0-0.dll',
