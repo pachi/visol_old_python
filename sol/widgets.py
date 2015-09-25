@@ -22,9 +22,11 @@
 #   02110-1301, USA.
 
 import math
-import numpy
+import numpy as np
+import pandas as pd
 import matplotlib
 matplotlib.use('GTK3Cairo')
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_gtk3cairo import FigureCanvasGTK3Cairo
 from matplotlib.transforms import offset_copy
@@ -323,7 +325,7 @@ class HistoMeses(HistoBase):
                          (0.5, 0.5), xycoords='axes fraction', ha='center')
             return
         # Meses como etiquetas y localizamos los valores límite
-        ind = numpy.arange(12)
+        ind = np.arange(12)
         x_names = [mes[:3] for mes in MESES]
         ax1.set_xticks(ind)
         ax1.set_xticklabels(x_names, size='small', rotation=90)
@@ -431,7 +433,7 @@ class HistoElementos(HistoBase):
         demandas = obj.demandas
         x_labels = [u"\n".join(name.split()) for name in obj.demandas['grupos']]
         labelrotation = 0 if self.model.modo == 'componente' else 90
-        ind = numpy.arange(len(x_labels))
+        ind = np.arange(len(x_labels))
         barras(demandas)
         ax1.set_xticks(ind + 0.5)
         ax1.set_xticklabels(x_labels, size='small',
