@@ -442,3 +442,128 @@ class HistoElementos(HistoBase):
         ax1.vlines(ind, ymin, ymax, color='gray')
         ax1.grid(False)
         self.fig.subplots_adjust(bottom=0.17, left=.15)
+
+class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
+    """Gráficas de zonas con Matplotlib"""
+    __gtype_name__ = 'ZonasGraph'
+
+    def __init__(self, modelo=None):
+        """Constructor
+
+        edificio - Edificio analizado (EdificioLIDER)
+        planta - Nombre de la planta "actual" analizada en el edificio (str)
+        zona - Nombre de la Zona "actual" analizada en la planta (str)
+        """
+        Observer.__init__(self, modelo)
+
+        self.fig = Figure()
+        FigureCanvasGTK3Cairo.__init__(self, self.fig)
+        self.ax1 = self.fig.add_subplot(311)
+        self.ax2 = self.fig.add_subplot(312, sharex=self.ax1)
+        self.ax3 = self.fig.add_subplot(313, sharex=self.ax1)
+
+        self.fig.suptitle(u'Temperatura y carga térmica. Promedios diarios', size='large')
+        self.fig.subplots_adjust(left=0.15,
+                                 #right=0.9,
+                                 top=0.92, bottom=0.1,
+                                 wspace=0.2, hspace=0.25)
+        self.needsredraw = False
+
+    def do_draw(self, cr):
+        if not self.needsredraw:
+            return False
+        self.needsredraw = False
+        self.dibujaseries()
+        self.draw()
+        return False
+
+    # ver si dibuja pasa a ser esto
+    def update(self, subject, **kwargs):
+        if kwargs.get('label', None) in ['grupos', 'index']:
+            self.needsredraw = True
+        else:
+            self.needsredraw = False
+        self.queue_draw()
+
+    def dibujaseries(self):
+        """Dibuja series de datos"""
+        ax1 = self.ax1
+        ax2 = self.ax2
+        ax3 = self.ax3
+
+        #Limpia datos anteriores
+        ax1.clear()
+        ax2.clear()
+        ax3.clear()
+
+        # No damos esta información en modo componente
+        if self.model.modo in ['componente', 'planta', 'edificio']:
+            for ax in [ax1, ax2, ax3]:
+                ax.axis('off')
+                ax.annotate(u"Información solo disponible para zonas",
+                            (0.5, 0.5), xycoords='axes fraction', ha='center')
+            return
+
+        ax1.axis('on')
+        ax2.axis('on')
+        ax3.axis('on')
+
+        ax1.set_ylabel(u'Temperatura\n$T$, $T_{min}$, $T_{max}$\n[ºC]', fontdict=dict(alpha=0.75, size='small'))
+        ax2.set_ylabel(u'Carga térmica\n$Q_S$, $Q_S + Q_L$\n[W]', fontdict=dict(alpha=0.75, size='small'))
+        ax3.set_ylabel(u'Ventilación e infiltraciones\n[m3/h]', fontdict=dict(alpha=0.75, size='small'))
+
+        zidf, zcdf, zddf = self.model.bindata
+        zonedf = zddf[zddf.Nombre==self.model.activo.nombre]
+        zonedf.index = pd.date_range('1/1/2007', periods=8760,
+                                     freq='H')
+
+        tdmed = zonedf.Temp.resample('D')
+        tdmin = zonedf.Temp.resample('D', how='min')
+        tdmax = zonedf.Temp.resample('D', how='max')
+
+        #tdmed.plot(ax=ax1, color='black', lw=0.5)
+        ax1.plot(tdmed.index, tdmed, color='black', lw=0.5)
+        ax1.fill_between(tdmed.index, tdmed, tdmax, facecolor='red', alpha=.2)
+        ax1.fill_between(tdmed.index, tdmin, tdmed, facecolor='blue', alpha=.2)
+        mintemp = np.ceil(zddf.Temp.min()) -3
+        maxtemp = np.floor(zddf.Temp.max()) + 3
+        ax1.set_ylim(mintemp, maxtemp)
+
+        #TODO: Ver cómo indicar zonas sobre y bajo consigna
+        #TODO: o poner bandas de verano e invierno
+
+        qldtot = zonedf.QLat.resample('D', how='sum') / 24.0
+        qsdtot = zonedf.QSen.resample('D', how='sum') / 24.0
+        qtot = (qldtot + qsdtot)
+
+        #qsdtot.plot(ax=ax2, color='blue', lw=0.5)
+        ax2.plot(qsdtot.index, qsdtot, color='blue', lw=0.5, alpha=0.5)
+
+        #qtot.plot(ax=ax2, color='black', lw=0.5)
+        ax2.plot(qtot.index, qtot, color='black', lw=0.5)
+        ax2.fill_between(qsdtot.index, 0, qsdtot, facecolor='blue', alpha=.2)
+        ax2.fill_between(qtot.index, qsdtot, qtot, facecolor='red', alpha=.2)
+
+        ax1.get_xaxis().set_major_formatter(matplotlib.dates.DateFormatter('%b'))
+
+        veninftot = zonedf.Vventinf.resample('D', how='mean') * 3600.0 / 1.2922 # m3/h
+        ax3.plot(veninftot.index, veninftot, color='black', lw=0.5)
+
+        #leg = ax1.legend((rects1[0], rects2[0]),
+        #                 (u'Calefacción', u'Refrigeración'),
+        #                 loc='lower left', prop={"size":'small'}, fancybox=True)
+        #leg.draw_frame(False)
+        #leg.get_frame().set_alpha(0.5)
+
+        #TODO: Calcular temperatura y carga total min y max para todas las zonas
+        #_min, _max = self.model.edificio.minmaxmeses()
+        #_min, _max = myround(_min, 5), myround(_max, 5)
+        #ax1.set_ylim(_min - 10, _max + 10)
+
+    def save(self, filename='histobase.png', dpi=100):
+        """Guardar y mostrar gráfica"""
+        self.fig.canvas.print_figure(filename,
+                                     format='png',
+                                     facecolor='w',
+                                     dpi=dpi)
+

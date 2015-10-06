@@ -31,7 +31,7 @@ import datetime
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
-from widgets import HistoMeses, HistoElementos, PieGlobal
+from widgets import HistoMeses, HistoElementos, PieGlobal, ZonasGraph
 import sol
 from solmodel import VISOLModel
 import util
@@ -92,6 +92,10 @@ class GtkSol(object):
                                      modelo=self.model)
         vb = self.ui.get_object('brefneg')
         vb.pack_start(self.refnegchart, expand=True, fill=True, padding=0)
+
+        self.zonaschart = ZonasGraph(modelo=self.model)
+        vb = self.ui.get_object('bzonas')
+        vb.pack_start(self.zonaschart, expand=True, fill=True, padding=0)
 
         # Filtro de archivos
         ffilter = self.ui.get_object('filefilter')
