@@ -18,11 +18,11 @@ _date=$(date +'%Y%m%d')
 _version=@VERSION@
 _filename=visol-${_arch}-${_version}.exe
 
-if [ "${_arch}" = "x86_64" ]; then
-  _bitness=64
-else
-  _bitness=32
-fi
+#if [ "${_arch}" = "x86_64" ]; then
+#  _bitness=64
+#else
+#  _bitness=32
+#fi
 #
 
 VERSION=$(shell python -c"from sol import __version__;print __version__")
