@@ -69,6 +69,7 @@ gtk_libs = ['etc/gtk-3.0',
             'share/glib-2.0',
             'share/gtk-3.0',
             'share/icons/hicolor',
+            'share/icons/Adwaita/16x16',
             'share/icons/Adwaita/22x22',
             'share/icons/Adwaita/index.theme',
             'share/themes/Default/gtk-3.0']
