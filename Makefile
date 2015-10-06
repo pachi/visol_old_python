@@ -59,7 +59,7 @@ install: setup.py
 README.html: README.rst res/style.css
 	$(RST2HTML) --stylesheet=res/style.css README.rst > $@
 
-setup.nsi: setup.nsi.in
+setup.nsi: setup.nsi.in sol/__init__.py
 	sed 's/@VERSION@/$(VERSION)/g; s/@UPXPATH@/$(UPXPATH)/g; s/@DISTDIR@/$(DISTDIR)/g' setup.nsi.in > setup.nsi
 
 splash:
