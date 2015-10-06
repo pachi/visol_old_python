@@ -28,6 +28,8 @@
 
 import os
 import datetime
+import gi
+gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
 from widgets import HistoMeses, HistoElementos, PieGlobal
 import sol
