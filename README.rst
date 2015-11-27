@@ -104,6 +104,13 @@ Descripción de la interfaz y capturas de pantalla
     :alt: Pantalla de flujo de calor negativo en temporada de refrigeración
     :align: center
 
+* La pestaña `Zonas` muestra **valores diarios de algunos parámetros de la zona**, como la temperatura media, máxima y mínima, la carga total, sensible y latente, y el caudal de ventilación e infiltraciones (media diaria y promedio anual).
+
+.. image:: res/pantallazo8.png
+    :scale: 75 %
+    :alt: Pantalla de valores diarios de zona
+    :align: center
+
 * La interfaz permite **visualizar en una pestaña adicional el contenido del archivo de resultados** `.res` o `.re2` activo:
 
 .. image:: res/pantallazo7.png

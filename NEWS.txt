@@ -3,11 +3,12 @@
 News
 ====
 
-2.1
+3.0
 ---
 
-*Release date: xx-xxx-2015*
+*Release date: 27-Nov-2015*
 
+* Soporte inicial de información (diaria) de zonas en archivos .BIN
 * Corregir error de apertura de archivos con acentos
 
 2.0
