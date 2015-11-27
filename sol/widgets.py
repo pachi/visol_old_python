@@ -461,12 +461,14 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
         self.ax1 = self.fig.add_subplot(311)
         self.ax2 = self.fig.add_subplot(312, sharex=self.ax1)
         self.ax3 = self.fig.add_subplot(313, sharex=self.ax1)
+        self.ax4 = self.ax3.twinx()
+        self.ax4.patch.set_visible(False)
 
-        self.fig.suptitle(u'Temperatura y carga térmica. Promedios diarios', size='large')
+        self.fig.suptitle(u'Valores diarios de zona', size='large')
         self.fig.subplots_adjust(left=0.15,
                                  #right=0.9,
-                                 top=0.92, bottom=0.1,
-                                 wspace=0.2, hspace=0.25)
+                                 top=0.9, bottom=0.1,
+                                 wspace=0.2, hspace=0.4)
         self.needsredraw = False
 
     def do_draw(self, cr):
@@ -490,11 +492,13 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
         ax1 = self.ax1
         ax2 = self.ax2
         ax3 = self.ax3
+        ax4 = self.ax4
 
         #Limpia datos anteriores
         ax1.clear()
         ax2.clear()
         ax3.clear()
+        ax4.clear()
 
         # No damos esta información en modo componente
         if self.model.modo in ['componente', 'planta', 'edificio']:
@@ -502,21 +506,27 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
                 ax.axis('off')
                 ax.annotate(u"Información solo disponible para zonas",
                             (0.5, 0.5), xycoords='axes fraction', ha='center')
+            ax4.axis('off')
             return
 
         ax1.axis('on')
         ax2.axis('on')
         ax3.axis('on')
+        ax4.axis('on')
+        ax4.patch.set_visible(False)
 
+        ax1.set_title(u'Temperatura diaria (máxima, media, mínima)', size='medium')
+        ax2.set_title(u'Carga térmica diaria (sensible, latente, total)', size='medium')
+        ax3.set_title(u'Caudal diario de ventilación e infiltraciones', size='medium')
         ax1.set_ylabel(u'Temperatura\n$T$, $T_{min}$, $T_{max}$\n[ºC]', fontdict=dict(alpha=0.75, size='small'))
         ax2.set_ylabel(u'Carga térmica\n$Q_S$, $Q_S + Q_L$\n[W]', fontdict=dict(alpha=0.75, size='small'))
         ax3.set_ylabel(u'Ventilación e infiltraciones\n[m3/h]', fontdict=dict(alpha=0.75, size='small'))
+        ax4.set_ylabel(u'[ren/h]', fontdict=dict(alpha=0.75, size='small'))
 
         zidf, zcdf, zddf = self.model.bindata
-        zonedf = zddf[zddf.Nombre==self.model.activo.nombre]
+        zonedf = zddf[zddf.Nombre == self.model.activo.nombre]
         zonedf.index = pd.date_range('1/1/2007', periods=8760,
                                      freq='H')
-
         tdmed = zonedf.Temp.resample('D')
         tdmin = zonedf.Temp.resample('D', how='min')
         tdmax = zonedf.Temp.resample('D', how='max')
@@ -546,20 +556,23 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
 
         ax1.get_xaxis().set_major_formatter(matplotlib.dates.DateFormatter('%b'))
 
-        veninftot = zonedf.Vventinf.resample('D', how='mean') * 3600.0 / 1.2922 # m3/h
+        # 3600 s/h * 1.2922 kg/m3
+        veninftot = zonedf.Vventinf.resample('D', how='mean') * 3600.0 / 1.225
+        #veninftot = zonedf.Vventinf * 3600.0 / 1.225
         ax3.plot(veninftot.index, veninftot, color='black', lw=0.5)
-
-        #leg = ax1.legend((rects1[0], rects2[0]),
-        #                 (u'Calefacción', u'Refrigeración'),
-        #                 loc='lower left', prop={"size":'small'}, fancybox=True)
-        #leg.draw_frame(False)
-        #leg.get_frame().set_alpha(0.5)
-
-        #TODO: Calcular temperatura y carga total min y max para todas las zonas
-        #_min, _max = self.model.edificio.minmaxmeses()
-        #_min, _max = myround(_min, 5), myround(_max, 5)
-        #ax1.set_ylim(_min - 10, _max + 10)
-
+        ax3.fill_between(veninftot.index, 0, veninftot, facecolor='cyan', alpha=.2)
+        
+        zoneinfo = zidf.loc[self.model.activo.nombre]
+        zonevolume = zoneinfo.Volumen
+        print zonevolume
+        ax3.text(.05, .85,
+                 u'Vol. zona = %.2f m3\n%.2f[ren/h]' % (zonevolume,
+                                               zonedf.Vventinf.mean() * 3600.0 / 1.225 / zonevolume),
+                 transform=ax3.transAxes, size='small', va='top')
+        ymin, ymax = ax3.get_ylim()
+        print ymin, ymax
+        ax4.set_ylim(ymin/zonevolume, ymax/zonevolume)
+        
     def save(self, filename='histobase.png', dpi=100):
         """Guardar y mostrar gráfica"""
         self.fig.canvas.print_figure(filename,
