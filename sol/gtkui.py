@@ -143,7 +143,7 @@ class GtkSol(object):
         else:
             self.ui.get_object('scrolledwindowtext').show()
 
-    def guardarbutton(self, button):
+    def guardarbutton(self, dummy_button):
         """Guarda imagen de la gráfica actual"""
         idx = self.nb.get_current_page()
         container = self.nb.get_nth_page(idx)
@@ -161,7 +161,7 @@ class GtkSol(object):
 
     def cursorchanged(self, tv):
         """Seleccionada una nueva fila de la vista de árbol"""
-        path, col = tv.get_cursor()
+        path, dummy_col = tv.get_cursor()
         if not path: # Al cargar archivos en un momento path es None
             return
         tm = tv.get_model()
@@ -183,7 +183,7 @@ class GtkSol(object):
         self.sb.push(0, u'Seleccionado %s: %s' % (tipo, nombre))
         self.ui.get_object('labelzona').props.label = txt1
 
-    def cbelementos(self, action):
+    def cbelementos(self, dummy_action):
         """Modifica el número de flujos activos en la vista de elementos"""
         he = self.histoelementos
         he.showelems = (self.ui.get_object('cbcalpos').props.active,
@@ -192,7 +192,7 @@ class GtkSol(object):
                         self.ui.get_object('cbrefneg').props.active)
 
     #{ Funciones generales de aplicación
-    def openfile(self, toolbutton):
+    def openfile(self, dummy_toolbutton):
         """Abre archivo de resultados"""
         chooser = self.ui.get_object('filechooserdialog')
         chooser.set_filename(self.model.file)
@@ -204,13 +204,13 @@ class GtkSol(object):
             self.sb.push(0, u'Carga de archivo cancelada')
         chooser.hide()
 
-    def about(self, toolbutton):
+    def about(self, dummy_toolbutton):
         """Diálogo de créditos"""
         about = self.ui.get_object('aboutdialog')
         about.run()
         about.hide()
 
-    def quit(self, w, *args):
+    def quit(self, dummy_w, *args):
         """Salir de la aplicación"""
         Gtk.main_quit()
 
