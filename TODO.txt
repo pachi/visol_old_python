@@ -10,6 +10,10 @@ TODO ViSOL
 - El sol.ico hay que guardarlo en GIMP con las capas ordenadas de mayor a menor resolución para que el icono se pueda ver en windows Vista o superior. También las capas de iconos mayores se guardan en formato png comprimido, al contrario que las más pequeñas, que no pueden estar así para ser compatibles con las versiones anteriores de windows.
 - Manejar medidor de edificios
 - Aprovechar informe.xml
+- Indicar en el treeview de zonas el multiplicador (x1), el área y el volumen de cada zona
+- Guardar pantallazos indicando en el nombre el tipo de gráfica que se guarda
+  (eg.componentes, meses, cal+, cal-, ref+, ref-...)
+- Guardar la versión de visol en el nombre del pantallazo
 
 WISHLIST
 --------
@@ -25,12 +29,6 @@ INSTALLER
 Ver archivos de gedit:
 https://git.gnome.org/browse/gedit/tree/win32/make-gedit-installer  -> create_archive()
 https://git.gnome.org/browse/gedit/tree/win32
-
-
-PORTING TO GTK+3
-----------------
-
-http://wiki.sugarlabs.org/go/Features/GTK3/Porting
 
 DOCS LIDER
 ----------
