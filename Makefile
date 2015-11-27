@@ -50,7 +50,7 @@ freeze: setup_exe.py
 installer: README.html setup.nsi splash
 	$(MAKENSIS) setup.nsi
 
-build: setup.py splash
+build: setup.py splash gtkschemas
 	$(PYTHON) setup.py build
 
 install: setup.py
@@ -65,6 +65,10 @@ setup.nsi: setup.nsi.in sol/__init__.py
 splash:
 	$(PYTHON) ./res/makesplash.py -b ./res/background.png -o ./res/splash.jpg $(VERSION)
 	cp ./res/splash.jpg ./ui/splash.jpg
+
+.PHONY = gtkschemas
+gtkschemas:
+	glib-compile-schemas /c/msys32/mingw32/share/glib-2.0/schemas
 
 test check tests:
 	unit2 discover
