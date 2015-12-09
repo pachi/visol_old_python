@@ -561,18 +561,16 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
         #veninftot = zonedf.Vventinf * 3600.0 / 1.225
         ax3.plot(veninftot.index, veninftot, color='black', lw=0.5)
         ax3.fill_between(veninftot.index, 0, veninftot, facecolor='cyan', alpha=.2)
-        
+
         zoneinfo = zidf.loc[self.model.activo.nombre]
         zonevolume = zoneinfo.Volumen
-        print zonevolume
         ax3.text(.05, .85,
                  u'Vol. zona = %.2f m3\n%.2f[ren/h]' % (zonevolume,
                                                zonedf.Vventinf.mean() * 3600.0 / 1.225 / zonevolume),
                  transform=ax3.transAxes, size='small', va='top')
         ymin, ymax = ax3.get_ylim()
-        print ymin, ymax
         ax4.set_ylim(ymin/zonevolume, ymax/zonevolume)
-        
+
     def save(self, filename='histobase.png', dpi=100):
         """Guardar y mostrar gráfica"""
         self.fig.canvas.print_figure(filename,
