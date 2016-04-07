@@ -1,6 +1,8 @@
 TODO ViSOL
 ==========
 
+- Mejorar selección de .bin, puesto que en directorios con varios .res y un
+  .bin la selección por defecto es el primer .bin encontrado.
 - Convertir sol en librería reslib y quitar de ahí las partes de aplicación (utils.py, gtkui.py), dejando resparser y clases.
   Así habría una aplicación en sol/ y una librería en reslib/
 - Ver si hay que unificar nombres de componentes de demanda cal+ -> calpos, etc entre clases y resparser
@@ -14,6 +16,7 @@ TODO ViSOL
 - Guardar pantallazos indicando en el nombre el tipo de gráfica que se guarda
   (eg.componentes, meses, cal+, cal-, ref+, ref-...)
 - Guardar la versión de visol en el nombre del pantallazo
+- Mirar paquete "appsdir" para guardar archivos de datos en directorios de usuario
 
 WISHLIST
 --------
