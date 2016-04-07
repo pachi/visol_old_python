@@ -5,7 +5,14 @@
   <object class="GtkAction" id="actioncbelementos">
     <signal name="activate" handler="cbelementos" swapped="no"/>
   </object>
-  <object class="GtkFileFilter" id="filefilter"/>
+  <object class="GtkFileFilter" id="filefilter">
+    <patterns>
+      <pattern>*.re[s|2|0]</pattern>
+      <pattern>*.bin</pattern>
+      <pattern>*.RE[S|2|0]</pattern>
+      <pattern>*.BIN</pattern>
+    </patterns>
+  </object>
   <object class="GtkAction" id="salir">
     <property name="label">Salir</property>
     <property name="tooltip">Salir de la aplicación</property>

@@ -195,7 +195,6 @@ class GtkSol(object):
     def openfile(self, dummy_toolbutton):
         """Abre archivo de resultados"""
         chooser = self.ui.get_object('filechooserdialog')
-        chooser.set_filename(self.model.file)
         response = chooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
