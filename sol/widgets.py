@@ -527,9 +527,9 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
         zonedf = zddf[zddf.Nombre == self.model.activo.nombre]
         zonedf.index = pd.date_range('1/1/2007', periods=8760,
                                      freq='H')
-        tdmed = zonedf.Temp.resample('D')
-        tdmin = zonedf.Temp.resample('D', how='min')
-        tdmax = zonedf.Temp.resample('D', how='max')
+        tdmed = zonedf.Temp.resample('D').mean()
+        tdmin = zonedf.Temp.resample('D').min()
+        tdmax = zonedf.Temp.resample('D').max()
 
         #tdmed.plot(ax=ax1, color='black', lw=0.5)
         ax1.plot(tdmed.index, tdmed, color='black', lw=0.5)
@@ -542,8 +542,8 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
         #TODO: Ver cómo indicar zonas sobre y bajo consigna
         #TODO: o poner bandas de verano e invierno
 
-        qldtot = zonedf.QLat.resample('D', how='sum') / 24.0
-        qsdtot = zonedf.QSen.resample('D', how='sum') / 24.0
+        qldtot = zonedf.QLat.resample('D').sum() / 24.0
+        qsdtot = zonedf.QSen.resample('D').sum() / 24.0
         qtot = (qldtot + qsdtot)
 
         #qsdtot.plot(ax=ax2, color='blue', lw=0.5)
@@ -557,7 +557,7 @@ class ZonasGraph(FigureCanvasGTK3Cairo, Observer):
         ax1.get_xaxis().set_major_formatter(matplotlib.dates.DateFormatter('%b'))
 
         # 3600 s/h * 1.2922 kg/m3
-        veninftot = zonedf.Vventinf.resample('D', how='mean') * 3600.0 / 1.225
+        veninftot = zonedf.Vventinf.resample('D').mean() * 3600.0 / 1.225
         #veninftot = zonedf.Vventinf * 3600.0 / 1.225
         ax3.plot(veninftot.index, veninftot, color='black', lw=0.5)
         ax3.fill_between(veninftot.index, 0, veninftot, facecolor='cyan', alpha=.2)
