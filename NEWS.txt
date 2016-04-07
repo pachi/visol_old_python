@@ -3,6 +3,14 @@
 News
 ====
 
+4.0
+---
+
+*Release date: 7-Abr-2016*
+
+* Soporte de archivos de HULC con nuevo formato
+* Mejora del selector de archivos
+
 3.0
 ---
 
