@@ -45,7 +45,7 @@ def cached_property(f):
 GRUPOSLIDER = [u'Paredes Exteriores', u'Cubiertas', u'Suelos',
                u'Puentes Térmicos', u'Solar Ventanas',
                u'Transmisión Ventanas', u'Fuentes Internas',
-               u'Infiltración', u'TOTAL']
+               u'Ventilación más Infiltración', u'TOTAL']
 
 class EdificioLIDER(OrderedDict):
     """Edificio en LIDER
@@ -91,7 +91,7 @@ class EdificioLIDER(OrderedDict):
              refrigeración +, refrigeración -, refrigeración neta)
         """
         dic = OrderedDict()
-        for grupo in GRUPOSLIDER:
+        for grupo in self.gruposlider:
             params = [self[planta].superficie *
                       numpy.array(self[planta].grupos[grupo])
                       for planta in self]
@@ -294,6 +294,8 @@ class ComponenteLIDER(object):
                los flujos de calor del componente [kWh/año]
     """
     def __init__(self, nombre, calpos, calneg, calnet, refpos, refneg, refnet):
+        # Cmabio de formato en HULC
+        nombre = u'Ventilación más Infiltración' if nombre == u'Infiltración' else nombre
         self.nombre = nombre
         self.values = (calpos, calneg, calnet, refpos, refneg, refnet)
         self.demandas = OrderedDict([('grupos', [self.nombre]),

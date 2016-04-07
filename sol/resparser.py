@@ -29,9 +29,13 @@ import numpy as np
 from .clases import EdificioLIDER, PlantaLIDER, ZonaLIDER, ComponenteLIDER
 
 def nextblock(linesiter, startswith):
-    """Avanza el iterador y devuelve la primera línea que empiece por startswith"""
+    """Avanza el iterador y devuelve la primera línea que empiece por cualquier patrón en startswith"""
+    if isinstance(startswith, basestring):
+        patterns = [startswith]
+    else:
+        patterns = startswith
     for line in linesiter:
-        if line.startswith(startswith):
+        if any(line.startswith(pat) for pat in patterns):
             return line
 
 def valores(linea):
@@ -41,7 +45,11 @@ def valores(linea):
     (u'Paredes Exteriores', [0.000000, -116.455211, 2.686940])
     """
     elems = linea.split(u',')
-    return elems[0].strip(u'"\' '), [float(elem) for elem in elems[1:]]
+    concepto = elems[0].strip(u'"\' ')
+    # Cambio de formato del concepto en HULC
+    concepto = u'Ventilación más Infiltración' if concepto == u'Infiltración' else concepto
+    valores = [float(elem) for elem in elems[1:]]
+    return concepto, valores
 
 def loadfile(resfile):
     """Devuelve un objeto de tipo EdificioLIDER a partir del archivo resfile"""
@@ -109,7 +117,7 @@ def loadfile(resfile):
     nextblock(lines, u'RESULTADOS A NIVEL EDIFICIO')
 
     # Datos generales de demandas del edificio
-    nextblock(lines, u'Calefacción, Refrigeración anual')
+    nextblock(lines, [u'Calefacción, Refrigeración anual', u'Calefacción anual'])
     cal, ref = next(lines).split(u',')
     edificio.calefaccion = float(cal)
     edificio.refrigeracion = float(ref)
