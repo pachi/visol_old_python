@@ -28,6 +28,11 @@ from collections import OrderedDict
 import numpy as np
 from .clases import EdificioLIDER, PlantaLIDER, ZonaLIDER, ComponenteLIDER
 
+try:
+    basestring
+except NameError:
+    basestring = str
+
 def nextblock(linesiter, startswith):
     """Avanza el iterador y devuelve la primera línea que empiece por cualquier patrón en startswith"""
     if isinstance(startswith, basestring):
@@ -56,7 +61,7 @@ def loadfile(resfile):
     try:
         data = codecs.open(resfile, "rU", "latin-1").readlines()
     except IOError:
-        print "Errores procesando archivo", resfile
+        print("Errores procesando archivo", resfile)
         raise
     lines = iter(data)
 
@@ -165,24 +170,26 @@ if __name__ == '__main__':
     try:
         params = parser.parse_args()
         file1 = codecs.open(params.file1, "rU", "latin-1")
-    except IOError, msg:
+    except IOError:
+        import sys
+        msg = sys.exc_info()[1]
         parser.error(str(msg))
 
     ed = loadfile(file1)
 
-    print ed.numzonas
-    print ed.calefaccion, ed.refrigeracion
-    print ed.calefaccion_meses
-    print ed.refrigeracion_meses
+    print(ed.numzonas)
+    print(ed.calefaccion, ed.refrigeracion)
+    print(ed.calefaccion_meses)
+    print(ed.refrigeracion_meses)
     pl = ed.plantas[u'P02']
-    print pl
+    print(pl)
     zn = pl[u'P02_E01']
-    print zn.nombre
-    print zn.numero
-    print zn.planta
-    print zn.superficie
-    print zn.multiplicador
-    print zn.keys()
-    print zn.grupos
-    print zn.calefaccion
-    print zn.refrigeracion
+    print(zn.nombre)
+    print(zn.numero)
+    print(zn.planta)
+    print(zn.superficie)
+    print(zn.multiplicador)
+    print(zn.keys())
+    print(zn.grupos)
+    print(zn.calefaccion)
+    print(zn.refrigeracion)

@@ -31,10 +31,11 @@ import datetime
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
-from widgets import HistoMeses, HistoElementos, PieGlobal, ZonasGraph
+
 import sol
-from solmodel import VISOLModel
 import util
+from widgets import HistoMeses, HistoElementos, PieGlobal, ZonasGraph
+from solmodel import VISOLModel
 
 TESTFILE = util.get_resource('data/test.res')
 

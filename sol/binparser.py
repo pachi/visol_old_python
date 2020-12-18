@@ -187,18 +187,18 @@ if __name__ == '__main__':
     binpath = args.binpath
     if os.path.exists(binpath):
         zi, zc, zd = readBIN(binpath)
-        print u"Leído archivo %s (%i zonas, %i vínculos, %i datos)" % (binpath, len(zi), len(zc), len(zd))
+        print(u"Leído archivo %s (%i zonas, %i vínculos, %i datos)" % (binpath, len(zi), len(zc), len(zd)))
         if args.save:
             saveBINdata(zi, zc, zd)
         if args.info:
-            print "* Información general de zonas (%i zonas): " % len(zi)
-            print zi
+            print("* Información general de zonas (%i zonas): " % len(zi))
+            print(zi)
         if args.conectividades:
-            print "* Conectividades entre zonas y con el exterior (UA W/K)"
-            print zc
+            print("* Conectividades entre zonas y con el exterior (UA W/K)")
+            print(zc)
         if args.datoshorarios:
-            print "* Datos horarios (iniciales) de las zonas (valores iniciales)"
-            print zd.head()
+            print("* Datos horarios (iniciales) de las zonas (valores iniciales)")
+            print(zd.head())
         # renh = suma de ventilación por zonas (kg/s * s/h * m3/kg) / Volumen zonas
     else:
         parser.print_help()
