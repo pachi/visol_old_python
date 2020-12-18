@@ -107,17 +107,17 @@ if sys.platform == "win32":
 
 executables = [
     Executable("bin/visol",
-               base=base
+               base=base,
+               icon='res/visol.ico'
     )
 ]
 
 buildOptions = dict(
-    compressed=False,
+    no_compress=True,
     includes=["gi"],
     excludes=["Tkinter", "tcl", "PyQt5", "_ssl", "doctest", "ssl", "PIL", "collections.abc"],
     packages=["gi"],
     include_files=include_files,
-    icon='res/visol.ico'
     )
 
 README = open('README.rst').read()
