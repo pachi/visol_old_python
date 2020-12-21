@@ -27,7 +27,7 @@ Instalación y código fuente
 La herramienta funciona en sistemas GNU/Linux y MS-Windows.
 
 El instalador para su uso en la plataforma Windows está disponible en
-la `página de descargas <https://bitbucket.org/pachi/visol/downloads>`_
+la `página de descargas <https://github.com/pachi/visol/releases>`_
 del proyecto.
 
 Créditos y licencia
