@@ -63,7 +63,7 @@ missing_dll = ['libgtk-3-0.dll',
 ## We need to add all the libraries too (for themes, etc..)
 gtk_libs = ['etc/gtk-3.0',
             'etc/pango',
-            #'lib/gdk-pixbuf-2.0', #SVG
+            'lib/gdk-pixbuf-2.0', #SVG
             'lib/gtk-3.0',
             'lib/girepository-1.0',
             'share/glib-2.0',
@@ -79,7 +79,7 @@ include_files = []
 for dll in missing_dll:
     include_files.append((os.path.join(include_dll_path, dll), dll))
 
-## Let's add ui and data dirs from ViSol
+## Let's add ui, res and data dirs from ViSol
 pats = ['ui/*.jpg', 'ui/*.png', 'res/pantallazo*.png']
 staticfiles = ['ui/sol.ui',
                'ui/visol.cfg',
@@ -91,9 +91,9 @@ staticfiles = ['ui/sol.ui',
                'HACKING.txt',
                'COPYING.txt'
 ]
-include_files.extend(ff for ffpat in pats for ff in glob(ffpat))
+include_files.extend((ff, ff) for ffpat in pats for ff in glob(ffpat))
 for ff in staticfiles:
-    include_files.append(ff)
+    include_files.append((ff, ff))
 
 ## Let's add gtk libraries folders and files
 for lib in gtk_libs:
