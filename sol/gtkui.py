@@ -39,15 +39,10 @@ from .solmodel import VISOLModel
 
 TESTFILE = util.get_resource('data/test.res')
 
-if hasattr(GdkPixbuf.Pixbuf, 'new_from_file_utf8'):
-    pixfromfile = GdkPixbuf.Pixbuf.new_from_file_utf8
-else:
-    pixfromfile = GdkPixbuf.Pixbuf.new_from_file
-
-EDIFICIOICON = pixfromfile(util.get_resource('ui/edificioicono.png'))
-PLANTAICON = pixfromfile(util.get_resource('ui/plantaicono.png'))
-ZONAICON = pixfromfile(util.get_resource('ui/zonaicono.png'))
-COMPONENTEICON = pixfromfile(util.get_resource('ui/componenteicono.png'))
+EDIFICIOICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/edificioicono.png'))
+PLANTAICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/plantaicono.png'))
+ZONAICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/zonaicono.png'))
+COMPONENTEICON = GdkPixbuf.Pixbuf.new_from_file(util.get_resource('ui/componenteicono.png'))
 
 class GtkSol(object):
     """Aplicación Visor de archivos de LIDER"""
