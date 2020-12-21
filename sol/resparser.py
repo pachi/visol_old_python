@@ -181,7 +181,7 @@ if __name__ == '__main__':
     print(ed.calefaccion, ed.refrigeracion)
     print(ed.calefaccion_meses)
     print(ed.refrigeracion_meses)
-    pl = ed.plantas[u'P02']
+    pl = ed[u'P02']
     print(pl)
     zn = pl[u'P02_E01']
     print(zn.nombre)
