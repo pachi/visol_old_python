@@ -21,24 +21,24 @@
 #   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #   
 
-import numpy
 from collections import OrderedDict, namedtuple
+import numpy
 
 
-def cached_property(f):
+def cached_property(function):
     """Propiedad cacheada
 
     Receta de: http://code.activestate.com/recipes/576563-cached-property/
     """
     def get(self):
         try:
-            return self._property_cache[f]
+            return self._property_cache[function]
         except AttributeError:
             self._property_cache = {}
-            x = self._property_cache[f] = f(self)
+            x = self._property_cache[function] = function(self)
             return x
         except KeyError:
-            x = self._property_cache[f] = f(self)
+            x = self._property_cache[function] = function(self)
             return x
     return property(get)
 
