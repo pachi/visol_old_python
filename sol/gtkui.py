@@ -136,6 +136,7 @@ class GtkSol(object):
             self.sb.push(0, u'Cargado modelo: %s' % path)
         except:
             self.sb.push(0, u'Error al leer archivo: %s' % self.model.file)
+            raise
 
     def showtextfile(self, button):
         """Cambia la visibilidad de la pestaña de texto"""
@@ -199,7 +200,7 @@ class GtkSol(object):
         response = chooser.run()
 
         if response == Gtk.ResponseType.ACCEPT:
-            self.loadfile(chooser.get_filename().decode('utf8'))
+            self.loadfile(chooser.get_filename())
         elif response == Gtk.ResponseType.CANCEL:
             self.sb.push(0, u'Carga de archivo cancelada')
         chooser.hide()

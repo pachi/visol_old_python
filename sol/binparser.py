@@ -21,6 +21,7 @@
 #   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #   02110-1301, USA.#!/usr/bin/env python
 
+import io
 import numpy as np
 import pandas as pd
 
@@ -104,13 +105,12 @@ _ZONASTRUCT = np.dtype({'names': ['nombreZona', 'Area', 'Volumen', 'multiplicado
 
 def readBIN(filename='ResumenRCC.bin'):
     """Genera dataframes a partir de archivo LIDER con información de zonas"""
-    with open(filename, "rb") as f:
+    with io.open(filename, "rb") as f:
         f.seek(4) #No necesitamos leer explícitamente el número de zonas
-        resto = f.read()
-        rawdata = np.fromstring(resto, dtype=_ZONASTRUCT)
+        rawdata = np.fromfile(f, dtype=_ZONASTRUCT)
 
     # Información general de zonas
-    zidata = [dict(Nombre=zona['nombreZona'].strip('"'),
+    zidata = [dict(Nombre=zona['nombreZona'].decode().strip('"'),
                    Area=zona['Area'],
                    Volumen=zona['Volumen'],
                    Multiplicador=zona['multiplicador'],
@@ -121,15 +121,15 @@ def readBIN(filename='ResumenRCC.bin'):
     zidf.set_index('Nombre', drop=True, inplace=True)
 
     # Conectividades (UA con exterior y con zonas adyacentes)
-    zcdata = [dict(Nombre=zona['nombreZona'].strip('"'),
+    zcdata = [dict(Nombre=zona['nombreZona'].decode().strip('"'),
                    Ext=zona['UAext'],
-                   **{local.strip('"'): zona['UAint'][i] for (i, local) in enumerate(zona['localAdyacente']) if local})
+                   **{local.decode().strip('"'): zona['UAint'][i] for (i, local) in enumerate(zona['localAdyacente']) if local})
               for zona in rawdata]
     zcdf = pd.DataFrame(zcdata)
     zcdf.set_index('Nombre', drop=True, inplace=True)
 
     # Datos horarios de las zonas
-    zddata = [pd.DataFrame(dict(Nombre=zona['nombreZona'].strip('"'),
+    zddata = [pd.DataFrame(dict(Nombre=zona['nombreZona'].decode().strip('"'),
                                 HasCal=zona['daCal'],
                                 HasRef=zona['daRef'],
                                 QSen=zona['QS'],
