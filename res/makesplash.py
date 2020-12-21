@@ -27,8 +27,9 @@ over a background image to be used as splash.
 """
 import os
 import optparse
+from gi.repository import Pango
+from gi.repository import PangoCairo
 import cairo
-import pango, pangocairo
 from PIL import Image #PIL
 
 APPNAME = u"ViSol"
@@ -57,15 +58,14 @@ def splashimage(version='1.0', bgfile='background.png', outfile='splash.jpg'):
     cr = cairo.Context(surface)
     width, height = surface.get_width(), surface.get_height()
     cr.set_source_rgb(1, 1, 1)
-    pctx = pangocairo.CairoContext(cr)
-    layout = pctx.create_layout()
-    layout.set_font_description(pango.FontDescription("Arial"))
+    layout = PangoCairo.create_layout(cr)
+    layout.set_font_description(Pango.FontDescription("Arial"))
     layout.set_markup(TXT)
     w, h = layout.get_pixel_size()
     sc = min((width - 2 * PADDING) / w, (height - 2 * PADDING) / h)
     cr.translate(PADDING, (height - PADDING - sc * h))
     cr.scale(sc, sc)
-    pctx.show_layout(layout)
+    PangoCairo.show_layout(cr, layout)
     cr.stroke()
     surface.write_to_png(PNGFILE)
     cr.show_page()

@@ -1,2 +1,7 @@
 venv/
 .hg/
+res/splash.jpg
+splash.jpg
+splash.png
+setup.nsi
+README.html

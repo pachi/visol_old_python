@@ -21,7 +21,7 @@
 #   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 #   
 
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict
 import numpy
 
 

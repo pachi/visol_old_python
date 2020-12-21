@@ -30,7 +30,7 @@ Para ver archivos necesarios en la distribución ver:
 http://www.tarnyko.net/repo/gtk3_build_system/tutorial/gtk3_tutorial.htm
 """
 
-import os, sys
+import os, sys, io
 from glob import glob
 from cx_Freeze import setup, Executable
 from sol import __version__
@@ -43,7 +43,7 @@ missing_dll = ['libgtk-3-0.dll',
                'libcairo-gobject-2.dll',
                #'libcroco-0.6-3.dll', #SVG
                'libepoxy-0.dll',
-               'libffi-6.dll',
+               'libffi-7.dll',
                'libgcrypt-20.dll',
                'libgdk_pixbuf-2.0-0.dll',
                'libgirepository-1.0-1.dll',
@@ -115,12 +115,12 @@ executables = [
 buildOptions = dict(
     no_compress=True,
     includes=["gi"],
-    excludes=["Tkinter", "tcl", "PyQt5", "_ssl", "doctest", "ssl", "PIL", "collections.abc"],
+    excludes=["Tkinter", "tcl", "PyQt5", "_ssl", "doctest", "ssl", "PIL"],
     packages=["gi"],
     include_files=include_files,
     )
 
-README = open('README.rst').read()
+README = io.open('README.rst', 'r', encoding="utf-8").read()
 NEWS = open('NEWS.txt').read()
 setup(
     name="visol",

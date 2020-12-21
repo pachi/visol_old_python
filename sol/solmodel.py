@@ -24,10 +24,10 @@
 
 import os
 from collections import namedtuple
-from observer import Subject
-import resparser
-import binparser
-from config import config
+from .observer import Subject
+from . import resparser
+from . import binparser
+from .config import config
 
 Index = namedtuple('Index', ['edificio', 'planta', 'zona', 'componente'])
 

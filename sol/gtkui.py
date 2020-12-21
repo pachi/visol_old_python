@@ -33,9 +33,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
 
 import sol
-from sol import util
-from sol.widgets import HistoMeses, HistoElementos, PieGlobal, ZonasGraph
-from sol.solmodel import VISOLModel
+from . import util
+from .widgets import HistoMeses, HistoElementos, PieGlobal, ZonasGraph
+from .solmodel import VISOLModel
 
 TESTFILE = util.get_resource('data/test.res')
 

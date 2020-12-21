@@ -22,7 +22,7 @@
 #   02110-1301, USA.
 """Configuración la herramienta ViSol"""
 
-from util import get_resource
+from .util import get_resource
 
 config = {}
 

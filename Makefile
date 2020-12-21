@@ -10,6 +10,7 @@
 # La versión para win32 se hace con MSYS2
 
 PYTHON = python
+PYTHONPATH=./sol
 
 # Not used yet. Ideas from gedit's installer
 _thisdir="$(dirname $0)"
@@ -25,9 +26,9 @@ _filename=visol-${_arch}-${_version}.exe
 #fi
 #
 
-VERSION=$(shell python -c"from sol import __version__;print __version__")
+VERSION=$(shell python -c"from sol import __version__;print(__version__)")
 UPXPATH?=$(subst /,\/,$(shell which upx))
-DISTDIR?=$(subst /,\/,build/exe.mingw-2.7)
+DISTDIR?=$(subst /,\/,build/exe.mingw-3.8)
 MAKENSIS?=$(shell which makensis)
 
 PYRSTEXISTS:=$(findstring .py, $(shell which rst2html.py))
@@ -44,17 +45,17 @@ endif
 winbuild: freeze installer
 
 freeze: setup_exe.py
-	$(PYTHON) setup_exe.py build
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) setup_exe.py build
 	sleep 5s
 
 installer: README.html setup.nsi splash
 	$(MAKENSIS) setup.nsi
 
 build: setup.py splash gtkschemas
-	$(PYTHON) setup.py build
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) setup.py build
 
 install: setup.py
-	$(PYTHON) setup.py install
+	PYTHONPATH=$(PYTHONPATH) $(PYTHON) setup.py install
 
 README.html: README.rst res/style.css
 	$(RST2HTML) --stylesheet=res/style.css README.rst > $@
@@ -75,8 +76,8 @@ test check tests:
 
 testall:
 #	python2.5 setup_exe.py test
-	python2.7 setup_exe.py test
-#	python3.1 setup_exe.py test
+#	python2.7 setup_exe.py test
+	python3 setup_exe.py test
 #	make checkdocs
 
 #docs:

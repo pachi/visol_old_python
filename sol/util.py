@@ -34,7 +34,7 @@ def get_main_dir():
         if not os.path.isdir(os.path.join(md, 'data')):
             md = os.path.abspath(os.path.join(md, '..'))
             if not os.path.isdir(os.path.join(md, 'data')):
-                raise ValueError, 'No se encuentra directorio base'
+                raise ValueError('No se encuentra directorio base')
     return md
 
 APPROOT = get_main_dir()

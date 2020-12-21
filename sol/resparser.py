@@ -25,8 +25,7 @@
 
 import codecs
 from collections import OrderedDict
-import numpy as np
-from .clases import EdificioLIDER, PlantaLIDER, ZonaLIDER, ComponenteLIDER
+from sol.clases import EdificioLIDER, PlantaLIDER, ZonaLIDER, ComponenteLIDER
 
 try:
     basestring
@@ -53,8 +52,8 @@ def valores(linea):
     concepto = elems[0].strip(u'"\' ')
     # Cambio de formato del concepto en HULC
     concepto = u'Ventilación más Infiltración' if concepto == u'Infiltración' else concepto
-    valores = [float(elem) for elem in elems[1:]]
-    return concepto, valores
+    vals = [float(elem) for elem in elems[1:]]
+    return concepto, vals
 
 def loadfile(resfile):
     """Devuelve un objeto de tipo EdificioLIDER a partir del archivo resfile"""

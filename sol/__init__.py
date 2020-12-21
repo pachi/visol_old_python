@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """Biblioteca de interpretación de archivos de resultados de LIDER"""
 
-import resparser
-import binparser
-import clases
+import sol.resparser
+import sol.binparser
+import sol.clases
 
-__version__ = '4.0'
+__version__ = '4.1'
