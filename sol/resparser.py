@@ -64,102 +64,106 @@ def loadfile(resfile):
         raise
     lines = iter(data)
 
-    edificio = EdificioLIDER()
-    edificio.resdata = ''.join(data)
+    try:
+        edificio = EdificioLIDER()
+        edificio.resdata = ''.join(data)
 
-    zonasstore = OrderedDict()
+        zonasstore = OrderedDict()
 
-    # Plantas del edificio
-    nextblock(lines, u'Numero de plantas')
-    numplantas = int(next(lines))
-    edificio.numplantas = numplantas
+        # Plantas del edificio
+        nextblock(lines, u'Numero de plantas')
+        numplantas = int(next(lines))
+        edificio.numplantas = numplantas
 
-    for iplanta in range(numplantas):
-        line = nextblock(lines, u'"P')
-        nombreplanta = line.strip(u'" \t\r\n')
-        planta = PlantaLIDER(nombreplanta)
-        edificio[nombreplanta] = planta
+        for iplanta in range(numplantas):
+            line = nextblock(lines, u'"P')
+            nombreplanta = line.strip(u'" \t\r\n')
+            planta = PlantaLIDER(nombreplanta)
+            edificio[nombreplanta] = planta
 
-        # Zonas de la planta
+            # Zonas de la planta
+            nextblock(lines, u'Numero de zonas')
+            numzonas = int(next(lines))
+            zonasplantanames = []
+            for izona in range(numzonas):
+                numzona, nombrezona = nextblock(lines, u'Zona ').split(u',')
+                nombrezona = nombrezona.strip(u'" \t\r\n')
+                zonasplantanames.append(nombrezona)
+                supzona = float(next(lines))
+
+                zona = ZonaLIDER(nombrezona)
+                zona.numero =  int(numzona[4:])
+                zona.planta = nombreplanta
+                zona.superficie = supzona
+
+                # Grupos de demanda de la zona
+                nextblock(lines, u'Concepto')
+                grupos = OrderedDict()
+                for igrupos in range(9): # 9 grupos de demanda
+                    gline = next(lines).strip()
+                    grupo, vals = valores(gline)
+                    grupos[grupo] = ComponenteLIDER(grupo, *vals)
+                zona.grupos = grupos
+
+                # Componentes de demanda de la zona
+                nextblock(lines, u'Numero de Componentes')
+                numcomponentes = int(next(lines))
+                nextblock(lines, u'Componente,')
+                for icomponente in range(numcomponentes):
+                    cline = next(lines).strip()
+                    componente, vals = valores(cline)
+                    zona[componente] = ComponenteLIDER(componente, *vals)
+
+                planta[nombrezona] = zona
+                zonasstore[nombrezona] = zona
+            edificio[nombreplanta] = planta
+
+        # Datos generales del edificio
+        nextblock(lines, u'RESULTADOS A NIVEL EDIFICIO')
+
+        # Datos generales de demandas del edificio
+        nextblock(lines, [u'Calefacción, Refrigeración anual', u'Calefacción anual'])
+        cal, ref = next(lines).split(u',')
+        edificio.calefaccion = float(cal)
+        edificio.refrigeracion = float(ref)
+        nextblock(lines, u'Calefacción mensual')
+        edificio.calefaccion_meses = [float(x) for x in next(lines).split(u',')]
+        nextblock(lines, u'Refrigeración mensual')
+        edificio.refrigeracion_meses = [float(x) for x in next(lines).split(u',')]
+
+        # Datos generales de las zonas del edificio
         nextblock(lines, u'Numero de zonas')
-        numzonas = int(next(lines))
-        zonasplantanames = []
-        for izona in range(numzonas):
-            numzona, nombrezona = nextblock(lines, u'Zona ').split(u',')
-            nombrezona = nombrezona.strip(u'" \t\r\n')
-            zonasplantanames.append(nombrezona)
-            supzona = float(next(lines))
+        numzonasedificio = int(next(lines))
+        edificio.numzonas = numzonasedificio
+        nextblock(lines, u'Nombre, m2, multiplicador')
+        zonasnames = []
+        for izona in range(numzonasedificio):
+            zline = next(lines)
+            nombrezona, (sup, multip, cal, ref) = valores(zline)
+            zonasnames.append(nombrezona)
+            zona = zonasstore[nombrezona]
+            # zona.superficie = sup # ya se almacenó antes
+            zona.multiplicador = multip
+            zona.calefaccion = cal
+            zona.refrigeracion = ref
 
-            zona = ZonaLIDER(nombrezona)
-            zona.numero =  int(numzona[4:])
-            zona.planta = nombreplanta
-            zona.superficie = supzona
+        supedificio, _, _ = next(lines).split(u',')[1:]
+        edificio.superficie = float(supedificio)
 
-            # Grupos de demanda de la zona
-            nextblock(lines, u'Concepto')
-            grupos = OrderedDict()
-            for igrupos in range(9): # 9 grupos de demanda
-                gline = next(lines).strip()
-                grupo, vals = valores(gline)
-                grupos[grupo] = ComponenteLIDER(grupo, *vals)
-            zona.grupos = grupos
+        # Demandas mensuales por zonas
+        nextblock(lines, u'Calefacción mensual por zonas')
+        for nombrezona in zonasnames:
+            vals = [float(x) for x in next(lines).split(u',')]
+            zonasstore[nombrezona].calefaccion_meses = vals
+        nextblock(lines, u'Refrigeración mensual por zonas')
+        for nombrezona in zonasnames:
+            vals = [float(x) for x in next(lines).split(u',')]
+            zonasstore[nombrezona].refrigeracion_meses = vals
 
-            # Componentes de demanda de la zona
-            nextblock(lines, u'Numero de Componentes')
-            numcomponentes = int(next(lines))
-            nextblock(lines, u'Componente,')
-            for icomponente in range(numcomponentes):
-                cline = next(lines).strip()
-                componente, vals = valores(cline)
-                zona[componente] = ComponenteLIDER(componente, *vals)
-
-            planta[nombrezona] = zona
-            zonasstore[nombrezona] = zona
-        edificio[nombreplanta] = planta
-
-    # Datos generales del edificio
-    nextblock(lines, u'RESULTADOS A NIVEL EDIFICIO')
-
-    # Datos generales de demandas del edificio
-    nextblock(lines, [u'Calefacción, Refrigeración anual', u'Calefacción anual'])
-    cal, ref = next(lines).split(u',')
-    edificio.calefaccion = float(cal)
-    edificio.refrigeracion = float(ref)
-    nextblock(lines, u'Calefacción mensual')
-    edificio.calefaccion_meses = [float(x) for x in next(lines).split(u',')]
-    nextblock(lines, u'Refrigeración mensual')
-    edificio.refrigeracion_meses = [float(x) for x in next(lines).split(u',')]
-
-    # Datos generales de las zonas del edificio
-    nextblock(lines, u'Numero de zonas')
-    numzonasedificio = int(next(lines))
-    edificio.numzonas = numzonasedificio
-    nextblock(lines, u'Nombre, m2, multiplicador')
-    zonasnames = []
-    for izona in range(numzonasedificio):
-        zline = next(lines)
-        nombrezona, (sup, multip, cal, ref) = valores(zline)
-        zonasnames.append(nombrezona)
-        zona = zonasstore[nombrezona]
-        # zona.superficie = sup # ya se almacenó antes
-        zona.multiplicador = multip
-        zona.calefaccion = cal
-        zona.refrigeracion = ref
-
-    supedificio, _, _ = next(lines).split(u',')[1:]
-    edificio.superficie = float(supedificio)
-
-    # Demandas mensuales por zonas
-    nextblock(lines, u'Calefacción mensual por zonas')
-    for nombrezona in zonasnames:
-        vals = [float(x) for x in next(lines).split(u',')]
-        zonasstore[nombrezona].calefaccion_meses = vals
-    nextblock(lines, u'Refrigeración mensual por zonas')
-    for nombrezona in zonasnames:
-        vals = [float(x) for x in next(lines).split(u',')]
-        zonasstore[nombrezona].refrigeracion_meses = vals
-
-    return edificio
+        return edificio
+    except Exception:
+        print("Errores de formato del archivo", resfile)
+        raise
 
 if __name__ == '__main__':
     import argparse
